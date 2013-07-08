@@ -5,22 +5,6 @@ var markovChain = (function() {
 ////////////////////////////////// global variables 
     
     //d3 chart components
-    var chart;
-    
-    var xMin = -10;
-    var xMax = 10;
-    var yMin = -10;
-    var yMax = 10;
-    
-    var outer_height = 300;
-    var outer_width = 300;
-
-    var margin = { top: 20, right: 20, bottom: 20, left: 20 }
-    var chart_width = outer_width - margin.left - margin.right;
-    var chart_height = outer_height -margin.top - margin.bottom;
-    
-    var x_scale = d3.scale.linear().domain([xMin,xMax]).range([0,chart_width]);
-    var y_scale = d3.scale.linear().domain([yMin,yMax]).range([chart_height,0]);
     
 ////////////////////////////////// helper functions    
     
@@ -103,28 +87,83 @@ var markovChain = (function() {
             
         }
         
-        return {transition: transition, observe: observe};
+        function get_current_state(){
+            return current_state;
+        }
+        function get_current_state_array(){
+            var pointData = [];
+            for(var i in current_state){
+                pointData.push(current_state[i]);
+            }
+            
+            return pointData;
+        }
+        
+        return {transition: transition, observe: observe, get_current_state: get_current_state, get_current_state_array: get_current_state_array};
     }
     
-    function Controller(){
+    function Controller(model){
         
         return {};
     }
     
-    function View(){
+    function View(div, model, controller){
+                
+        div.append("<div class = 'container-fluid'><div class = 'row-fluid'><div class = 'span10'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
         
-        return {};
+        var chart;
+        
+        var outer_height = parseInt($("body").css("height"))*0.9;
+        var outer_width = parseInt($(".span10").css("width"));
+    
+        var margin = { top: 30, right: 20, bottom: 20, left: 20 }
+        var chart_width = outer_width - margin.left - margin.right;
+        var chart_height = outer_height -margin.top - margin.bottom;
+        
+        setupGraph();
+        updateBubbles();
+        updateArrows();
+        
+        function updateBubbles(){
+            chart.selectAll(".bubble").remove();
+            
+            var points = model.get_current_state_array();
+            
+            chart.selectAll(".bubble").data(points).enter().append("circle")
+                .attr("class", "bubble")
+                .attr("cx", function(d,i){return chart_width*(i/points.length)})
+                .attr("cy", 0)
+                .attr("r", function(d){return d*10+4})
+                .style("fill","blue")
+                .style("stroke","black")
+                .style("fill-opacity",function(d){return d;});
+        }
+        
+        function updateArrows(){
+            chart.selectAll(".arrow").remove();
+            
+            var points = model.get_current_state_array();
+            
+            chart.selectAll(".arrow").data(points).enter().append("line")
+                .attr("class", "arrow")
+                .attr("x1", function(d,i){return chart_width*(i/points.length)})
+                .attr("y1", chart_height/5)
+                .attr("x2", function(d,i){return chart_width*(i/points.length)})
+                .attr("y2", (4/5)*chart_height)
+                .style("stroke","black");
+        }
+        
+        //set up svg with axes and labels
+        function setupGraph(){
+            
+            $(".chart-container").empty();
+            chart = d3.select(".chart-container").append("svg").attr("class","chart").attr("height", outer_height).attr("width",outer_width).append("g").attr("transform","translate(" + margin.left + "," + margin.top + ")");
+    
+        }
+        
+        return {updateBubbles: updateBubbles, updateArrows: updateArrows, setupGraph: setupGraph};
     }
     
-    //set up svg with axes and labels
-    function setupGraph(){
-        
-        $(".chart-container").empty();
-        chart = d3.select(".chart-container").append("svg").attr("class","chart").attr("height", outer_height).attr("width",outer_width).append("g").attr("transform","translate(" + margin.left + "," + margin.top + ")");
-        
-        chart.selectAll(".y-line")
-
-    }
     
     //setup main structure of app
     function setup(div) {
