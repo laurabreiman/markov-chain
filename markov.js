@@ -179,7 +179,7 @@ var markovChain = (function() {
                 .attr("class", "bubble")
                 .attr("cx", function(d,i){return chart_width*(i/points.length)})
                 .attr("cy", 0)
-                .attr("r", function(d){return d*10+4})
+                .attr("r", function(d){return d*(chart_height/20)+4})
                 .style("fill","blue")
                 .style("stroke","black")
                 .style("fill-opacity",function(d){return d;});
