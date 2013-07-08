@@ -48,15 +48,82 @@ var markovChain = (function() {
     };
     return result;
 };
+    
+//    function setAllValsZero( assocArray ){
+//        for(var i in assocArray){
+//            assocArray[i] = 0;
+//        }
+//        return assocArray;
+//    }
 /////////////////////////////////// set up div functions
     
-    funciton Model(){
+    function Model(){
+        var initial_state = {a: 1, b: 0, c:0};
+        var transition_model = {a: {a:.5, b:0.5}, b:{a:1/8, b: 1/2, c: 3/8}, c:{b: 1/4, c: 3/4}};
+        var observation_model = {a: {red:0, white:1}, b: {red:1/2, white:1/2}, c: {red:1,white:0}};
+        var current_state = {a: 1, b: 0, c:0};
+        //var previous_state = {a: 1, b: 0, c:0};
+        
+        function transition(){
+            var next_state = {};
+            
+            for(var i in current_state){
+                next_state[i] = 0;
+            }
+            
+            for(var i in current_state){
+                for(var j in transition_model[i]){
+                    next_state[i] += current_state[j]*transition_model[j][i]
+                }
+                
+            }
+            //console.log(next_state);
+            current_state = next_state;
+        }
+        
+        function observe(obs){
+            var next_state = {};
+            
+            for(var i in current_state){
+                next_state[i] = 0;
+            }
+            
+            var total = 0;
+            for(var i in current_state){
+                next_state[i] += current_state[i]*observation_model[i][obs]
+                total += current_state[i]*observation_model[i][obs];
+            }
+            
+            for(var i in next_state){
+                next_state[i] = next_state[i]/total;
+            }
+            
+            console.log(next_state);
+            current_state = next_state;
+            
+        }
+        
+        return {transition: transition, observe: observe};
     }
     
     function Controller(){
+        
+        return {};
     }
     
     function View(){
+        
+        return {};
+    }
+    
+    //set up svg with axes and labels
+    function setupGraph(){
+        
+        $(".chart-container").empty();
+        chart = d3.select(".chart-container").append("svg").attr("class","chart").attr("height", outer_height).attr("width",outer_width).append("g").attr("transform","translate(" + margin.left + "," + margin.top + ")");
+        
+        chart.selectAll(".y-line")
+
     }
     
     //setup main structure of app
