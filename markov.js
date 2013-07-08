@@ -155,7 +155,10 @@ var markovChain = (function() {
     
     function View(div, model, controller){
                 
-        div.append("<div class = 'container-fluid'><div class = 'row-fluid'><div class = 'span10'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+        div.append("<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'span10'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div></div>");
+        
+        $(".transition").on("click",transition)
         
         var chart;
         
