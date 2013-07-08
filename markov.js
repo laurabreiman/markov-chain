@@ -58,12 +58,58 @@ var markovChain = (function() {
 /////////////////////////////////// set up div functions
     
     function Model(){
-        var initial_state = {a: 1, b: 0, c:0};
-        var transition_model = {a: {a:.5, b:0.5}, b:{a:1/8, b: 1/2, c: 3/8}, c:{b: 1/4, c: 3/4}};
-        var observation_model = {a: {red:0, white:1}, b: {red:1/2, white:1/2}, c: {red:1,white:0}};
-        var current_state = {a: 1, b: 0, c:0};
-        //var previous_state = {a: 1, b: 0, c:0};
-        
+        var initial_state = {0: 1, 1: 0, 2: 0};
+        var transition_model = {0: {0: .5, 1: 0.5}, 1: {0: 1/8, 1: 1/2, 2:  3/8}, 2: {1: 1/4, 2:  3/4}};
+        var observation_model = {0: {red: 0, white: 1}, 1: {red: 1/2, white: 1/2}, 2:  {red: 1,white: 0}};
+        var current_state = {0: 1, 1: 0, 2: 0};
+        //var previous_state = {0: 1, 1: 0, 2: 0};
+        function set_initial_state(array){
+            var sum = 0;
+            $.each(array,function() {
+                sum += this;
+            });
+            if (sum != 1){throw new Error("the sum should be 1.");} //throw an error if the sum isn't 1.
+            else {
+                for (var i = 0; i < array.length; i++){
+                initial_state[i] = array[i];
+                }
+            }
+            console.log(initial_state);
+        }
+        function set_num_states(num_states){
+            //change initial_state
+            for (var i in initial_state){
+                delete initial_state[i];
+            }
+            for (var i = 0; i < num_states; i++){
+                initial_state[i] = 1/num_states;    //each state set to be equally likely
+            }
+            console.log('intial state', initial_state);
+
+            //change transition_model
+            for (var i in transition_model){
+                delete transition_model[i];
+            }
+            //special cases: state 0 and n-1
+            transition_model[0] = {0: 0.5, 1: 0.5};
+            console.log('trans for',0,"=",transition_model[0]); 
+                       
+            transition_model[num_states-1] = {};
+            transition_model[num_states-1][num_states-2] = 0.5;
+            transition_model[num_states-1][num_states-1]= 0.5;
+
+            for (var i = 1; i < num_states-1; i++){
+                var assocArray = {};
+                assocArray[i-1] = i/(num_states-1)*0.5;
+                assocArray[i] = 0.5;
+                assocArray[i+1] = 0.5-i/(num_states-1)*0.5;
+                transition_model[i] = assocArray;
+                console.log('trans for',i,'=', assocArray);
+            }
+            console.log('trans for',num_states-1,"=",transition_model[num_states-1]);
+
+        }
+       
         function transition(){
             var next_state = {};
             
@@ -103,7 +149,8 @@ var markovChain = (function() {
             
         }
         
-        return {transition: transition, observe: observe};
+        return {transition: transition, observe: observe,
+            set_num_states: set_num_states, set_initial_state: set_initial_state};
     }
     
     function Controller(){
