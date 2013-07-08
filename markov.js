@@ -192,6 +192,8 @@ var markovChain = (function() {
         
         function updateArrows(){
             chart.selectAll(".arrow").remove();
+            chart.selectAll(".diagRight").remove();
+            chart.selectAll(".diagLeft").remove();
             
             var points = model.get_current_state_array();
             
@@ -202,6 +204,26 @@ var markovChain = (function() {
                 .attr("x2", function(d,i){return chart_width*(i/points.length)})
                 .attr("y2", (4/5)*chart_height)
                 .style("stroke","black");
+            
+            chart.selectAll(".diagRight").data(points).enter().append("line")
+                .attr("class", "diagRight")
+                .attr("x1", function(d,i){return chart_width*(i/points.length)})
+                .attr("y1", chart_height/5)
+                .attr("x2", function(d,i){if(i!=points.length-1){return chart_width*((i+1)/points.length)}
+                                          else{return chart_width*(i/points.length)}})
+                .attr("y2", function(d,i){if(i!=points.length-1){ return (4/5)*chart_height}
+                                          else{ return chart_height/5}})
+                .style("stroke","blue");
+            
+            chart.selectAll(".diaLeft").data(points).enter().append("line")
+                .attr("class", "diagLeft")
+                .attr("x1", function(d,i){return chart_width*(i/points.length)})
+                .attr("y1", chart_height/5)
+                .attr("x2", function(d,i){if(i!=0){return chart_width*((i-1)/points.length)}
+                                          else{return chart_width*(i/points.length)}})
+                .attr("y2", function(d,i){if(i!=0){ return (4/5)*chart_height}
+                                          else{ return chart_height/5}})
+                .style("stroke","orange");
         }
         
         //set up svg with axes and labels
