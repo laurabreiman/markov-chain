@@ -133,10 +133,6 @@ var markovChain = (function() {
             
         }
         
-<<<<<<< HEAD
-        return {transition: transition, observe: observe,
-            set_num_states: set_num_states, set_initial_state: set_initial_state};
-=======
         function get_current_state(){
             return current_state;
         }
@@ -149,8 +145,7 @@ var markovChain = (function() {
             return pointData;
         }
         
-        return {transition: transition, observe: observe, get_current_state: get_current_state, get_current_state_array: get_current_state_array};
->>>>>>> 671f479db7d58294ee1fac2618a316af2c1468b7
+        return {transition: transition, observe: observe, get_current_state: get_current_state, get_current_state_array: get_current_state_array, set_num_states: set_num_states, set_initial_state: set_initial_state};
     }
     
     function Controller(model){
