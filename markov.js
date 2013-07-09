@@ -47,21 +47,42 @@ var markovChain = (function() {
         var observation_model = {0: {red: 0, white: 1}, 1: {red: 1/2, white: 1/2}, 2:  {red: 1,white: 0}};
         var current_state = {0: 1, 1: 0, 2: 0};
         //var previous_state = {0: 1, 1: 0, 2: 0};
-        function set_initial_state(array){
-            var sum = 0;
-            $.each(array,function() {
-                sum += this;
-            });
-            if (sum != 1){throw new Error("the sum should be 1.");} //throw an error if the sum isn't 1.
-            else {
-                //set_num_states(array.length);
-                for (var i = 0; i < array.length; i++){
-                initial_state[i] = array[i];
-                }
+
+        /*
+        function that takes in the number of red blocks, and changes the initial
+        probability distribution accordingly.
+        */
+        function set_num_red(num_red){
+            var n = Object.getOwnPropertyNames(current_state).length;
+            if (num_red > n-1){throw new Error("num_red exceeds number of lego blocks");}
+            initial_state = {};
+            for (var i = 0; i < n; i++){
+                 initial_state[i] = 0;
             }
+            initial_state[num_red] = 1;
             current_state = initial_state;
             console.log(initial_state);
         }
+        // function set_initial_state(array){
+        //     var sum = 0;
+        //     $.each(array,function() {
+        //         sum += this;
+        //     });
+        //     if (sum != 1){throw new Error("the sum should be 1.");} //throw an error if the sum isn't 1.
+        //     else {
+        //         //set_num_states(array.length);
+        //         for (var i = 0; i < array.length; i++){
+        //         initial_state[i] = array[i];
+        //         }
+        //     }
+        //     current_state = initial_state;
+        //     console.log(initial_state);
+        // }
+
+        /*
+        function that takes in the number of states(=number of blocks +1)
+        and changes the initial probability, transition and observation models accordingly.
+        */
         function set_num_states(num_states){
             //change initial_state
             initial_state = {};
@@ -104,7 +125,9 @@ var markovChain = (function() {
 
         }
 
-        //returns red or white depending on the current prob distribution.
+        /*
+        function that returns "red" or "white" depending on the current prob distribution.
+        */
         function make_obs(){
             var n = Object.getOwnPropertyNames(current_state).length;
             var prob_red = 0;
@@ -118,8 +141,10 @@ var markovChain = (function() {
             else {return "white";}
         }
 
-        //Returns probability of Obs=o given State=s as an assoc array of assoc arrays.
-        //prob_OgS()[o][s] will return the desired probability.
+        /*
+        function that returns probability of Obs=o given State=s as an assoc array of assoc arrays.
+        prob_OgS()[o][s] will return the desired probability.
+        */
         function prob_OgS(){
             var n = Object.getOwnPropertyNames(initial_state).length;
             var assocArray = {};
@@ -134,8 +159,9 @@ var markovChain = (function() {
             return assocArray;
         }
 
-        //Returns probability of Obs=o & State=s as an assoc array of assoc arrays.
-        //prob_OnS()[o][s] will return the desired probability.
+        /*Returns probability of Obs=o & State=s as an assoc array of assoc arrays.
+        prob_OnS()[o][s] will return the desired probability.
+        */
         function prob_OnS(){
             var n = Object.getOwnPropertyNames(initial_state).length
             var assocArray = {};
@@ -149,7 +175,7 @@ var markovChain = (function() {
             assocArray["red"] = r; assocArray["white"] = w;
             return assocArray;
         }
-       
+        
         function transition(){
             var next_state = {};
             
@@ -201,7 +227,7 @@ var markovChain = (function() {
         
         return {transition: transition, observe: observe, 
             get_current_state: get_current_state, get_current_state_array: get_current_state_array, 
-            set_num_states: set_num_states, set_initial_state: set_initial_state, 
+            set_num_states: set_num_states, set_num_red: set_num_red, 
             prob_OnS: prob_OnS, prob_OgS: prob_OgS, make_obs: make_obs};
     }
     
@@ -228,8 +254,8 @@ var markovChain = (function() {
             return result;
         }
         /*
-        function that takes in an array of probabilites
-        returns an array like ["right","wrong","wrong"...0] based on the probability of 
+        function that takes in an array of probabilites and an observation("red" or "white")
+        returns an array like ["right","wrong","wrong"...0] based on the probability of Obs=obs | state=s 
         with the last entry a flag of whether it was all right (1) or not (0)
         */
         function checkOgS(answers, obs){
@@ -246,6 +272,11 @@ var markovChain = (function() {
             return result;
         }
 
+        /*
+        function that takes in an array of probabilites and an observation string
+        returns an array like ["right","wrong","wrong"...0] based on the probability of Obs=obs & state=s
+        with the last entry a flag of whether it was all right (1) or not (0)
+        */
         function checkOnS(answers, obs){
             var result = [];
             var correct = model.prob_OnS()[obs];
