@@ -214,7 +214,7 @@ var markovChain = (function() {
     
     function View(div, model, controller){
                 
-        div.append("<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'span10'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+        div.append("<div class = 'container-fluid well'><div class = 'hero-unit'><h2>Lego Game</h2><p>Two white lego bricks are put into a bag. <br> A transition occurs. 1. A random brick is removed from the bag. 2. A replacement brick that is equally likely to be red or white is added to the bag. <br>Then you pull one brick from the bag, observe color, and replace.</p></div><div class = 'row-fluid'><div class = 'span10'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
         $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div><div class ='row-fluid'><input class='num-states' placeholder = '# of states'><button class='btn btn-small new-chain'>New</button></div></div>");
         $(".span10").append("<div class = 'row-fluid'><div class = 'input-row'></div></div>");
         
