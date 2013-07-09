@@ -237,12 +237,12 @@ var markovChain = (function() {
 
         function newChain(){
             console.log('hello')
-            if(isNaN($(".num-states").html()) || $(".num-states").html() < 0){
+            if(isNaN($(".num-states").val()) || $(".num-states").val() < 0){
                 alert("Please enter a valid number");
             }
             
             else{
-                var numStates = $(".num-states").html();
+                var numStates = $(".num-states").val();
                 console.log(numStates)
                 model.set_num_states(numStates);
                 console.log(model.get_current_state());
