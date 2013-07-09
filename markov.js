@@ -104,8 +104,23 @@ var markovChain = (function() {
 
         }
 
+        //returns red or white depending on the current prob distribution.
+        function make_obs(){
+            var n = Object.getOwnPropertyNames(current_state).length;
+            var prob_red = 0;
+            for (var i in current_state){
+                prob_red += current_state[i]*i/(n-1);
+            }
+            var r = Math.random();
+            console.log(r);
+            console.log(prob_red);
+            if (r < prob_red){return "red";}
+            else {return "white";}
+        }
+
+        //probability of Obs=o given State=s
         function prob_OgS(){
-            var n = Object.getOwnPropertyNames(initial_state).length
+            var n = Object.getOwnPropertyNames(initial_state).length;
             var assocArray = {};
             var r = {}; var w = {};
             for (var i = 0; i < n; i++){
@@ -118,6 +133,7 @@ var markovChain = (function() {
             return assocArray;
         }
 
+        //probability of Obs=o & State=s
         function prob_OnS(){
             var n = Object.getOwnPropertyNames(initial_state).length
             var assocArray = {};
@@ -186,7 +202,7 @@ var markovChain = (function() {
         return {transition: transition, observe: observe, 
             get_current_state: get_current_state, get_current_state_array: get_current_state_array, 
             set_num_states: set_num_states, set_initial_state: set_initial_state, 
-            prob_OnS: prob_OnS, prob_OgS: prob_OgS};
+            prob_OnS: prob_OnS, prob_OgS: prob_OgS, make_obs: make_obs};
     }
     
     function Controller(model){
