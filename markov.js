@@ -54,21 +54,22 @@ var markovChain = (function() {
             });
             if (sum != 1){throw new Error("the sum should be 1.");} //throw an error if the sum isn't 1.
             else {
+                //set_num_states(array.length);
                 for (var i = 0; i < array.length; i++){
                 initial_state[i] = array[i];
                 }
             }
+            current_state = initial_state;
             console.log(initial_state);
         }
         function set_num_states(num_states){
             //change initial_state
-            for (var i in initial_state){
-                delete initial_state[i];
-            }
+            initial_state = {};
             for (var i = 0; i < num_states; i++){
                 initial_state[i] = 1/num_states;    //each state set to be equally likely
             }
             console.log('intial state', initial_state);
+            current_state = initial_state;
 
             //change transition_model
             for (var i in transition_model){
@@ -92,6 +93,43 @@ var markovChain = (function() {
             }
             console.log('trans for',num_states-1,"=",transition_model[num_states-1]);
 
+            //change observation_model
+            for (var i in observation_model){
+                delete observation_model[i];
+            }
+            for (var i = 0; i < num_states; i++){
+                observation_model[i] = {red: i/(num_states-1), white: 1-i/(num_states-1)};
+                //console.log('obs for',i,'=', observation_model[i]);
+            }
+
+        }
+
+        function prob_OgS(){
+            var n = Object.getOwnPropertyNames(initial_state).length
+            var assocArray = {};
+            var r = {}; var w = {};
+            for (var i = 0; i < n; i++){
+                r[i] = i/(n-1);
+            }
+            for (var i = 0; i < n; i++){
+                w[i] = 1-i/(n-1);
+            }
+            assocArray["red"] = r; assocArray["white"] = w;
+            return assocArray;
+        }
+
+        function prob_OnS(){
+            var n = Object.getOwnPropertyNames(initial_state).length
+            var assocArray = {};
+            var r = {}; var w = {};
+            for (var i = 0; i < n; i++){
+                r[i] = current_state[i]*prob_OgS()["red"][i];
+            }
+            for (var i = 0; i < n; i++){
+                w[i] = current_state[i]*prob_OgS()["white"][i];
+            }
+            assocArray["red"] = r; assocArray["white"] = w;
+            return assocArray;
         }
        
         function transition(){
@@ -107,7 +145,7 @@ var markovChain = (function() {
                 }
                 
             }
-            //console.log(next_state);
+            console.log(next_state);
             current_state = next_state;
         }
         
@@ -145,7 +183,10 @@ var markovChain = (function() {
             return pointData;
         }
         
-        return {transition: transition, observe: observe, get_current_state: get_current_state, get_current_state_array: get_current_state_array, set_num_states: set_num_states, set_initial_state: set_initial_state};
+        return {transition: transition, observe: observe, 
+            get_current_state: get_current_state, get_current_state_array: get_current_state_array, 
+            set_num_states: set_num_states, set_initial_state: set_initial_state, 
+            prob_OnS: prob_OnS, prob_OgS: prob_OgS};
     }
     
     function Controller(model){
@@ -159,7 +200,7 @@ var markovChain = (function() {
         
         var chart;
         
-        var outer_height = parseInt($("body").css("height"))*0.9;
+        var outer_height = 500;
         var outer_width = parseInt($(".span10").css("width"));
     
         var margin = { top: 30, right: 20, bottom: 20, left: 20 }
