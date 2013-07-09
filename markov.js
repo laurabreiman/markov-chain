@@ -279,8 +279,12 @@ var markovChain = (function() {
             return pointData;
         }
         
+        function get_transition_model(){
+            return transition_model;
+        }
+        
         return {transition: transition, observe: observe, 
-            get_current_state: get_current_state, get_current_state_array: get_current_state_array, 
+            get_current_state: get_current_state, get_current_state_array: get_current_state_array, get_transition_model: get_transition_model,
             set_num_blocks: set_num_blocks, 
             prob_OnS: prob_OnS, prob_OgS: prob_OgS, make_obs: make_obs};
     }
@@ -390,7 +394,7 @@ var markovChain = (function() {
             }
             
             else{
-                var states = [parseInt($(".num-whites").val()),parseInt($(".num-reds").val())];
+                var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
                 updateDisplay();
             }
@@ -425,9 +429,9 @@ var markovChain = (function() {
                 .attr("cx", function(d,i){return (chart_width)*(i/(points.length-1))})
                 .attr("cy", 0)
                 .attr("r", function(d){return d*(chart_height/20)+4})
-                .style("fill","red")
+                .style("fill","blue")
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return 1-d;});
+                .style("fill-opacity",function(d){return d;});
             
             updateTopLabels();
         }
@@ -438,7 +442,7 @@ var markovChain = (function() {
             
             chart.selectAll(".top_bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/20)+4})
-                .style("fill-opacity",function(d){return 1-d;});
+                .style("fill-opacity",function(d){return d;});
             
             updateTopLabels();
         }
@@ -449,7 +453,7 @@ var markovChain = (function() {
             
             chart.selectAll(".bottom_bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/16)+4})
-                .style("fill-opacity",function(d){return 1-d;});
+                .style("fill-opacity",function(d){return d;});
             
             updateBottomLabels();
         }
@@ -459,7 +463,7 @@ var markovChain = (function() {
             
             chart.selectAll(".bottom_bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/16)+4})
-                .style("fill-opacity",function(d){return 1-d;});
+                .style("fill-opacity",function(d){return d;});
             
             updateBottomLabels();
         }
@@ -478,9 +482,9 @@ var markovChain = (function() {
                 .attr("cx", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("cy", chart_height)
                 .attr("r", function(d){return d*(chart_height/16)+4})
-                .style("fill","red")
+                .style("fill","blue")
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return 1-d;});
+                .style("fill-opacity",function(d){return d;});
             
             updateBottomLabels();
         }
@@ -545,7 +549,7 @@ var markovChain = (function() {
                 for(var i=0; i<num_entries; i++){
                     answers.push(parseFloat($('.input-row #'+i+'').val()));
                 }
-                console.log(answers);
+
                 transitionBottom(answers);
                 
                 var results = controller.checkAnswers(answers);
@@ -592,6 +596,8 @@ var markovChain = (function() {
             chart.selectAll(".diagLeft").remove();
             
             var points = model.get_current_state_array();
+            var numpoints = points.length;
+            var transmodel = model.get_transition_model();
             
             chart.append("defs").append("marker")
                 .attr("id", "arrowhead")
@@ -635,8 +641,11 @@ var markovChain = (function() {
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
                 .style("stroke","orange");
-            
-            
+
+            chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
+                .attr("x", function(d,i){return i*(chart_width/numpoints)})
+                .attr("y", chart_height/2)
+                .text(function(d) { console.log(d); return d; });
         }
         
         function updateArrowLabels(){
