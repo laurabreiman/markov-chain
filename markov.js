@@ -293,7 +293,8 @@ var markovChain = (function() {
         whether it was all right (1) or not (0)
         */
         function checkAnswers(answers){
-            var current_state = model.get_current_state(); //check this!!!!!
+            var current_state = model.get_current_state();
+            console.log(model.get_current_state());
             var result = [];
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
@@ -348,7 +349,14 @@ var markovChain = (function() {
     
     function View(div, model, controller){
         
-        div.append("<div class = 'hero-unit'><h2> <small>Illustration of Markov Chain:</small> Lego Game</h2><p>Two white lego bricks are put into a bag. A transition and an observation happens every round.<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be <span class='text-error'>red</span> or <span class='muted'>white</span> is added to the bag. <br>2. Then you pull one brick from the bag, observe color, and replace.</p><p class='text-info'><small>Fill in the blank with appropriate probabilities. You may also change number of blocks on the right column.</small></p></div><div class = 'container-fluid well'><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+        div.append("<div class = 'hero-unit'><h2><small>Illustration of Markov Chain:</small> Lego Game</h2>"
+            +"<p>Two <span class='muted'>white</span> lego bricks are put into a bag. A transition and an observation happens every round."
+            +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
+            +" <span class='text-error'>red</span> or <span class='muted'>white</span> is added to the bag."
+            +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
+            +"<p class='text-info'><small>Fill in the blank with appropriate probabilities."
+            +" You may change number of blocks on the right column and start over.</small></p></div>"
+            +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
     
         $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div><div class ='row-fluid'><input class='num-states num-whites' placeholder = '# of whites'><input class='num-states num-reds' placeholder = '# of reds'><button class='btn btn-small new-chain'>New</button></div></div>");
         $(".span8").append("<div class = 'row-fluid'><div class = 'input-row'></div></div>");

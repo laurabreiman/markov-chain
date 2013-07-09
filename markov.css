@@ -34,3 +34,7 @@ line {
     position:absolute;
     margin-top: 4px;
 }
+
+.hero-unit h2 small {
+	color: black;
+}
