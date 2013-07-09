@@ -29,3 +29,8 @@ line {
     font-size: 12px;
     text-align:right;
 }
+
+.icon{
+    position:absolute;
+    margin-top: 4px;
+}

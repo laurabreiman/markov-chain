@@ -297,9 +297,7 @@ var markovChain = (function() {
             var result = [];
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
-                console.log(answers[i].toFixed(3), current_state[i].toFixed(3));
                 if (answers[i].toFixed(3) == current_state[i].toFixed(3)){
-                    console.log("here");
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
@@ -372,8 +370,9 @@ var markovChain = (function() {
         setupSideLabels();
 
         function transition(){
+            model.transition();
             transitionTop();
-            transitionBottom();
+            //transitionBottom();
         }
 
         function newChain(){
@@ -383,16 +382,16 @@ var markovChain = (function() {
             }
             
             else{
-                var numStates = parseInt($(".num-whites").val()) + parseInt($(".num-reds").val());
-                model.set_num_states(numStates);
+                var states = [parseInt($(".num-whites").val()),parseInt($(".num-reds").val())];
+                model.set_num_blocks(states);
                 updateDisplay();
             }
         }
         
         function setupSideLabels(){
-            $('.side-labels').append("<div class='num-label'># of whites in bag</div>");
+            $('.side-labels').append("<div class='num-label'># of reds in bag</div>");
             $('.side-labels').append("<div class='first-prob'>P(S<sub>1</sub>=s)</div>");
-            $('.side-labels').append("<div class='num2-label'># of whites in bag</div>");
+            $('.side-labels').append("<div class='num2-label'># of reds in bag</div>");
             $('.side-labels').append("<div class='second-prob'>P(S<sub>2</sub>=s)</div>");
             $('.num-label').offset({top: $(".bubble-name").offset().top});
             $('.first-prob').offset({top: $(".bubble-label").offset().top});
@@ -404,7 +403,6 @@ var markovChain = (function() {
         function updateDisplay(){
             updateTopBubbles();
             updateArrows();
-            model.transition();
             updateBottomBubbles();
             updateFirstInputRow();
         }
@@ -414,24 +412,25 @@ var markovChain = (function() {
             
             var points = model.get_current_state_array();
             
-            chart.selectAll(".top_bubble").data(points).enter().append("circle")
+            var bubbles = chart.selectAll(".top_bubble").data(points).enter().append("circle")
                 .attr("class", "top_bubble")
                 .attr("cx", function(d,i){return (chart_width)*(i/(points.length-1))})
                 .attr("cy", 0)
                 .attr("r", function(d){return d*(chart_height/20)+4})
                 .style("fill","red")
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return d;});
+                .style("fill-opacity",function(d){return 1-d;});
             
             updateTopLabels();
         }
         
         function transitionTop(){
+            
             var points = model.get_current_state_array();
             
             chart.selectAll(".top_bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/20)+4})
-                .style("fill-opacity",function(d){return d;});
+                .style("fill-opacity",function(d){return 1-d;});
             
             updateTopLabels();
         }
@@ -442,15 +441,29 @@ var markovChain = (function() {
             
             chart.selectAll(".bottom_bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/16)+4})
-                .style("fill-opacity",function(d){return d;});
+                .style("fill-opacity",function(d){return 1-d;});
+            
+            updateBottomLabels();
+        }
+        
+        function transitionBottom(state){
+            var points = state;
+            
+            chart.selectAll(".bottom_bubble").data(points).transition().duration(500)
+                .attr("r", function(d){return d*(chart_height/16)+4})
+                .style("fill-opacity",function(d){return 1-d;});
             
             updateBottomLabels();
         }
         
         function updateBottomBubbles(){
             chart.selectAll(".bottom_bubble").remove();
+            var pointlength = model.get_current_state_array().length;
+            var points = [];
             
-            var points = model.get_current_state_array();
+            for(var i = 0; i<pointlength; i++){
+                points.push(1/pointlength);
+            }
 
             chart.selectAll(".bottom_bubble").data(points).enter().append("circle")
                 .attr("class", "bottom_bubble")
@@ -459,7 +472,7 @@ var markovChain = (function() {
                 .attr("r", function(d){return d*(chart_height/16)+4})
                 .style("fill","red")
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return d;});
+                .style("fill-opacity",function(d){return 1-d;});
             
             updateBottomLabels();
         }
@@ -524,6 +537,8 @@ var markovChain = (function() {
                 for(var i=0; i<num_entries; i++){
                     answers.push(parseFloat($('.input-row #'+i+'').val()));
                 }
+                console.log(answers);
+                transitionBottom(answers);
                 
                 var results = controller.checkAnswers(answers);
                 
@@ -535,12 +550,13 @@ var markovChain = (function() {
                         $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))});
                     }
                     else{
+                        $('.input-row #'+i+'').after('<i class="icon icon-remove" id="icon'+i+'"></i>');
                         $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))});
-                        $('.input-row #'+i+'').after('<i class="icon icon-remove"></i>');
                     }
                 }
                 
-                if(results[-1] == 1){
+    
+                if(results[results.length-1] == 1){
                     $(this).remove();
                     displayNextInputRow();
                 }
@@ -548,7 +564,18 @@ var markovChain = (function() {
         }
         
         function displayNextInputRow(){
-        
+            $(".span8").append("<div class='row-fluid'><div class ='input-obs-given-row'></div></div>");
+
+            var num_entries = model.get_current_state_array().length;
+            
+            for(var i = 0; i < num_entries; i++){
+                $('.input-row').append("<input class='obs-entry' id='"+i+"' placeholder='P("+i+")'>");
+                $('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
+                $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
+            }
+            
+            $('.input-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            
         }
         
         function updateArrows(){
