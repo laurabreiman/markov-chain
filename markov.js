@@ -48,21 +48,75 @@ var markovChain = (function() {
         var current_state = {0: 1, 1: 0, 2: 0};
         //var previous_state = {0: 1, 1: 0, 2: 0};
 
+        // /*
+        // function that takes in the number of red blocks, and changes the initial
+        // probability distribution accordingly.
+        // */
+        // function set_num_red(num_red){
+        //     var n = Object.getOwnPropertyNames(current_state).length;
+        //     if (num_red > n-1){throw new Error("num_red exceeds number of lego blocks");}
+        //     initial_state = {};
+        //     for (var i = 0; i < n; i++){
+        //          initial_state[i] = 0;
+        //     }
+        //     initial_state[num_red] = 1;
+        //     current_state = initial_state;
+        //     console.log(initial_state);
+        // }
+
         /*
-        function that takes in the number of red blocks, and changes the initial
-        probability distribution accordingly.
+        function that takes in an array of [number of red blocks, number of white blocks]
+        and changes the initial probability, transition and observation models accordingly.
         */
-        function set_num_red(num_red){
-            var n = Object.getOwnPropertyNames(current_state).length;
-            if (num_red > n-1){throw new Error("num_red exceeds number of lego blocks");}
+        function set_num_blocks(array) {
+            var total_blocks = parseInt(array[0])+parseInt(array[1]);
+
+            //change initial_state
             initial_state = {};
-            for (var i = 0; i < n; i++){
-                 initial_state[i] = 0;
+            for (var i = 0; i <= total_blocks; i++){
+                initial_state[i] = 0;    //each state set to be equally likely
             }
-            initial_state[num_red] = 1;
+            initial_state[array[0]] = 1;
+            console.log('intial state', initial_state);
             current_state = initial_state;
-            console.log(initial_state);
+
+            //change transition_model
+            // for (var i in transition_model){
+            //     delete transition_model[i];//delete all
+            // }
+            transition_model={};
+            //special cases: state 0 and n-1
+            transition_model[0] = {0: 0.5, 1: 0.5};
+            console.log('trans for',0,"=",transition_model[0]); 
+                       
+            transition_model[total_blocks] = {};
+            transition_model[total_blocks][total_blocks-1] = 0.5;
+            transition_model[total_blocks][total_blocks-2]= 0.5;
+
+            for (var i = 1; i < total_blocks; i++){
+                var assocArray = {};
+                assocArray[i-1] = i/(total_blocks)*0.5;
+                assocArray[i] = 0.5;
+                assocArray[i+1] = 0.5-i/(total_blocks)*0.5;
+                transition_model[i] = assocArray;
+                console.log('trans for',i,'=', assocArray);
+            }
+            console.log('trans for',total_blocks,"=",transition_model[total_blocks]);
+
+            //change observation_model
+            // for (var i in observation_model){
+            //     delete observation_model[i];
+            // }
+            observation_model = {};
+            for (var i = 0; i <= total_blocks; i++){
+                observation_model[i] = {red: i/(total_blocks), white: 1-i/(total_blocks)};
+                //console.log('obs for',i,'=', observation_model[i]);
+            }
         }
+
+
+
+
         // function set_initial_state(array){
         //     var sum = 0;
         //     $.each(array,function() {
@@ -79,51 +133,51 @@ var markovChain = (function() {
         //     console.log(initial_state);
         // }
 
-        /*
-        function that takes in the number of states(=number of blocks +1)
-        and changes the initial probability, transition and observation models accordingly.
-        */
-        function set_num_states(num_states){
-            //change initial_state
-            initial_state = {};
-            for (var i = 0; i < num_states; i++){
-                initial_state[i] = 1/num_states;    //each state set to be equally likely
-            }
-            console.log('intial state', initial_state);
-            current_state = initial_state;
+        // /*
+        // function that takes in the number of states(=number of blocks +1)
+        // and changes the initial probability, transition and observation models accordingly.
+        // */
+        // function set_num_states(num_states){
+        //     //change initial_state
+        //     initial_state = {};
+        //     for (var i = 0; i < num_states; i++){
+        //         initial_state[i] = 1/num_states;    //each state set to be equally likely
+        //     }
+        //     console.log('intial state', initial_state);
+        //     current_state = initial_state;
 
-            //change transition_model
-            for (var i in transition_model){
-                delete transition_model[i];
-            }
-            //special cases: state 0 and n-1
-            transition_model[0] = {0: 0.5, 1: 0.5};
-            console.log('trans for',0,"=",transition_model[0]); 
+        //     //change transition_model
+        //     for (var i in transition_model){
+        //         delete transition_model[i];
+        //     }
+        //     //special cases: state 0 and n-1
+        //     transition_model[0] = {0: 0.5, 1: 0.5};
+        //     console.log('trans for',0,"=",transition_model[0]); 
                        
-            transition_model[num_states-1] = {};
-            transition_model[num_states-1][num_states-2] = 0.5;
-            transition_model[num_states-1][num_states-1]= 0.5;
+        //     transition_model[num_states-1] = {};
+        //     transition_model[num_states-1][num_states-2] = 0.5;
+        //     transition_model[num_states-1][num_states-1]= 0.5;
 
-            for (var i = 1; i < num_states-1; i++){
-                var assocArray = {};
-                assocArray[i-1] = i/(num_states-1)*0.5;
-                assocArray[i] = 0.5;
-                assocArray[i+1] = 0.5-i/(num_states-1)*0.5;
-                transition_model[i] = assocArray;
-                console.log('trans for',i,'=', assocArray);
-            }
-            console.log('trans for',num_states-1,"=",transition_model[num_states-1]);
+        //     for (var i = 1; i < num_states-1; i++){
+        //         var assocArray = {};
+        //         assocArray[i-1] = i/(num_states-1)*0.5;
+        //         assocArray[i] = 0.5;
+        //         assocArray[i+1] = 0.5-i/(num_states-1)*0.5;
+        //         transition_model[i] = assocArray;
+        //         console.log('trans for',i,'=', assocArray);
+        //     }
+        //     console.log('trans for',num_states-1,"=",transition_model[num_states-1]);
 
-            //change observation_model
-            for (var i in observation_model){
-                delete observation_model[i];
-            }
-            for (var i = 0; i < num_states; i++){
-                observation_model[i] = {red: i/(num_states-1), white: 1-i/(num_states-1)};
-                //console.log('obs for',i,'=', observation_model[i]);
-            }
+        //     //change observation_model
+        //     for (var i in observation_model){
+        //         delete observation_model[i];
+        //     }
+        //     for (var i = 0; i < num_states; i++){
+        //         observation_model[i] = {red: i/(num_states-1), white: 1-i/(num_states-1)};
+        //         //console.log('obs for',i,'=', observation_model[i]);
+        //     }
 
-        }
+        // }
 
         /*
         function that returns "red" or "white" depending on the current prob distribution.
@@ -227,7 +281,7 @@ var markovChain = (function() {
         
         return {transition: transition, observe: observe, 
             get_current_state: get_current_state, get_current_state_array: get_current_state_array, 
-            set_num_states: set_num_states, set_num_red: set_num_red, 
+            set_num_blocks: set_num_blocks, 
             prob_OnS: prob_OnS, prob_OgS: prob_OgS, make_obs: make_obs};
     }
     
@@ -296,7 +350,7 @@ var markovChain = (function() {
     
     function View(div, model, controller){
         
-        div.append("<div class = 'container-fluid well'><div class = 'hero-unit'><h2>Lego Game</h2><p>Two white lego bricks are put into a bag. <br> A transition occurs. 1. A random brick is removed from the bag. 2. A replacement brick that is equally likely to be red or white is added to the bag. <br>Then you pull one brick from the bag, observe color, and replace.</p></div>><div class = 'row-fluid'><div class ='span1'><div class='side-labels'></div></div><div class = 'span9'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+        div.append("<div class = 'container-fluid well'><div class = 'hero-unit'><h3>Illustration of Markov Chains</h3><p>Two white lego bricks are put into a bag. <br> A transition occurs. 1. A random brick is removed from the bag. 2. A replacement brick that is equally likely to be red or white is added to the bag. <br>Then you pull one brick from the bag, observe color, and replace.</p></div><div class = 'row-fluid'><div class ='span1'><div class='side-labels'></div></div><div class = 'span9'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
       
         //div.append("<div class = 'container-fluid well'</div>");
         $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div><div class ='row-fluid'><input class='num-states' placeholder = '# of blocks'><button class='btn btn-small new-chain'>New</button></div></div>");
