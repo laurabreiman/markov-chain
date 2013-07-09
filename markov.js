@@ -204,8 +204,11 @@ var markovChain = (function() {
     }
     
     function Controller(model){
-        
-        //function that takes in an array of probabilites and returns an array like ["right","wrong","wrong"...] based on the model's answers
+        /*
+        function that takes in an array of probabilites
+        returns an array like ["right","wrong","wrong"...0] based on the model's answers
+        with the last entry a flag of whether it was all right (1) or not (0)
+        */
         function checkAnswers(answers){
         }
         
@@ -378,7 +381,14 @@ var markovChain = (function() {
                     answers.push($('.input-row #'+i+'').val());
                 }
                 var results = controller.checkAnswers(answers);
+                if(results[-1] == 1){
+                    displayNextInputRow();
+                }
             });
+        }
+        
+        function displayNextInputRow(){
+        
         }
         
         function updateArrows(){
