@@ -264,8 +264,10 @@ var markovChain = (function() {
     }
     
     function View(div, model, controller){
-                
-        div.append("<div class = 'container-fluid well'><div class = 'row-fluid'><div class ='span1'><div class='side-labels'></div></div><div class = 'span9'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+        
+        div.append("<div class = 'container-fluid well'><div class = 'hero-unit'><h2>Lego Game</h2><p>Two white lego bricks are put into a bag. <br> A transition occurs. 1. A random brick is removed from the bag. 2. A replacement brick that is equally likely to be red or white is added to the bag. <br>Then you pull one brick from the bag, observe color, and replace.</p></div>><div class = 'row-fluid'><div class ='span1'><div class='side-labels'></div></div><div class = 'span9'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+      
+        //div.append("<div class = 'container-fluid well'</div>");
         $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div><div class ='row-fluid'><input class='num-states' placeholder = '# of blocks'><button class='btn btn-small new-chain'>New</button></div></div>");
         $(".span9").append("<div class = 'row-fluid'><div class = 'input-row'></div></div>");
         
@@ -291,7 +293,6 @@ var markovChain = (function() {
         }
 
         function newChain(){
-            console.log('hello')
 
             if(isNaN($(".num-states").val()) || $(".num-states").val() < 0){
                 alert("Please enter a valid number");
@@ -299,9 +300,6 @@ var markovChain = (function() {
             
             else{
                 var numStates = $(".num-states").val();
-
-                console.log(numStates)
-
                 model.set_num_states(numStates);
                 updateDisplay();
             }
@@ -427,7 +425,7 @@ var markovChain = (function() {
         function updateFirstInputRow(){
             $('.input-row').empty();
             var num_entries = model.get_current_state_array().length;
-            console.log($(".input-row").css("width"));
+            
             for(var i = 0; i < num_entries; i++){
                 $('.input-row').append("<input class='obs-entry' id='"+i+"' placeholder='P("+i+")'>");
                 $('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
@@ -438,11 +436,28 @@ var markovChain = (function() {
             
             $('.check').on('click',function(){
                 var answers = [];
+                
                 for(var i=0; i<num_entries; i++){
-                    answers.push($('.input-row #'+i+'').val());
+                    answers.push(parseFloat($('.input-row #'+i+'').val()));
                 }
+                
                 var results = controller.checkAnswers(answers);
+                
+                $('.icon').remove();
+                
+                for(var i = 0; i<results.length-1 ; i++){
+                    if(results[i] == "right"){
+                        $('.input-row #'+i+'').after('<i class="icon icon-ok" id="icon'+i+'"></i>');
+                        $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))});
+                    }
+                    else{
+                        $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))});
+                        $('.input-row #'+i+'').after('<i class="icon icon-remove"></i>');
+                    }
+                }
+                
                 if(results[-1] == 1){
+                    $(this).remove();
                     displayNextInputRow();
                 }
             });
