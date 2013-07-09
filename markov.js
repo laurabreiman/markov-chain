@@ -205,6 +205,10 @@ var markovChain = (function() {
     
     function Controller(model){
         
+        //function that takes in an array of probabilites and returns an array like ["right","wrong","wrong"...] based on the model's answers
+        function checkAnswers(answers){
+        }
+        
         return {};
     }
     
@@ -359,10 +363,22 @@ var markovChain = (function() {
         function updateFirstInputRow(){
             $('.input-row').empty();
             var num_entries = model.get_current_state_array().length;
-            console.log(num_entries);
+            console.log($(".input-row").css("width"));
             for(var i = 0; i < num_entries; i++){
                 $('.input-row').append("<input class='obs-entry' id='"+i+"' placeholder='P("+i+")'>");
+                $('.input-row #'+i+'').offset({left: i*(chart_width)/(num_entries-1)});
+                $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
             }
+            
+            $('.input-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            
+            $('.check').on('click',function(){
+                var answers = [];
+                for(var i=0; i<num_entries; i++){
+                    answers.push($('.input-row #'+i+'').val());
+                }
+                var results = controller.checkAnswers(answers);
+            });
         }
         
         function updateArrows(){

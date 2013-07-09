@@ -17,5 +17,10 @@ line {
 }
 
 .obs-entry{
-    width: 10%;
+    width: 8%;
+    position:relative;
+}
+
+.check-row{
+    text-align:center;
 }
