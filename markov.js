@@ -265,9 +265,9 @@ var markovChain = (function() {
     
     function View(div, model, controller){
                 
-        div.append("<div class = 'container-fluid well'><div class = 'hero-unit'><h2>Lego Game</h2><p>Two white lego bricks are put into a bag. <br> A transition occurs. 1. A random brick is removed from the bag. 2. A replacement brick that is equally likely to be red or white is added to the bag. <br>Then you pull one brick from the bag, observe color, and replace.</p></div><div class = 'row-fluid'><div class = 'span10'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
-        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div><div class ='row-fluid'><input class='num-states' placeholder = '# of states'><button class='btn btn-small new-chain'>New</button></div></div>");
-        $(".span10").append("<div class = 'row-fluid'><div class = 'input-row'></div></div>");
+        div.append("<div class = 'container-fluid well'><div class = 'row-fluid'><div class ='span1'><div class='side-labels'></div></div><div class = 'span9'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div><div class ='row-fluid'><input class='num-states' placeholder = '# of blocks'><button class='btn btn-small new-chain'>New</button></div></div>");
+        $(".span9").append("<div class = 'row-fluid'><div class = 'input-row'></div></div>");
         
         $(".transition").on("click",transition);
         $(".new-chain").on("click",newChain);
@@ -275,7 +275,7 @@ var markovChain = (function() {
         var chart;
         
         var outer_height = 400;
-        var outer_width = parseInt($(".span10").css("width"));
+        var outer_width = parseInt($(".span9").css("width"));
     
         var margin = { top: 30, right: 20, bottom: 20, left: 20 }
         var chart_width = outer_width - margin.left - margin.right;
@@ -283,6 +283,7 @@ var markovChain = (function() {
         
         setupGraph();
         updateDisplay();
+        setupSideLabels();
 
         function transition(){
             transitionTop();
@@ -304,6 +305,18 @@ var markovChain = (function() {
                 model.set_num_states(numStates);
                 updateDisplay();
             }
+        }
+        
+        function setupSideLabels(){
+            $('.side-labels').append("<div class='num-label'># of whites</div>");
+            $('.side-labels').append("<div class='first-prob'>P(S<sub>1</sub>=s)</div>");
+            $('.side-labels').append("<div class='num2-label'># of whites</div>");
+            $('.side-labels').append("<div class='second-prob'>P(S<sub>2</sub>=s)</div>");
+            $('.num-label').offset({top: $(".bubble-name").offset().top});
+            $('.first-prob').offset({top: $(".bubble-label").offset().top});
+            $('.num2-label').offset({top: $(".bottom-bubble-name").offset().top});       
+            $('.second-prob').offset({top: $(".input-row").offset().top});
+            //$('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
         }
         
         function updateDisplay(){
@@ -417,7 +430,7 @@ var markovChain = (function() {
             console.log($(".input-row").css("width"));
             for(var i = 0; i < num_entries; i++){
                 $('.input-row').append("<input class='obs-entry' id='"+i+"' placeholder='P("+i+")'>");
-                $('.input-row #'+i+'').offset({left: i*(chart_width)/(num_entries-1)});
+                $('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
             }
             
