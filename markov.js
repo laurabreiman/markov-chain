@@ -196,7 +196,10 @@ var markovChain = (function() {
     
     function View(div, model, controller){
                 
-        div.append("<div class = 'container-fluid'><div class = 'row-fluid'><div class = 'span10'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+        div.append("<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'span10'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
+        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div></div>");
+        
+        $(".transition").on("click",transition)
         
         var chart;
         
@@ -208,22 +211,115 @@ var markovChain = (function() {
         var chart_height = outer_height -margin.top - margin.bottom;
         
         setupGraph();
-        updateBubbles();
-        updateArrows();
+        updateDisplay();
         
-        function updateBubbles(){
-            chart.selectAll(".bubble").remove();
+        function transition(){
+            transitionTop();
+            transitionBottom();
+        }
+
+        function updateDisplay(){
+            updateTopBubbles();
+            updateArrows();
+            model.transition();
+            updateBottomBubbles();
+        }
+        
+        function updateTopBubbles(){
+            chart.selectAll(".top_bubble").remove();
             
             var points = model.get_current_state_array();
             
-            chart.selectAll(".bubble").data(points).enter().append("circle")
-                .attr("class", "bubble")
-                .attr("cx", function(d,i){return chart_width*(i/points.length)})
+            chart.selectAll(".top_bubble").data(points).enter().append("circle")
+                .attr("class", "top_bubble")
+                .attr("cx", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("cy", 0)
                 .attr("r", function(d){return d*(chart_height/20)+4})
-                .style("fill","blue")
+                .style("fill","red")
                 .style("stroke","black")
                 .style("fill-opacity",function(d){return d;});
+            
+            updateTopLabels();
+        }
+        
+        function transitionTop(){
+            var points = model.get_current_state_array();
+            
+            chart.selectAll(".top_bubble").data(points).transition().duration(1000)
+                .attr("r", function(d){return d*(chart_height/20)+4})
+                .style("fill-opacity",function(d){return d;});
+            
+            updateTopLabels();
+        }
+        
+        function transitionBottom(){
+            model.transition();
+            var points = model.get_current_state_array();
+            
+            chart.selectAll(".bottom_bubble").data(points).transition().duration(1000)
+                .attr("r", function(d){return d*(chart_height/20)+4})
+                .style("fill-opacity",function(d){return d;});
+            
+            updateBottomLabels();
+        }
+        
+        function updateBottomBubbles(){
+            chart.selectAll(".bottom_bubble").remove();
+            
+            var points = model.get_current_state_array();
+
+            chart.selectAll(".bottom_bubble").data(points).enter().append("circle")
+                .attr("class", "bottom_bubble")
+                .attr("cx", function(d,i){return chart_width*(i/(points.length-1))})
+                .attr("cy", chart_height)
+                .attr("r", function(d){return d*(chart_height/20)+4})
+                .style("fill","red")
+                .style("stroke","black")
+                .style("fill-opacity",function(d){return d;});
+            
+            updateBottomLabels();
+        }
+        
+        function updateTopLabels(){
+            
+            var points = model.get_current_state_array();
+            var names = Object.keys(model.get_current_state());
+            
+            chart.selectAll(".bubble-name").remove();
+            chart.selectAll(".bubble-label").remove();
+            
+            chart.selectAll(".bubble-name").data(names).enter().append("text").attr("class", "bubble-name")
+                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
+                .attr('y',chart_height/8)
+                .attr("dx",-4)
+                .text(function(d) { return d; });
+            
+            chart.selectAll(".bubble-label").data(points).enter().append("text").attr("class", "bubble-label")
+                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
+                .attr('y',chart_height/6)
+                .attr("dx",-4)
+                .text(function(d) { return d; });
+        }
+        
+        function updateBottomLabels(){
+            
+            var points = model.get_current_state_array();
+            var names = Object.keys(model.get_current_state());
+            
+            chart.selectAll(".bottom-bubble-name").remove();
+            chart.selectAll(".bottom-bubble-label").remove();
+            
+            chart.selectAll(".bottom-bubble-name").data(names).enter().append("text").attr("class", "bottom-bubble-name")
+                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
+                .attr('y',(7/8)*chart_height)
+                .attr("dx",-4)
+                .text(function(d) { return d; });
+            
+            chart.selectAll(".bottom-bubble-label").data(points).enter().append("text").attr("class", "bottom-bubble-label")
+                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
+                .attr('y',(5/6)*chart_height)
+                .attr("dx",-4)
+                .text(function(d) { return d; });
         }
         
         function updateArrows(){
@@ -233,33 +329,50 @@ var markovChain = (function() {
             
             var points = model.get_current_state_array();
             
+            chart.append("defs").append("marker")
+                .attr("id", "arrowhead")
+                .attr("refX", 6) /*must be smarter way to calculate shift*/
+                .attr("refY", 2)
+                .attr("markerWidth", 10)
+                .attr("markerHeight", 6)
+                .attr("orient", "auto")
+                .append("path")
+                    .attr("d", "M 0,0 V 4 L6,2 Z");
+            
             chart.selectAll(".arrow").data(points).enter().append("line")
                 .attr("class", "arrow")
-                .attr("x1", function(d,i){return chart_width*(i/points.length)})
+                .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", chart_height/5)
-                .attr("x2", function(d,i){return chart_width*(i/points.length)})
+                .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y2", (4/5)*chart_height)
-                .style("stroke","black");
+                .style("stroke","black")
+                .attr("marker-end", "url(#arrowhead)");
             
             chart.selectAll(".diagRight").data(points).enter().append("line")
                 .attr("class", "diagRight")
-                .attr("x1", function(d,i){return chart_width*(i/points.length)})
+                .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", chart_height/5)
-                .attr("x2", function(d,i){if(i!=points.length-1){return chart_width*((i+1)/points.length)}
-                                          else{return chart_width*(i/points.length)}})
+                .attr("x2", function(d,i){if(i!=points.length-1){return chart_width*((i+1)/(points.length-1))}
+                                          else{return chart_width*(i/(points.length-1))}})
                 .attr("y2", function(d,i){if(i!=points.length-1){ return (4/5)*chart_height}
                                           else{ return chart_height/5}})
+                .attr("marker-end", function(d,i){if(i!=points.length-1){ return "url(#arrowhead)"}
+                                          else{ return ""}})
                 .style("stroke","blue");
             
-            chart.selectAll(".diaLeft").data(points).enter().append("line")
+            chart.selectAll(".diagLeft").data(points).enter().append("line")
                 .attr("class", "diagLeft")
-                .attr("x1", function(d,i){return chart_width*(i/points.length)})
+                .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", chart_height/5)
-                .attr("x2", function(d,i){if(i!=0){return chart_width*((i-1)/points.length)}
-                                          else{return chart_width*(i/points.length)}})
+                .attr("x2", function(d,i){if(i!=0){return chart_width*((i-1)/(points.length-1))}
+                                          else{return chart_width*(i/(points.length-1))}})
                 .attr("y2", function(d,i){if(i!=0){ return (4/5)*chart_height}
                                           else{ return chart_height/5}})
+                .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
+                                            else{ return ""}})
                 .style("stroke","orange");
+            
+            
         }
         
         //set up svg with axes and labels
@@ -270,7 +383,7 @@ var markovChain = (function() {
     
         }
         
-        return {updateBubbles: updateBubbles, updateArrows: updateArrows, setupGraph: setupGraph};
+        return {updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph};
     }
     
     
