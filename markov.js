@@ -118,7 +118,8 @@ var markovChain = (function() {
             else {return "white";}
         }
 
-        //probability of Obs=o given State=s
+        //Returns probability of Obs=o given State=s as an assoc array of assoc arrays.
+        //prob_OgS()[o][s] will return the desired probability.
         function prob_OgS(){
             var n = Object.getOwnPropertyNames(initial_state).length;
             var assocArray = {};
@@ -133,7 +134,8 @@ var markovChain = (function() {
             return assocArray;
         }
 
-        //probability of Obs=o & State=s
+        //Returns probability of Obs=o & State=s as an assoc array of assoc arrays.
+        //prob_OnS()[o][s] will return the desired probability.
         function prob_OnS(){
             var n = Object.getOwnPropertyNames(initial_state).length
             var assocArray = {};
@@ -206,13 +208,59 @@ var markovChain = (function() {
     function Controller(model){
         /*
         function that takes in an array of probabilites
-        returns an array like ["right","wrong","wrong"...0] based on the model's answers
-        with the last entry a flag of whether it was all right (1) or not (0)
+        returns an array like ["right","wrong","wrong"...0] based on the current
+        probability states with the last entry a flag of 
+        whether it was all right (1) or not (0)
         */
         function checkAnswers(answers){
+            var current_state = model.get_current_state(); //check this!!!!!
+            var result = [];
+            var allCorrect = 1;
+            for (var i = 0; i < answers.length; i++){
+                console.log(answers[i].toFixed(3), current_state[i].toFixed(3));
+                if (answers[i].toFixed(3) == current_state[i].toFixed(3)){
+                    console.log("here");
+                    result[i] = "right";                 
+                }
+                else {result[i] = "wrong"; allCorrect = 0;}
+            }
+            result[answers.length] = allCorrect;
+            return result;
+        }
+        /*
+        function that takes in an array of probabilites
+        returns an array like ["right","wrong","wrong"...0] based on the probability of 
+        with the last entry a flag of whether it was all right (1) or not (0)
+        */
+        function checkOgS(answers, obs){
+            var result = [];
+            var correct = model.prob_OgS()[obs];
+            var allCorrect = 1;
+            for (var i = 0; i < answers.length; i++){
+                if (answers[i].toFixed(3) == correct[i].toFixed(3)){
+                    result[i] = "right";                 
+                }
+                else {result[i] = "wrong"; allCorrect = 0;}
+            }
+            result[answers.length] = allCorrect;
+            return result;
+        }
+
+        function checkOnS(answers, obs){
+            var result = [];
+            var correct = model.prob_OnS()[obs];
+            var allCorrect = 1;
+            for (var i = 0; i < answers.length; i++){
+                if (answers[i].toFixed(3) == correct[i].toFixed(3)){
+                    result[i] = "right";                 
+                }
+                else {result[i] = "wrong"; allCorrect = 0;}
+            }
+            result[answers.length] = allCorrect;
+            return result;
         }
         
-        return {};
+        return {checkAnswers: checkAnswers, checkOgS: checkOgS, checkOnS: checkOnS};
     }
     
     function View(div, model, controller){
