@@ -2,3 +2,16 @@ text {
     text-align:center;
     font-size: 12px;
 }
+
+line {
+    stroke-dasharray: 2,2;
+}
+
+.num-states{
+    width: 60%;
+    margin-top: 10px;
+}
+
+.new-chain{
+    margin-top: 10px;
+}

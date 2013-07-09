@@ -197,9 +197,10 @@ var markovChain = (function() {
     function View(div, model, controller){
                 
         div.append("<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'span10'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
-        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div></div>");
+        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div><div class ='row-fluid'><input class='num-states' placeholder = '# of states'><button class='btn btn-small new-chain'>New</button></div></div>");
         
-        $(".transition").on("click",transition)
+        $(".transition").on("click",transition);
+        $(".new-chain").on("click",newChain);
         
         var chart;
         
@@ -218,6 +219,20 @@ var markovChain = (function() {
             transitionBottom();
         }
 
+        function newChain(){
+            console.log('hello')
+            if(isNaN($(".num-states").html()) || $(".num-states").html() < 0){
+                alert("Please enter a valid number");
+            }
+            
+            else{
+                var numStates = $(".num-states").html();
+                console.log(numStates)
+                model.set_num_states(numStates);
+                console.log(model.get_current_state());
+            }
+        }
+        
         function updateDisplay(){
             updateTopBubbles();
             updateArrows();
@@ -245,7 +260,7 @@ var markovChain = (function() {
         function transitionTop(){
             var points = model.get_current_state_array();
             
-            chart.selectAll(".top_bubble").data(points).transition().duration(1000)
+            chart.selectAll(".top_bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/20)+4})
                 .style("fill-opacity",function(d){return d;});
             
@@ -256,7 +271,7 @@ var markovChain = (function() {
             model.transition();
             var points = model.get_current_state_array();
             
-            chart.selectAll(".bottom_bubble").data(points).transition().duration(1000)
+            chart.selectAll(".bottom_bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/20)+4})
                 .style("fill-opacity",function(d){return d;});
             
@@ -296,9 +311,9 @@ var markovChain = (function() {
             
             chart.selectAll(".bubble-label").data(points).enter().append("text").attr("class", "bubble-label")
                 .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-                .attr('y',chart_height/6)
+                .attr('y',chart_height/6+5)
                 .attr("dx",-4)
-                .text(function(d) { return d; });
+                .text(function(d) { return round_number(d,4); });
         }
         
         function updateBottomLabels(){
@@ -311,15 +326,15 @@ var markovChain = (function() {
             
             chart.selectAll(".bottom-bubble-name").data(names).enter().append("text").attr("class", "bottom-bubble-name")
                 .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-                .attr('y',(7/8)*chart_height)
+                .attr('y',(8/9)*chart_height+5)
                 .attr("dx",-4)
                 .text(function(d) { return d; });
             
             chart.selectAll(".bottom-bubble-label").data(points).enter().append("text").attr("class", "bottom-bubble-label")
                 .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-                .attr('y',(5/6)*chart_height)
+                .attr('y',(6/7)*chart_height)
                 .attr("dx",-4)
-                .text(function(d) { return d; });
+                .text(function(d) { return round_number(d,4); });
         }
         
         function updateArrows(){
@@ -373,6 +388,10 @@ var markovChain = (function() {
                 .style("stroke","orange");
             
             
+        }
+        
+        function updateArrowLabels(){
+        
         }
         
         //set up svg with axes and labels
