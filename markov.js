@@ -4,7 +4,6 @@ var markovChain = (function() {
     
 ////////////////////////////////// global variables 
     
-    //d3 chart components
     
 ////////////////////////////////// helper functions    
     
@@ -436,15 +435,40 @@ var markovChain = (function() {
             chart.selectAll(".top_bubble").remove();
             
             var points = model.get_current_state_array();
+            var pointdict = model.get_current_state();
+            var newpoints =[];
             
-            var bubbles = chart.selectAll(".top_bubble").data(points).enter().append("circle")
+            for(var i in pointdict){
+                newpoints.push([i,points[i]])
+            }
+            
+            var node = chart.selectAll(".top-node")
+                  .data(newpoints)
+                .enter().append("g")
+                  .attr("class", "top-node")
+                .attr("transform", function(d,i,j) { return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + 0 + ")"; });
+            
+            node.append("circle")
                 .attr("class", "top_bubble")
-                .attr("cx", function(d,i){return (chart_width)*(i/(points.length-1))})
-                .attr("cy", 0)
-                .attr("r", function(d){return d*(chart_height/20)+4})
+                .attr("r", function(d){return d[1]*(chart_height/20)+8})
                 .style("fill","blue")
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return d;});
+                .style("fill-opacity",function(d){return d[1];});
+            
+            node.append("text")
+                .attr("class","bubble-name")
+                .attr("dy", ".3em")
+                .style("text-anchor", "middle")
+                .text(function(d,i) { return d[0]; });
+
+//            var bubbles = chart.selectAll(".top_bubble").data(points).enter().append("circle")
+//                .attr("class", "top_bubble")
+//                .attr("cx", function(d,i){return (chart_width)*(i/(points.length-1))})
+//                .attr("cy", 0)
+//                .attr("r", function(d){return d*(chart_height/20)+4})
+//                .style("fill","blue")
+//                .style("stroke","black")
+//                .style("fill-opacity",function(d){return d;});
             
             updateTopLabels();
         }
@@ -484,21 +508,43 @@ var markovChain = (function() {
         function updateBottomBubbles(){
             chart.selectAll(".bottom_bubble").remove();
             var pointlength = model.get_current_state_array().length;
-            var points = [];
             
-            for(var i = 0; i<pointlength; i++){
-                points.push(1/pointlength);
+            var points = model.get_current_state_array();
+            var pointdict = model.get_current_state();
+            var newpoints =[];
+            
+            for(var i in pointdict){
+                newpoints.push([i,1/pointlength])
             }
-
-            chart.selectAll(".bottom_bubble").data(points).enter().append("circle")
-                .attr("class", "bottom_bubble")
-                .attr("cx", function(d,i){return chart_width*(i/(points.length-1))})
-                .attr("cy", chart_height)
-                .attr("r", function(d){return d*(chart_height/16)+4})
+            
+            var node = chart.selectAll(".bottom-node")
+                  .data(newpoints)
+                .enter().append("g")
+                  .attr("class", "bottom-node")
+                .attr("transform", function(d,i) { return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height+ ")"; });
+            
+            node.append("circle")
+                .attr("class", "top_bubble")
+                .attr("r", function(d){return d[1]*(chart_height/20)+8})
                 .style("fill","blue")
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return d;});
+                .style("fill-opacity",function(d){return d[1];});
             
+            node.append("text")
+                .attr("class","bottom-bubble-name")
+                .attr("dy", ".3em")
+                .style("text-anchor", "middle")
+                .text(function(d) { return d[0]; });
+            
+//            chart.selectAll(".bottom_bubble").data(points).enter().append("circle")
+//                .attr("class", "bottom_bubble")
+//                .attr("cx", function(d,i){return chart_width*(i/(points.length-1))})
+//                .attr("cy", chart_height)
+//                .attr("r", function(d){return d*(chart_height/16)+4})
+//                .style("fill","blue")
+//                .style("stroke","black")
+//                .style("fill-opacity",function(d){return d;});
+//            
             updateBottomLabels();
         }
         
@@ -507,14 +553,14 @@ var markovChain = (function() {
             var points = model.get_current_state_array();
             var names = Object.keys(model.get_current_state());
             
-            chart.selectAll(".bubble-name").remove();
+//            chart.selectAll(".bubble-name").remove();
             chart.selectAll(".bubble-label").remove();
             
-            chart.selectAll(".bubble-name").data(names).enter().append("text").attr("class", "bubble-name")
-                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-                .attr('y',chart_height/8)
-                .attr("dx",-4)
-                .text(function(d) { return d; });
+//            chart.selectAll(".bubble-name").data(names).enter().append("text").attr("class", "bubble-name")
+//                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
+//                .attr('y',chart_height/8)
+//                .attr("dx",-4)
+//                .text(function(d) { return d; });
             
             chart.selectAll(".bubble-label").data(points).enter().append("text").attr("class", "bubble-label")
                 .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
@@ -528,14 +574,14 @@ var markovChain = (function() {
             var points = model.get_current_state_array();
             var names = Object.keys(model.get_current_state());
             
-            chart.selectAll(".bottom-bubble-name").remove();
+//            chart.selectAll(".bottom-bubble-name").remove();
             chart.selectAll(".bottom-bubble-label").remove();
             
-            chart.selectAll(".bottom-bubble-name").data(names).enter().append("text").attr("class", "bottom-bubble-name")
-                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-                .attr('y',(7/8)*chart_height)
-                .attr("dx",-4)
-                .text(function(d) { return d; });
+//            chart.selectAll(".bottom-bubble-name").data(names).enter().append("text").attr("class", "bottom-bubble-name")
+//                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
+//                .attr('y',(7/8)*chart_height)
+//                .attr("dx",-4)
+//                .text(function(d) { return d; });
 //            
 //            chart.selectAll(".bottom-bubble-label").data(points).enter().append("text").attr("class", "bottom-bubble-label")
 //                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
@@ -555,6 +601,8 @@ var markovChain = (function() {
             }
             
             $('.input-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            
+            model.transition();
             
             $('.check').on('click',function(){
                 var answers = [];
@@ -610,7 +658,10 @@ var markovChain = (function() {
             
             var points = model.get_current_state_array();
             var numpoints = points.length;
-            var transmodel = model.get_transition_model();
+            var transmodel = [];
+            for(var i=0; i< Object.keys(model.get_transition_model()).length ; i++){
+                transmodel.push(model.get_transition_model()[i]);
+            }
             
             chart.append("defs").append("marker")
                 .attr("id", "arrowhead")
@@ -654,11 +705,34 @@ var markovChain = (function() {
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
                 .style("stroke","orange");
-
+            
+            //set up labels that show the probability of a transition occuring between states
             chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
-                .attr("x", function(d,i){return i*(chart_width/numpoints)})
+                .attr("x", function(d,i){ return i*(chart_width/(numpoints-1))})
+                .attr('dx',"-0.3em")
+                .attr('dy',"0.9em")
                 .attr("y", chart_height/2)
-                .text(function(d) { console.log(d); return d; });
+                .attr("text-anchor","end")
+                .text(function(d,i) {  return d[i]; });
+            
+            chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
+                .attr("x", function(d,i){return i*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
+                .attr('dx',"-0.3em")
+                .attr('dy',"0.9em")
+                .attr("y", chart_height/2)
+                .attr("text-anchor","end")
+                .attr("fill","blue")
+                .text(function(d,i) { return d[i+1]; });
+            
+            chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
+                .attr("x", function(d,i){return (i-1)*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
+                .attr('dx',".5em")
+                .attr('dy',"0.9em")
+                .attr("y", chart_height/2)
+                .attr("text-anchor","start")
+                .attr("fill","orange")
+                .text(function(d,i) { return d[i-1]; });
+            
         }
         
         function updateArrowLabels(){
