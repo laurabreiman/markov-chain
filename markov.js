@@ -41,7 +41,7 @@ var markovChain = (function() {
 /////////////////////////////////// set up div functions
     
     function Model(){
-        var states_array = [];
+        var states_array = [{0: 1, 1: 0, 2: 0}];
         //var initial_state = {0: 1, 1: 0, 2: 0};
         var transition_model = {0: {0: .5, 1: 0.5}, 1: {0: 1/8, 1: 1/2, 2:  3/8}, 2: {1: 1/4, 2:  3/4}};
         var observation_model = {0: {red: 0, white: 1}, 1: {red: 1/2, white: 1/2}, 2:  {red: 1,white: 0}};
@@ -78,6 +78,7 @@ var markovChain = (function() {
             }
             current_state[array[0]] = 1;
             //console.log('intial state', initial_state);
+            states_array = []; states_array.push(current_state);
 
             //change transition_model
             // for (var i in transition_model){
@@ -248,7 +249,9 @@ var markovChain = (function() {
                 }
             }
 
-            if (updateCurrent){current_state = next_state;}
+            if (updateCurrent){
+                current_state = next_state;
+                states_array.push(current_state);}
             else {return next_state;}
         }
 
@@ -268,14 +271,23 @@ var markovChain = (function() {
             for(var i in current_state){
                 next_state[i] += current_state[i]*observation_model[i][obs]
                 total += current_state[i]*observation_model[i][obs];
+                //console.log(i,current_state[i],observation_model[i][obs]);
             }
+            //console.log(total);
             
             for(var i in next_state){
                 next_state[i] = next_state[i]/total;
             }
             
-            if (updateCurrent){current_state = next_state;}
+            if (updateCurrent){
+                current_state = next_state;
+                states_array.push(current_state);
+            }
             else {return next_state;}           
+        }
+
+        function get_states_array(){
+            return states_array;
         }
         
         function get_current_state(){
@@ -297,7 +309,7 @@ var markovChain = (function() {
         
         return {transition: transition, observe: observe, 
             get_current_state: get_current_state, get_current_state_array: get_current_state_array, get_transition_model: get_transition_model,
-            set_num_blocks: set_num_blocks, 
+            set_num_blocks: set_num_blocks, get_states_array: get_states_array,
             prob_OnS: prob_OnS, prob_OgS: prob_OgS, make_obs: make_obs};
     }
     
@@ -370,8 +382,8 @@ var markovChain = (function() {
             +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
             +" <span class='text-error'>red</span> or <span class='muted'>white</span> is added to the bag."
             +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
-            +"<p class='text-info'><small>Fill in the blank with appropriate probabilities."
-            +" You may change number of blocks on the right column and start over.</small></p></div>"
+            +"<p class='text-info'><small>We've already done one transition for you:)<br>Fill in the blank with appropriate probabilities."
+            +"You may change number of blocks on the right column and start over.</small></p></div>"
             +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div></div>");
     
         $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div><div class ='row-fluid'><input class='num-states num-whites' placeholder = '# of whites'><input class='num-states num-reds' placeholder = '# of reds'><button class='btn btn-small new-chain'>New</button></div></div>");
