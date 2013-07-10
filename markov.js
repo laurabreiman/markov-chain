@@ -189,8 +189,8 @@ var markovChain = (function() {
                 prob_red += current_state[i]*i/(n-1);
             }
             var r = Math.random();
-            console.log(r);
-            console.log(prob_red);
+            //console.log(r);
+            console.log('prob_red',prob_red);
             if (r < prob_red){return "red";}
             else {return "white";}
         }
@@ -221,10 +221,10 @@ var markovChain = (function() {
             var assocArray = {};
             var r = {}; var w = {};
             for (var i = 0; i < n; i++){
-                r[i] = transition(false)[i]*prob_OgS()["red"][i];
+                r[i] = current_state[i]*prob_OgS()["red"][i];
             }
             for (var i = 0; i < n; i++){
-                w[i] = transition(false)[i]*prob_OgS()["white"][i];
+                w[i] = current_state[i]*prob_OgS()["white"][i];
             }
             assocArray["red"] = r; assocArray["white"] = w;
             return assocArray;
@@ -322,7 +322,7 @@ var markovChain = (function() {
         */
         function checkAnswers(answers){
             var correctAns = model.transition(false);
-            console.log(model.transition(false));
+            //console.log(model.transition(false));
             var result = [];
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
@@ -362,7 +362,7 @@ var markovChain = (function() {
         function checkOnS(answers, obs){
             var result = [];
             var correctAns = model.prob_OnS()[obs];
-            console.log(correctAns);
+            console.log('ans',correctAns);
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
                 if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
@@ -876,7 +876,7 @@ var markovChain = (function() {
             }
             //console.log('data1',data1);
 
-            var line = d3.svg.line().x(function(d){console.log("this",d,d.x,x_scale(d.x));return x_scale(d.x);}).y(function(d){console.log("this",d,d.y,y_scale(d.y));return y_scale(d.y);});
+            var line = d3.svg.line().x(function(d){/*console.log("this",d,d.x,x_scale(d.x));*/return x_scale(d.x);}).y(function(d){/*console.log("this",d,d.y,y_scale(d.y));*/return y_scale(d.y);});
             graph.selectAll(".line").data(restructured_data).enter().append("path").attr("class","line").attr("d",line).attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
 
             // var first_line = graph.selectAll(".prob-line").data([data1]).enter().append("path");
