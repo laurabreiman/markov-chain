@@ -375,6 +375,29 @@ var markovChain = (function() {
         }
         
         return {checkAnswers: checkAnswers, checkOgS: checkOgS, checkOnS: checkOnS};
+
+        /*
+        function that takes in an array of probabilites and an observation string
+        returns an array like ["right","wrong","wrong"...0] based on the probability of Obs=obs & state=s
+        with the last entry a flag of whether it was all right (1) or not (0)
+        */
+        function checkObs(answers, obs){
+            var result = [];
+            var correctAns = model.observe(obs,false);
+            console.log('ans',correctAns);
+            var allCorrect = 1;
+            for (var i = 0; i < answers.length; i++){
+                if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
+                    result[i] = "right";                 
+                }
+                else {result[i] = "wrong"; allCorrect = 0;}
+            }
+            result[answers.length] = allCorrect;
+            return result;
+        }
+        
+        return {checkAnswers: checkAnswers, checkOgS: checkOgS, checkOnS: checkOnS};
+
     }
     
     function View(div, model, controller){
@@ -382,7 +405,7 @@ var markovChain = (function() {
         div.append("<div class = 'hero-unit'><h2><small>Illustration of Markov Chain:</small> Lego Game</h2>"
             +"<p>Two <span style='color:white'>white</span> lego bricks are put into a bag. A transition and an observation happens every round."
             +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
-            +" <span style='color:red'>red</span> or <span class='muted'>white</span> is added to the bag."
+            +" <span style='color:red'>red</span> or <span style='color:white'>white</span> is added to the bag."
             +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
             +"<p class='text-info'><small>We've already done one transition for you:)<br>Fill in the blank with appropriate probabilities."
             +"You may change number of blocks on the right column and start over.</small></p></div>"
@@ -843,23 +866,46 @@ var markovChain = (function() {
         function setupGraph(){
             
             $(".chart-container").empty();
-            chart = d3.select(".chart-container").append("svg").attr("class","chart").attr("height", outer_height).attr("width",outer_width).append("g").attr("transform","translate(" + margin.left + "," + margin.top + ")");
+            chart = d3.select(".chart-container").append("svg")
+                .attr("class","chart")
+                .attr("height", outer_height)
+                .attr("width",outer_width)
+                .append("g")
+                .attr("transform","translate(" + margin.left + "," + margin.top + ")");
     
         }
         
         function setupProbVsTime(){
             //var array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
             $(".graph-container").empty();
-            var graph = d3.select(".graph-container").append("svg").attr("class","graph").attr("height", outer_height).attr("width",outer_width).append("g").attr("transform","translate(" + margin.left + "," + margin.top + ")");
+            var graph = d3.select(".graph-container").append("svg")
+                .attr("class","graph").attr("height", outer_height)
+                .attr("width",outer_width).append("g")
+                .attr("transform","translate(" + margin.left + "," + margin.top + ")");
             
             var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
             var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
 
-            graph.selectAll(".y-line").data(y_scale.ticks(1)).enter().append("line").attr("class", "y-line").attr('x1', 0).attr('x2', chart_width).attr('y1', y_scale).attr('y2',y_scale);
+            graph.selectAll(".y-line").data(y_scale.ticks(1)).enter().append("line")
+                .attr("class", "y-line")
+                .attr('x1', 0)
+                .attr('x2', chart_width)
+                .attr('y1', y_scale)
+                .attr('y2',y_scale);
             
-            graph.selectAll(".x-line").data(x_scale.ticks(1)).enter().append("line").attr("class", "x-line").attr('x1', x_scale).attr('x2', x_scale).attr('y1', 0).attr('y2',chart_height);
+            graph.selectAll(".x-line").data(x_scale.ticks(1)).enter().append("line")
+                .attr("class", "x-line").attr('x1', x_scale)
+                .attr('x2', x_scale).attr('y1', 0)
+                .attr('y2',chart_height);
             
-            graph.selectAll(".y-scale-label").data(y_scale.ticks(6)).enter().append("text").attr("class", "y-scale-label").attr("x",x_scale(0)).attr('y',y_scale).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text(String);
+            graph.selectAll(".y-scale-label").data(y_scale.ticks(6)).enter().append("text")
+                .attr("class", "y-scale-label")
+                .attr("x",x_scale(0))
+                .attr('y',y_scale)
+                .attr("text-anchor","end")
+                .attr("dy","0.3em")
+                .attr("dx","-0.1em")
+                .text(String);
             
             //graph.selectAll(".time-label").data().enter().append("text").attr("class", "y-scale-label").attr("x",x_scale(0)).attr('y',y_scale).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
             //graph.selectAll(".time-label").data([]).enter().append("text").attr("class", "time-label").attr("x",chart_width).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
@@ -870,14 +916,20 @@ var markovChain = (function() {
             for (var i = 0; i < Object.keys(data_array[0]).length; i++) {
                 var inner_array = [];
                 for (var j = 0; j < data_array.length; j++) {
-                    inner_array.push({"x":j,"y":data_array[j][i]});
+                    inner_array.push({"px":j,"py":data_array[j][i],"color_id":i});
                 }
                 restructured_data.push(inner_array);
             }
             //console.log('data1',data1);
-
-            var line = d3.svg.line().x(function(d){/*console.log("this",d,d.x,x_scale(d.x));*/return x_scale(d.x);}).y(function(d){/*console.log("this",d,d.y,y_scale(d.y));*/return y_scale(d.y);});
-            graph.selectAll(".line").data(restructured_data).enter().append("path").attr("class","line").attr("d",line).attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
+            var color = d3.scale.category10();
+            var line = d3.svg.line().x(function(d){console.log("this",d,d.px,x_scale(d.px));return x_scale(d.px);}).y(function(d){/*console.log("this",d,d.y,y_scale(d.y));*/return y_scale(d.py);});
+            graph.selectAll(".line").data(restructured_data).enter().append("path")
+                .attr("class","line")
+                .attr("d",line)
+                //.attr("stroke","black")
+                .style("stroke", function(d){return color(d.color_id);})
+                .attr("stroke-width",3)
+                .attr("fill","none");
 
             // var first_line = graph.selectAll(".prob-line").data([data1]).enter().append("path");
             // first_line.attr("d", d3.svg.line().x(function(d){console.log("this",d,d.x,x_scale(d.x));return x_scale(d.x);}).y(function(d){console.log("this",d,d.y,y_scale(d.y));return y_scale(d.y);}));
