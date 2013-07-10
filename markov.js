@@ -382,7 +382,7 @@ var markovChain = (function() {
         div.append("<div class = 'hero-unit'><h2><small>Illustration of Markov Chain:</small> Lego Game</h2>"
             +"<p>Two <span style='color:white'>white</span> lego bricks are put into a bag. A transition and an observation happens every round."
             +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
-            +" <span style='color:red'>red</span> or <span class='muted'>white</span> is added to the bag."
+            +" <span style='color:red'>red</span> or <span style='color:white'>white</span> is added to the bag."
             +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
             +"<p class='text-info'><small>We've already done one transition for you:)<br>Fill in the blank with appropriate probabilities."
             +"You may change number of blocks on the right column and start over.</small></p></div>"
@@ -397,7 +397,7 @@ var markovChain = (function() {
         
         var chart;
         
-        var outer_height = 400;
+        var outer_height = 300;
         var outer_width = parseInt($(".span8").css("width"));
     
         var margin = { top: 30, right: 20, bottom: 20, left: 20 }
@@ -460,17 +460,15 @@ var markovChain = (function() {
                 newpoints.push([i,points[i]])
             }
             
-            console.log(newpoints);
-            
             var node = chart.selectAll(".top-node")
                   .data(newpoints)
                 .enter().append("g")
                   .attr("class", "top-node")
-                .attr("transform", function(d,i,j) { console.log(d); return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + 0 + ")"; });
+                .attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
             
             node.append("circle")
                 .attr("class", "top_bubble")
-                .attr("r", function(d){return d[1]*(chart_height/20)+8})
+                .attr("r", function(d){return d[1]*(chart_height/16)+8})
                 .style("fill","blue")
                 .style("stroke","black")
                 .style("fill-opacity",function(d){return d[1];});
@@ -480,15 +478,6 @@ var markovChain = (function() {
                 .attr("dy", ".3em")
                 .style("text-anchor", "middle")
                 .text(function(d,i) { return d[0]; });
-
-//            var bubbles = chart.selectAll(".top_bubble").data(points).enter().append("circle")
-//                .attr("class", "top_bubble")
-//                .attr("cx", function(d,i){return (chart_width)*(i/(points.length-1))})
-//                .attr("cy", 0)
-//                .attr("r", function(d){return d*(chart_height/20)+4})
-//                .style("fill","blue")
-//                .style("stroke","black")
-//                .style("fill-opacity",function(d){return d;});
             
             updateTopLabels();
         }
@@ -498,7 +487,7 @@ var markovChain = (function() {
             var points = model.get_current_state_array();
             
             chart.selectAll(".top_bubble").data(points).transition().duration(500)
-                .attr("r", function(d){return d*(chart_height/20)+4})
+                .attr("r", function(d){return d*(chart_height/16)+8})
                 .style("fill-opacity",function(d){return d;});
             
             updateTopLabels();
@@ -509,7 +498,7 @@ var markovChain = (function() {
             var points = model.get_current_state_array();
             
             chart.selectAll(".bottom_bubble").data(points).transition().duration(500)
-                .attr("r", function(d){return d*(chart_height/16)+4})
+                .attr("r", function(d){return d*(chart_height/16)+8})
                 .style("fill-opacity",function(d){return d;});
             
             updateBottomLabels();
@@ -519,7 +508,7 @@ var markovChain = (function() {
             var points = state;
             
             chart.selectAll(".bottom-bubble").data(points).transition().duration(500)
-                .attr("r", function(d){return d*(chart_height/16)+4})
+                .attr("r", function(d){return d*(chart_height/16)+8})
                 .style("fill-opacity",function(d){return d;});
             
             updateBottomLabels();
@@ -547,7 +536,7 @@ var markovChain = (function() {
             
             node.append("circle")
                 .attr("class", "bottom-bubble")
-                .attr("r", function(d){return d[1]*(chart_height/20)+8})
+                .attr("r", function(d){return d[1]*(chart_height/16)+8})
                 .style("fill","blue")
                 .style("stroke","black")
                 .style("fill-opacity",function(d){return d[1];});
@@ -586,7 +575,7 @@ var markovChain = (function() {
             
             chart.selectAll(".bubble-label").data(points).enter().append("text").attr("class", "bubble-label")
                 .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-                .attr('y',chart_height/6+5)
+                .attr('y',chart_height/4)
                 .attr("dx",-4)
                 .text(function(d) { return round_number(d,4); });
         }
@@ -765,7 +754,7 @@ var markovChain = (function() {
             
             chart.append("defs").append("marker")
                 .attr("id", "arrowhead")
-                .attr("refX", 6) /*must be smarter way to calculate shift*/
+                .attr("refX", 6) 
                 .attr("refY", 2)
                 .attr("markerWidth", 10)
                 .attr("markerHeight", 6)
@@ -776,20 +765,20 @@ var markovChain = (function() {
             chart.selectAll(".arrow").data(points).enter().append("line")
                 .attr("class", "arrow")
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
-                .attr("y1", chart_height/5)
+                .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
-                .attr("y2", (5/6)*chart_height)
+                .attr("y2", (13/16)*chart_height)
                 .style("stroke","black")
                 .attr("marker-end", "url(#arrowhead)");
             
             chart.selectAll(".diagRight").data(points).enter().append("line")
                 .attr("class", "diagRight")
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
-                .attr("y1", chart_height/5)
+                .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){if(i!=points.length-1){return chart_width*((i+1)/(points.length-1))}
                                           else{return chart_width*(i/(points.length-1))}})
-                .attr("y2", function(d,i){if(i!=points.length-1){ return (5/6)*chart_height}
-                                          else{ return chart_height/5}})
+                .attr("y2", function(d,i){if(i!=points.length-1){ return (13/16)*chart_height}
+                                          else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=points.length-1){ return "url(#arrowhead)"}
                                           else{ return ""}})
                 .style("stroke","blue");
@@ -797,11 +786,11 @@ var markovChain = (function() {
             chart.selectAll(".diagLeft").data(points).enter().append("line")
                 .attr("class", "diagLeft")
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
-                .attr("y1", chart_height/5)
+                .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){if(i!=0){return chart_width*((i-1)/(points.length-1))}
                                           else{return chart_width*(i/(points.length-1))}})
-                .attr("y2", function(d,i){if(i!=0){ return (5/6)*chart_height}
-                                          else{ return chart_height/5}})
+                .attr("y2", function(d,i){if(i!=0){ return (13/16)*chart_height}
+                                          else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
                 .style("stroke","orange");
@@ -811,24 +800,24 @@ var markovChain = (function() {
                 .attr("x", function(d,i){ return i*(chart_width/(numpoints-1))})
                 .attr('dx',"-0.3em")
                 .attr('dy',"0.9em")
-                .attr("y", chart_height/2)
+                .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","end")
                 .text(function(d,i) {  return round_number(d[i],3); });
             
             chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
                 .attr("x", function(d,i){return i*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
-                .attr('dx',"-0.3em")
+                .attr('dx',"-0.8em")
                 .attr('dy',"0.9em")
-                .attr("y", chart_height/2)
+                .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","end")
                 .attr("fill","blue")
                 .text(function(d,i) { return round_number(d[i+1],3); });
             
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
                 .attr("x", function(d,i){return (i-1)*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
-                .attr('dx',".5em")
+                .attr('dx',".9em")
                 .attr('dy',"0.9em")
-                .attr("y", chart_height/2)
+                .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","start")
                 .attr("fill","orange")
                 .text(function(d,i) { return round_number(d[i-1],3); });
