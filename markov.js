@@ -382,11 +382,21 @@ var markovChain = (function() {
             +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
             +" <span class='text-error'>red</span> or <span class='muted'>white</span> is added to the bag."
             +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
+<<<<<<< HEAD
+<<<<<<< HEAD
+            +"<p class='text-info'><small>Fill in the blank with appropriate probabilities."
+            +" You may change number of blocks on the right column and start over.</small></p></div>"
+            +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'controls'></div></div><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'></div></div><div class ='row-fluid'><div class = 'graph-container'></div></div></div>");
+=======
+=======
+>>>>>>> 972c24db6624186efad0ea8162ff650296f38748
             +"<p class='text-info'><small>We've already done one transition for you:)<br>Fill in the blank with appropriate probabilities."
             +"You may change number of blocks on the right column and start over.</small></p></div>"
             +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div><div class ='row-fluid'><div class = 'graph-container'></div></div></div>");
+>>>>>>> 972c24db6624186efad0ea8162ff650296f38748
     
-        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button></div><div class ='row-fluid'><input class='num-states num-whites' placeholder = '# of whites'><input class='num-states num-reds' placeholder = '# of reds'><button class='btn btn-small new-chain'>New</button></div></div>");
+        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button># of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
+        
         $(".span8").append("<div class = 'row-fluid'><div class = 'input-row'></div></div>");
         
         $(".transition").on("click",transition);
@@ -515,7 +525,7 @@ var markovChain = (function() {
         function transitionBottom(state){
             var points = state;
             
-            chart.selectAll(".bottom_bubble").data(points).transition().duration(500)
+            chart.selectAll(".bottom-bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/16)+4})
                 .style("fill-opacity",function(d){return d;});
             
@@ -540,7 +550,7 @@ var markovChain = (function() {
                   .data(newpoints)
                 .enter().append("g")
                   .attr("class", "bottom-node")
-                .attr("transform", function(d,i) { return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height+ ")"; });
+                .attr("transform", function(d,i) { return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + (10/11)*chart_height+ ")"; });
             
             node.append("circle")
                 .attr("class", "bottom-bubble")
@@ -639,34 +649,48 @@ var markovChain = (function() {
                 for(var i = 0; i<results.length-1 ; i++){
                     if(results[i] == "right"){
                         $('.input-row #'+i+'').after('<i class="icon icon-ok" id="icon'+i+'"></i>');
-                        $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))});
+                        $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))+5});
                     }
                     else{
                         $('.input-row #'+i+'').after('<i class="icon icon-remove" id="icon'+i+'"></i>');
-                        $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))});
+                        $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))+5});
                     }
                 }
                 
     
                 if(results[results.length-1] == 1){
+                    model.transition(true);
+                    console.log(model.get_current_state());
                     $(this).remove();
-                    displayNextInputRow();
+                    $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
+                    
+                    $('.observation').on("click",makeObservation);
+                    //displayNextInputRow();
                 }
             });
         }
         
+        function makeObservation(){
+            var observation = model.make_obs();
+            alert(observation);
+        }
+        
         function displayNextInputRow(){
             $(".span8").append("<div class='row-fluid'><div class ='input-obs-given-row'></div></div>");
-
+            
+            $('.side-labels').append("<div class='obs-given-p'>P(S<sub>2</sub>=s)</div>");
+            
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-row').append("<input class='obs-entry' id='"+i+"' placeholder='P("+i+")'>");
-                $('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
+                $('.input-obs-given-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+")'>");
+                $('.input-obs-given-row .'+i+'').offset({left: $(".input-obs-given-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
             }
             
-            $('.input-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            $('.obs-given-p').offset({top: $(".bubble-name").offset().top});
+            
+            $('.input-obs-given-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
             
         }
         
@@ -674,6 +698,9 @@ var markovChain = (function() {
             chart.selectAll(".arrow").remove();
             chart.selectAll(".diagRight").remove();
             chart.selectAll(".diagLeft").remove();
+            chart.selectAll(".trans-label").remove();
+            chart.selectAll(".diagRight-label").remove();
+            chart.selectAll(".diagLeft-label").remove();
             
             var points = model.get_current_state_array();
             var numpoints = points.length;
@@ -732,7 +759,7 @@ var markovChain = (function() {
                 .attr('dy',"0.9em")
                 .attr("y", chart_height/2)
                 .attr("text-anchor","end")
-                .text(function(d,i) {  return d[i]; });
+                .text(function(d,i) {  return round_number(d[i],3); });
             
             chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
                 .attr("x", function(d,i){return i*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
@@ -741,7 +768,7 @@ var markovChain = (function() {
                 .attr("y", chart_height/2)
                 .attr("text-anchor","end")
                 .attr("fill","blue")
-                .text(function(d,i) { return d[i+1]; });
+                .text(function(d,i) { return round_number(d[i+1],3); });
             
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
                 .attr("x", function(d,i){return (i-1)*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
@@ -750,7 +777,7 @@ var markovChain = (function() {
                 .attr("y", chart_height/2)
                 .attr("text-anchor","start")
                 .attr("fill","orange")
-                .text(function(d,i) { return d[i-1]; });
+                .text(function(d,i) { return round_number(d[i-1],3); });
             
         }
         
