@@ -189,8 +189,8 @@ var markovChain = (function() {
                 prob_red += current_state[i]*i/(n-1);
             }
             var r = Math.random();
-            //console.log(r);
-            console.log('prob_red',prob_red);
+            console.log(r);
+            console.log(prob_red);
             if (r < prob_red){return "red";}
             else {return "white";}
         }
@@ -221,10 +221,10 @@ var markovChain = (function() {
             var assocArray = {};
             var r = {}; var w = {};
             for (var i = 0; i < n; i++){
-                r[i] = current_state[i]*prob_OgS()["red"][i];
+                r[i] = transition(false)[i]*prob_OgS()["red"][i];
             }
             for (var i = 0; i < n; i++){
-                w[i] = current_state[i]*prob_OgS()["white"][i];
+                w[i] = transition(false)[i]*prob_OgS()["white"][i];
             }
             assocArray["red"] = r; assocArray["white"] = w;
             return assocArray;
@@ -322,7 +322,7 @@ var markovChain = (function() {
         */
         function checkAnswers(answers){
             var correctAns = model.transition(false);
-            //console.log(model.transition(false));
+            console.log(model.transition(false));
             var result = [];
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
@@ -362,7 +362,7 @@ var markovChain = (function() {
         function checkOnS(answers, obs){
             var result = [];
             var correctAns = model.prob_OnS()[obs];
-            console.log('ans',correctAns);
+            console.log(correctAns);
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
                 if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
@@ -435,7 +435,6 @@ var markovChain = (function() {
         function transition(){
             model.transition(true);
             transitionTop();
-            //transitionBottom();
         }
 
         function newChain(){
@@ -445,13 +444,17 @@ var markovChain = (function() {
             }
             
             else{
+                $('.side-labels').empty();
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
                 updateDisplay();
+                
+                setupSideLabels();
             }
         }
         
         function setupSideLabels(){
+            $('.side-labels').empty();
             $('.side-labels').append("<div class='num-label'># of reds in bag</div>");
             $('.side-labels').append("<div class='first-prob'>P(S<sub>1</sub>=s)</div>");
             $('.side-labels').append("<div class='num2-label'># of reds in bag</div>");
@@ -570,15 +573,6 @@ var markovChain = (function() {
                 .style("text-anchor", "middle")
                 .text(function(d) { return d[0]; });
             
-//            chart.selectAll(".bottom_bubble").data(points).enter().append("circle")
-//                .attr("class", "bottom_bubble")
-//                .attr("cx", function(d,i){return chart_width*(i/(points.length-1))})
-//                .attr("cy", chart_height)
-//                .attr("r", function(d){return d*(chart_height/16)+4})
-//                .style("fill","blue")
-//                .style("stroke","black")
-//                .style("fill-opacity",function(d){return d;});
-//            
             updateBottomLabels();
         }
         
@@ -586,15 +580,8 @@ var markovChain = (function() {
             
             var points = model.get_current_state_array();
             var names = Object.keys(model.get_current_state());
-            
-//            chart.selectAll(".bubble-name").remove();
+
             chart.selectAll(".bubble-label").remove();
-            
-//            chart.selectAll(".bubble-name").data(names).enter().append("text").attr("class", "bubble-name")
-//                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-//                .attr('y',chart_height/8)
-//                .attr("dx",-4)
-//                .text(function(d) { return d; });
             
             chart.selectAll(".bubble-label").data(points).enter().append("text").attr("class", "bubble-label")
                 .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
@@ -607,21 +594,9 @@ var markovChain = (function() {
             
             var points = model.get_current_state_array();
             var names = Object.keys(model.get_current_state());
-            
-//            chart.selectAll(".bottom-bubble-name").remove();
+
             chart.selectAll(".bottom-bubble-label").remove();
             
-//            chart.selectAll(".bottom-bubble-name").data(names).enter().append("text").attr("class", "bottom-bubble-name")
-//                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-//                .attr('y',(7/8)*chart_height)
-//                .attr("dx",-4)
-//                .text(function(d) { return d; });
-//            
-//            chart.selectAll(".bottom-bubble-label").data(points).enter().append("text").attr("class", "bottom-bubble-label")
-//                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-//                .attr('y',(6/7)*chart_height)
-//                .attr("dx",-4)
-//                .text(function(d) { return round_number(d,4); });
         }
         
         function updateFirstInputRow(){
@@ -670,20 +645,22 @@ var markovChain = (function() {
             else if(indexOfCheck == 1){
                 var results = controller.checkOgS(answers,observation);
             }
-            else{
+            else if(indexOfCheck == 2){
                 var results = controller.checkOnS(answers,observation);
-                console.log(results);
+            }
+            else{// if(indexOfCheck == 3){
+                var results = controller.checkOnS(answers,observation);
             }   
             
             $('.input-row .icon').remove();
             
             for(var i = 0; i<results.length-1 ; i++){
                 if(results[i] == "right"){
-                    $('.input-row .'+i).after('<i class="icon icon-ok" id="icon'+i+'"></i>');
+                    $('.input-row .'+i).after('<i class="icon icon-large icon-ok" id="icon'+i+'"></i>');
                     $(".input-row #icon"+i).offset({left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
                 }
                 else{
-                    $('.input-row .'+i).after('<i class="icon icon-remove" id="icon'+i+'"></i>');
+                    $('.input-row .'+i).after('<i class="icon icon-large icon-remove" id="icon'+i+'"></i>');
                     $(".input-row #icon"+i).offset({left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
                 }
             }
@@ -752,6 +729,37 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(2,observation);
+    
+                if(results[results.length-1] == 1){
+                    $(this).remove();
+                    displayNormInputRow();
+                }
+            });
+        }
+        
+        function displayNormInputRow(observation){
+            $(".span8").append("<div class='row-fluid'><div class ='input-norm-row'></div></div>");
+            
+            $('.side-labels').append("<div class='norm-label'>P(S<sub>2</sub>=s|O="+observation+")</div>");
+            
+            var num_entries = model.get_current_state_array().length;
+            
+            for(var i = 0; i < num_entries; i++){
+                $('.input-norm-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+"|"+observation+")'>");
+                $('.input-norm-row .'+i+'').offset({left: $(".input-norm-row").offset().left + i*(chart_width)/(num_entries-1)});
+                $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
+            }
+            
+            $('.norm-label').offset({top: $(".input-norm-row").offset().top});
+            
+            $('.input-norm-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            
+            $('.input-row').removeClass('input-row');
+            $('.input-norm-row').addClass('input-row');
+            
+            $('.check').on('click',function(){
+                
+                var results = checkView(3,observation);
     
                 if(results[results.length-1] == 1){
                     $(this).remove();
@@ -865,7 +873,6 @@ var markovChain = (function() {
         }
         
         function setupProbVsTime(){
-            //var array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
             $(".graph-container").empty();
             var graph = d3.select(".graph-container").append("svg")
                 .attr("class","graph").attr("height", outer_height)
@@ -896,9 +903,10 @@ var markovChain = (function() {
                 .attr("dx","-0.1em")
                 .text(String);
             
-            //graph.selectAll(".time-label").data().enter().append("text").attr("class", "y-scale-label").attr("x",x_scale(0)).attr('y',y_scale).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
-            //graph.selectAll(".time-label").data([]).enter().append("text").attr("class", "time-label").attr("x",chart_width).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
+            graph.selectAll(".time-label").data([]).enter().append("text").attr("class", "time-label").attr("x",chart_width).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
             
+<<<<<<< HEAD
+=======
             //var data_array = model.get_states_array();
             var data_array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
             var restructured_data = [];
@@ -940,6 +948,7 @@ var markovChain = (function() {
             // var first_line = graph.selectAll(".prob-line").data([data1]).enter().append("path");
             // first_line.attr("d", d3.svg.line().x(function(d){console.log("this",d,d.x,x_scale(d.x));return x_scale(d.x);}).y(function(d){console.log("this",d,d.y,y_scale(d.y));return y_scale(d.y);}));
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
+>>>>>>> b982be70600e84374d0e1977464732b62de29827
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
         
