@@ -375,6 +375,29 @@ var markovChain = (function() {
         }
         
         return {checkAnswers: checkAnswers, checkOgS: checkOgS, checkOnS: checkOnS};
+
+        /*
+        function that takes in an array of probabilites and an observation string
+        returns an array like ["right","wrong","wrong"...0] based on the probability of Obs=obs & state=s
+        with the last entry a flag of whether it was all right (1) or not (0)
+        */
+        function checkObs(answers, obs){
+            var result = [];
+            var correctAns = model.observe(obs,false);
+            console.log('ans',correctAns);
+            var allCorrect = 1;
+            for (var i = 0; i < answers.length; i++){
+                if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
+                    result[i] = "right";                 
+                }
+                else {result[i] = "wrong"; allCorrect = 0;}
+            }
+            result[answers.length] = allCorrect;
+            return result;
+        }
+        
+        return {checkAnswers: checkAnswers, checkOgS: checkOgS, checkOnS: checkOnS};
+
     }
     
     function View(div, model, controller){
@@ -840,25 +863,75 @@ var markovChain = (function() {
         function setupGraph(){
             
             $(".chart-container").empty();
-            chart = d3.select(".chart-container").append("svg").attr("class","chart").attr("height", outer_height).attr("width",outer_width).append("g").attr("transform","translate(" + margin.left + "," + margin.top + ")");
+            chart = d3.select(".chart-container").append("svg")
+                .attr("class","chart")
+                .attr("height", outer_height)
+                .attr("width",outer_width)
+                .append("g")
+                .attr("transform","translate(" + margin.left + "," + margin.top + ")");
     
         }
         
         function setupProbVsTime(){
             $(".graph-container").empty();
-            var graph = d3.select(".graph-container").append("svg").attr("class","graph").attr("height", outer_height).attr("width",outer_width).append("g").attr("transform","translate(" + margin.left + "," + margin.top + ")");
+            var graph = d3.select(".graph-container").append("svg")
+                .attr("class","graph").attr("height", outer_height)
+                .attr("width",outer_width).append("g")
+                .attr("transform","translate(" + margin.left + "," + margin.top + ")");
             
             var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
             var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
 
-            graph.selectAll(".y-line").data(y_scale.ticks(1)).enter().append("line").attr("class", "y-line").attr('x1', 0).attr('x2', chart_width).attr('y1', y_scale).attr('y2',y_scale);
+            graph.selectAll(".y-line").data(y_scale.ticks(1)).enter().append("line")
+                .attr("class", "y-line")
+                .attr('x1', 0)
+                .attr('x2', chart_width)
+                .attr('y1', y_scale)
+                .attr('y2',y_scale);
             
-            graph.selectAll(".x-line").data(x_scale.ticks(1)).enter().append("line").attr("class", "x-line").attr('x1', x_scale).attr('x2', x_scale).attr('y1', 0).attr('y2',chart_height);
+            graph.selectAll(".x-line").data(x_scale.ticks(1)).enter().append("line")
+                .attr("class", "x-line").attr('x1', x_scale)
+                .attr('x2', x_scale).attr('y1', 0)
+                .attr('y2',chart_height);
             
-            graph.selectAll(".y-scale-label").data(y_scale.ticks(6)).enter().append("text").attr("class", "y-scale-label").attr("x",x_scale(0)).attr('y',y_scale).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text(String);
+            graph.selectAll(".y-scale-label").data(y_scale.ticks(6)).enter().append("text")
+                .attr("class", "y-scale-label")
+                .attr("x",x_scale(0))
+                .attr('y',y_scale)
+                .attr("text-anchor","end")
+                .attr("dy","0.3em")
+                .attr("dx","-0.1em")
+                .text(String);
             
             graph.selectAll(".time-label").data([]).enter().append("text").attr("class", "time-label").attr("x",chart_width).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
             
+<<<<<<< HEAD
+=======
+            //var data_array = model.get_states_array();
+            var data_array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
+            var restructured_data = [];
+            for (var i = 0; i < Object.keys(data_array[0]).length; i++) {
+                var inner_array = [];
+                for (var j = 0; j < data_array.length; j++) {
+                    inner_array.push({"px":j,"py":data_array[j][i],"color_id":i});
+                }
+                restructured_data.push(inner_array);
+            }
+            //console.log('data1',data1);
+            var color = d3.scale.category10();
+            var line = d3.svg.line().x(function(d){console.log("this",d,d.px,x_scale(d.px));return x_scale(d.px);}).y(function(d){/*console.log("this",d,d.y,y_scale(d.y));*/return y_scale(d.py);});
+            graph.selectAll(".line").data(restructured_data).enter().append("path")
+                .attr("class","line")
+                .attr("d",line)
+                //.attr("stroke","black")
+                .style("stroke", function(d){return color(d.color_id);})
+                .attr("stroke-width",3)
+                .attr("fill","none");
+
+            // var first_line = graph.selectAll(".prob-line").data([data1]).enter().append("path");
+            // first_line.attr("d", d3.svg.line().x(function(d){console.log("this",d,d.x,x_scale(d.x));return x_scale(d.x);}).y(function(d){console.log("this",d,d.y,y_scale(d.y));return y_scale(d.y);}));
+            // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
+>>>>>>> b982be70600e84374d0e1977464732b62de29827
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
         
