@@ -350,6 +350,7 @@ var markovChain = (function() {
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
+            console.log(result);
             return result;
         }
 
@@ -361,6 +362,7 @@ var markovChain = (function() {
         function checkOnS(answers, obs){
             var result = [];
             var correctAns = model.prob_OnS()[obs];
+            console.log(correctAns);
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
                 if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
@@ -378,9 +380,9 @@ var markovChain = (function() {
     function View(div, model, controller){
         
         div.append("<div class = 'hero-unit'><h2><small>Illustration of Markov Chain:</small> Lego Game</h2>"
-            +"<p>Two <span class='muted'>white</span> lego bricks are put into a bag. A transition and an observation happens every round."
+            +"<p>Two <span style='color:white'>white</span> lego bricks are put into a bag. A transition and an observation happens every round."
             +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
-            +" <span class='text-error'>red</span> or <span class='muted'>white</span> is added to the bag."
+            +" <span style='color:red'>red</span> or <span class='muted'>white</span> is added to the bag."
             +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
             +"<p class='text-info'><small>We've already done one transition for you:)<br>Fill in the blank with appropriate probabilities."
             +"You may change number of blocks on the right column and start over.</small></p></div>"
@@ -626,39 +628,39 @@ var markovChain = (function() {
             
             $('.check').on('click',function(){
                 
-                var results = checkView(0);
+                var results = checkView(0,"none");
     
                 if(results[results.length-1] == 1){
+                    $('.input-row .obs-entry').attr("disabled","true");
                     model.transition(true);
                     console.log(model.get_current_state());
                     $(this).remove();
                     $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
                     
                     $('.observation').on("click",makeObservation);
-                    //displayNextInputRow();
                 }
             });
         }
         
         //displays to the user if they are correct or incorrect, with the parameter indexOfCheck referring to the type of answer it is (which row is being checked - 0: p(s=s), 1: p(o=obs|s=s), 2: p(o=obs,s=s)...)
-        function checkView(indexOfCheck){
+        function checkView(indexOfCheck,observation){
             var answers = [];
             var num_entries = model.get_current_state_array().length;
                 
             for(var i=0; i<num_entries; i++){
                 answers.push(parseFloat($('.input-row .'+i).val()));
             }
-
-            transitionBottom(answers);
-            
+            console.log(indexOfCheck);
             if(indexOfCheck == 0){
+                transitionBottom(answers);
                 var results = controller.checkAnswers(answers);
             }
             else if(indexOfCheck == 1){
-                var results = controller.checkOgS(answers);
+                var results = controller.checkOgS(answers,observation);
             }
             else{
-                var results = controller.checkAnswers(answers);
+                var results = controller.checkOnS(answers,observation);
+                console.log(results);
             }   
             
             $('.input-row .icon').remove();
@@ -680,10 +682,10 @@ var markovChain = (function() {
             $('.observation').remove();
             var observation = model.make_obs();
             $(".check-row").append("<div class='row-fluid'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
-            displayNextInputRow(observation);
+            displayOgSInputRow(observation);
         }
         
-        function displayNextInputRow(observation){
+        function displayOgSInputRow(observation){
             $(".span8").append("<div class='row-fluid'><div class ='input-obs-given-row'></div></div>");
             
             $('.side-labels').append("<div class='obs-given-p'>P(O="+observation+"|S<sub>2</sub>=s)</div>");
@@ -705,16 +707,43 @@ var markovChain = (function() {
             
             $('.check').on('click',function(){
                 
-                var results = checkView(1);
+                var results = checkView(1,observation);
     
                 if(results[results.length-1] == 1){
-                    model.transition(true);
-                    console.log(model.get_current_state());
+                    $('.input-row .obs-entry').attr("disabled",true);
                     $(this).remove();
-                    $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
-                    
-                    $('.observation').on("click",makeObservation);
-                    //displayNextInputRow();
+                    displayOnSInputRow(observation);
+                }
+            });
+        }
+        
+        function displayOnSInputRow(observation){
+            $(".span8").append("<div class='row-fluid'><div class ='input-ons-row'></div></div>");
+            
+            $('.side-labels').append("<div class='ons-label'>P(O="+observation+",S<sub>2</sub>=s)</div>");
+            
+            var num_entries = model.get_current_state_array().length;
+            
+            for(var i = 0; i < num_entries; i++){
+                $('.input-ons-row').append("<input class='obs-entry "+i+"' placeholder='P("+observation+","+i+")'>");
+                $('.input-ons-row .'+i+'').offset({left: $(".input-ons-row").offset().left + i*(chart_width)/(num_entries-1)});
+                $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
+            }
+            
+            $('.ons-label').offset({top: $(".input-ons-row").offset().top});
+            
+            $('.input-ons-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            
+            $('.input-row').removeClass('input-row');
+            $('.input-ons-row').addClass('input-row');
+            
+            $('.check').on('click',function(){
+                
+                var results = checkView(2,observation);
+    
+                if(results[results.length-1] == 1){
+                    $(this).remove();
+                    //displayOnSInputRow();
                 }
             });
         }
