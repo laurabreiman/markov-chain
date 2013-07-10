@@ -3,7 +3,7 @@ text {
     font-size: 12px;
 }
 
-line {
+.chart-container line {
     stroke-dasharray: 2,2;
 }
 
@@ -37,4 +37,8 @@ line {
 
 .hero-unit h2 small {
 	color: black;
+}
+
+.graph-container line{
+    stroke: black;
 }
