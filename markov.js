@@ -911,14 +911,31 @@ var markovChain = (function() {
             }
             //console.log('data1',data1);
             var color = d3.scale.category10();
-            var line = d3.svg.line().x(function(d){console.log("this",d,d.px,x_scale(d.px));return x_scale(d.px);}).y(function(d){/*console.log("this",d,d.y,y_scale(d.y));*/return y_scale(d.py);});
-            graph.selectAll(".line").data(restructured_data).enter().append("path")
-                .attr("class","line")
-                .attr("d",line)
-                //.attr("stroke","black")
-                .style("stroke", function(d){return color(d.color_id);})
-                .attr("stroke-width",3)
-                .attr("fill","none");
+            var line = d3.svg.line()
+                .x(function(d){
+                    //console.log("this",d,d.px,x_scale(d.px));
+                    return x_scale(d.px);
+                })
+                .y(function(d){
+                    //console.log("this",d,d.y,y_scale(d.y));
+                    return y_scale(d.py);
+                });
+
+            for (var i = 0; i < restructured_data.length; i++){
+                graph.append("path")
+                    .attr("d",line(restructured_data[i]))
+                    .attr("stroke-width",3)  
+                    .attr("fill","none")
+                    .attr("stroke", color(i));
+            }
+
+            // graph.selectAll(".line").data(restructured_data[1]).enter().append("path")
+            //     .attr("class","line")
+            //     .attr("d",line(restructured_data[1]))
+            //     //.attr("stroke","black")
+            //     .style("stroke", function(d){return color(d.color_id);})
+            //     .attr("stroke-width",3)
+            //     .attr("fill","none");
 
             // var first_line = graph.selectAll(".prob-line").data([data1]).enter().append("path");
             // first_line.attr("d", d3.svg.line().x(function(d){console.log("this",d,d.x,x_scale(d.x));return x_scale(d.x);}).y(function(d){console.log("this",d,d.y,y_scale(d.y));return y_scale(d.y);}));
