@@ -383,10 +383,13 @@ var markovChain = (function() {
             +" <span class='text-error'>red</span> or <span class='muted'>white</span> is added to the bag."
             +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
 <<<<<<< HEAD
+<<<<<<< HEAD
             +"<p class='text-info'><small>Fill in the blank with appropriate probabilities."
             +" You may change number of blocks on the right column and start over.</small></p></div>"
             +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'controls'></div></div><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'></div></div><div class ='row-fluid'><div class = 'graph-container'></div></div></div>");
 =======
+=======
+>>>>>>> 972c24db6624186efad0ea8162ff650296f38748
             +"<p class='text-info'><small>We've already done one transition for you:)<br>Fill in the blank with appropriate probabilities."
             +"You may change number of blocks on the right column and start over.</small></p></div>"
             +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div><div class ='row-fluid'><div class = 'graph-container'></div></div></div>");
