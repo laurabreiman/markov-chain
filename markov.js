@@ -42,7 +42,8 @@ var markovChain = (function() {
 /////////////////////////////////// set up div functions
     
     function Model(){
-        var initial_state = {0: 1, 1: 0, 2: 0};
+        var states_array = [];
+        //var initial_state = {0: 1, 1: 0, 2: 0};
         var transition_model = {0: {0: .5, 1: 0.5}, 1: {0: 1/8, 1: 1/2, 2:  3/8}, 2: {1: 1/4, 2:  3/4}};
         var observation_model = {0: {red: 0, white: 1}, 1: {red: 1/2, white: 1/2}, 2:  {red: 1,white: 0}};
         var current_state = {0: 1, 1: 0, 2: 0};
@@ -72,13 +73,12 @@ var markovChain = (function() {
             var total_blocks = parseInt(array[0])+parseInt(array[1]);
 
             //change initial_state
-            initial_state = {};
+            current_state = {};
             for (var i = 0; i <= total_blocks; i++){
-                initial_state[i] = 0;    //each state set to be equally likely
+                current_state[i] = 0;    //each state set to be equally likely
             }
-            initial_state[array[0]] = 1;
-            console.log('intial state', initial_state);
-            current_state = initial_state;
+            current_state[array[0]] = 1;
+            //console.log('intial state', initial_state);
 
             //change transition_model
             // for (var i in transition_model){
@@ -90,8 +90,8 @@ var markovChain = (function() {
             console.log('trans for',0,"=",transition_model[0]); 
                        
             transition_model[total_blocks] = {};
-            transition_model[total_blocks][total_blocks-1] = 0.5;
-            transition_model[total_blocks][total_blocks-2]= 0.5;
+            transition_model[total_blocks][total_blocks] = 0.5;
+            transition_model[total_blocks][total_blocks-1]= 0.5;
 
             for (var i = 1; i < total_blocks; i++){
                 var assocArray = {};
@@ -200,7 +200,7 @@ var markovChain = (function() {
         prob_OgS()[o][s] will return the desired probability.
         */
         function prob_OgS(){
-            var n = Object.getOwnPropertyNames(initial_state).length;
+            var n = Object.getOwnPropertyNames(current_state).length;
             var assocArray = {};
             var r = {}; var w = {};
             for (var i = 0; i < n; i++){
@@ -217,20 +217,25 @@ var markovChain = (function() {
         prob_OnS()[o][s] will return the desired probability.
         */
         function prob_OnS(){
-            var n = Object.getOwnPropertyNames(initial_state).length
+            var n = Object.getOwnPropertyNames(current_state).length
             var assocArray = {};
             var r = {}; var w = {};
             for (var i = 0; i < n; i++){
-                r[i] = current_state[i]*prob_OgS()["red"][i];
+                r[i] = transition(false)[i]*prob_OgS()["red"][i];
             }
             for (var i = 0; i < n; i++){
-                w[i] = current_state[i]*prob_OgS()["white"][i];
+                w[i] = transition(false)[i]*prob_OgS()["white"][i];
             }
             assocArray["red"] = r; assocArray["white"] = w;
             return assocArray;
         }
         
-        function transition(){
+        /*
+        function that transitions the current prob dist.
+        if updateCurrent is true, then updates the current state,
+        if false, then just return the next state while keeping the current state the same.
+        */
+        function transition(updateCurrent){
             var next_state = {};
             
             for(var i in current_state){
@@ -240,13 +245,20 @@ var markovChain = (function() {
             for(var i in current_state){
                 for(var j in transition_model[i]){
                     next_state[i] += current_state[j]*transition_model[j][i]
+                    //console.log(i,j,'=',current_state[j],'*',transition_model[j][i]);
                 }
-                
             }
-            current_state = next_state;
+
+            if (updateCurrent){current_state = next_state;}
+            else {return next_state;}
         }
-        
-        function observe(obs){
+
+        /*
+        function that makes an observation.
+        if updateCurrent is true, then updates the current state,
+        if false, then just return the next prob dist depending on the obs while keeping the current state the same.
+        */
+        function observe(obs, updateCurrent){            
             var next_state = {};
             
             for(var i in current_state){
@@ -263,13 +275,14 @@ var markovChain = (function() {
                 next_state[i] = next_state[i]/total;
             }
             
-            current_state = next_state;
-            
+            if (updateCurrent){current_state = next_state;}
+            else {return next_state;}           
         }
         
         function get_current_state(){
             return current_state;
         }
+
         function get_current_state_array(){
             var pointData = [];
             for(var i in current_state){
@@ -297,12 +310,12 @@ var markovChain = (function() {
         whether it was all right (1) or not (0)
         */
         function checkAnswers(answers){
-            var current_state = model.get_current_state();
-            console.log(model.get_current_state());
+            var correctAns = model.transition(false);
+            console.log(model.transition(false));
             var result = [];
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
-                if (answers[i].toFixed(3) == current_state[i].toFixed(3)){
+                if (round_number(answers[i],3) == round_number(correctAns[i],3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
@@ -317,10 +330,10 @@ var markovChain = (function() {
         */
         function checkOgS(answers, obs){
             var result = [];
-            var correct = model.prob_OgS()[obs];
+            var correctAns = model.prob_OgS()[obs];
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
-                if (answers[i].toFixed(3) == correct[i].toFixed(3)){
+                if (round_number(answers[i],3) == round_number(correctAns[i],3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
@@ -336,10 +349,10 @@ var markovChain = (function() {
         */
         function checkOnS(answers, obs){
             var result = [];
-            var correct = model.prob_OnS()[obs];
+            var correctAns = model.prob_OnS()[obs];
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
-                if (answers[i].toFixed(3) == correct[i].toFixed(3)){
+                if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
@@ -382,7 +395,7 @@ var markovChain = (function() {
         setupSideLabels();
 
         function transition(){
-            model.transition();
+            model.transition(true);
             transitionTop();
             //transitionBottom();
         }
