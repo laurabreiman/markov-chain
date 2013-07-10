@@ -615,8 +615,8 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-row').append("<input class='obs-entry' id='"+i+"' placeholder='P("+i+")'>");
-                $('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
+                $('.input-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+")'>");
+                $('.input-row .'+i).offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
             }
             
@@ -625,29 +625,8 @@ var markovChain = (function() {
             model.transition();
             
             $('.check').on('click',function(){
-                var answers = [];
                 
-                for(var i=0; i<num_entries; i++){
-                    answers.push(parseFloat($('.input-row #'+i+'').val()));
-                }
-
-                transitionBottom(answers);
-                
-                var results = controller.checkAnswers(answers);
-                
-                $('.icon').remove();
-                
-                for(var i = 0; i<results.length-1 ; i++){
-                    if(results[i] == "right"){
-                        $('.input-row #'+i+'').after('<i class="icon icon-ok" id="icon'+i+'"></i>');
-                        $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))+5});
-                    }
-                    else{
-                        $('.input-row #'+i+'').after('<i class="icon icon-remove" id="icon'+i+'"></i>');
-                        $("#icon"+i).offset({left: $('.input-row #'+i+'').offset().left + parseInt($('.input-row #'+i+'').css("width"))+5});
-                    }
-                }
-                
+                var results = checkView(0);
     
                 if(results[results.length-1] == 1){
                     model.transition(true);
@@ -661,28 +640,83 @@ var markovChain = (function() {
             });
         }
         
-        function makeObservation(){
-            var observation = model.make_obs();
-            alert(observation);
+        //displays to the user if they are correct or incorrect, with the parameter indexOfCheck referring to the type of answer it is (which row is being checked - 0: p(s=s), 1: p(o=obs|s=s), 2: p(o=obs,s=s)...)
+        function checkView(indexOfCheck){
+            var answers = [];
+            var num_entries = model.get_current_state_array().length;
+                
+            for(var i=0; i<num_entries; i++){
+                answers.push(parseFloat($('.input-row .'+i).val()));
+            }
+
+            transitionBottom(answers);
+            
+            if(indexOfCheck == 0){
+                var results = controller.checkAnswers(answers);
+            }
+            else if(indexOfCheck == 1){
+                var results = controller.checkOgS(answers);
+            }
+            else{
+                var results = controller.checkAnswers(answers);
+            }   
+            
+            $('.input-row .icon').remove();
+            
+            for(var i = 0; i<results.length-1 ; i++){
+                if(results[i] == "right"){
+                    $('.input-row .'+i).after('<i class="icon icon-ok" id="icon'+i+'"></i>');
+                    $(".input-row #icon"+i).offset({left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
+                }
+                else{
+                    $('.input-row .'+i).after('<i class="icon icon-remove" id="icon'+i+'"></i>');
+                    $(".input-row #icon"+i).offset({left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
+                }
+            }
+            return results;
         }
         
-        function displayNextInputRow(){
+        function makeObservation(){
+            $('.observation').remove();
+            var observation = model.make_obs();
+            $(".check-row").append("<div class='row-fluid'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
+            displayNextInputRow(observation);
+        }
+        
+        function displayNextInputRow(observation){
             $(".span8").append("<div class='row-fluid'><div class ='input-obs-given-row'></div></div>");
             
-            $('.side-labels').append("<div class='obs-given-p'>P(S<sub>2</sub>=s)</div>");
+            $('.side-labels').append("<div class='obs-given-p'>P(O="+observation+"|S<sub>2</sub>=s)</div>");
             
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-obs-given-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+")'>");
+                $('.input-obs-given-row').append("<input class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+")'>");
                 $('.input-obs-given-row .'+i+'').offset({left: $(".input-obs-given-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
             }
             
-            $('.obs-given-p').offset({top: $(".bubble-name").offset().top});
+            $('.obs-given-p').offset({top: $(".input-obs-given-row").offset().top});
             
             $('.input-obs-given-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
             
+            $('.input-row').removeClass('input-row');
+            $('.input-obs-given-row').addClass('input-row');
+            
+            $('.check').on('click',function(){
+                
+                var results = checkView(1);
+    
+                if(results[results.length-1] == 1){
+                    model.transition(true);
+                    console.log(model.get_current_state());
+                    $(this).remove();
+                    $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
+                    
+                    $('.observation').on("click",makeObservation);
+                    //displayNextInputRow();
+                }
+            });
         }
         
         function updateArrows(){
@@ -797,7 +831,7 @@ var markovChain = (function() {
             
             graph.selectAll(".y-scale-label").data(y_scale.ticks(6)).enter().append("text").attr("class", "y-scale-label").attr("x",x_scale(0)).attr('y',y_scale).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text(String);
             
-            graph.selectAll(".time-label").data().enter().append("text").attr("class", "y-scale-label").attr("x",x_scale(0)).attr('y',y_scale).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
+            graph.selectAll(".time-label").data([]).enter().append("text").attr("class", "time-label").attr("x",chart_width).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
             
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
