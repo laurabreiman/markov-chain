@@ -422,15 +422,40 @@ var markovChain = (function() {
             chart.selectAll(".top_bubble").remove();
             
             var points = model.get_current_state_array();
+            var pointdict = model.get_current_state();
+            var newpoints =[];
             
-            var bubbles = chart.selectAll(".top_bubble").data(points).enter().append("circle")
+            for(var i in pointdict){
+                newpoints.push([i,points[i]])
+            }
+            
+            var node = chart.selectAll(".top-node")
+                  .data(newpoints)
+                .enter().append("g")
+                  .attr("class", "top-node")
+                .attr("transform", function(d,i,j) { return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + 0 + ")"; });
+            
+            node.append("circle")
                 .attr("class", "top_bubble")
-                .attr("cx", function(d,i){return (chart_width)*(i/(points.length-1))})
-                .attr("cy", 0)
-                .attr("r", function(d){return d*(chart_height/20)+4})
+                .attr("r", function(d){return d[1]*(chart_height/20)+8})
                 .style("fill","blue")
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return d;});
+                .style("fill-opacity",function(d){return d[1];});
+            
+            node.append("text")
+                .attr("class","bubble-name")
+                .attr("dy", ".3em")
+                .style("text-anchor", "middle")
+                .text(function(d,i) { return d[0]; });
+
+//            var bubbles = chart.selectAll(".top_bubble").data(points).enter().append("circle")
+//                .attr("class", "top_bubble")
+//                .attr("cx", function(d,i){return (chart_width)*(i/(points.length-1))})
+//                .attr("cy", 0)
+//                .attr("r", function(d){return d*(chart_height/20)+4})
+//                .style("fill","blue")
+//                .style("stroke","black")
+//                .style("fill-opacity",function(d){return d;});
             
             updateTopLabels();
         }
@@ -470,21 +495,43 @@ var markovChain = (function() {
         function updateBottomBubbles(){
             chart.selectAll(".bottom_bubble").remove();
             var pointlength = model.get_current_state_array().length;
-            var points = [];
             
-            for(var i = 0; i<pointlength; i++){
-                points.push(1/pointlength);
+            var points = model.get_current_state_array();
+            var pointdict = model.get_current_state();
+            var newpoints =[];
+            
+            for(var i in pointdict){
+                newpoints.push([i,1/pointlength])
             }
-
-            chart.selectAll(".bottom_bubble").data(points).enter().append("circle")
-                .attr("class", "bottom_bubble")
-                .attr("cx", function(d,i){return chart_width*(i/(points.length-1))})
-                .attr("cy", chart_height)
-                .attr("r", function(d){return d*(chart_height/16)+4})
+            
+            var node = chart.selectAll(".bottom-node")
+                  .data(newpoints)
+                .enter().append("g")
+                  .attr("class", "bottom-node")
+                .attr("transform", function(d,i) { return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height+ ")"; });
+            
+            node.append("circle")
+                .attr("class", "top_bubble")
+                .attr("r", function(d){return d[1]*(chart_height/20)+8})
                 .style("fill","blue")
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return d;});
+                .style("fill-opacity",function(d){return d[1];});
             
+            node.append("text")
+                .attr("class","bottom-bubble-name")
+                .attr("dy", ".3em")
+                .style("text-anchor", "middle")
+                .text(function(d) { return d[0]; });
+            
+//            chart.selectAll(".bottom_bubble").data(points).enter().append("circle")
+//                .attr("class", "bottom_bubble")
+//                .attr("cx", function(d,i){return chart_width*(i/(points.length-1))})
+//                .attr("cy", chart_height)
+//                .attr("r", function(d){return d*(chart_height/16)+4})
+//                .style("fill","blue")
+//                .style("stroke","black")
+//                .style("fill-opacity",function(d){return d;});
+//            
             updateBottomLabels();
         }
         
@@ -493,14 +540,14 @@ var markovChain = (function() {
             var points = model.get_current_state_array();
             var names = Object.keys(model.get_current_state());
             
-            chart.selectAll(".bubble-name").remove();
+//            chart.selectAll(".bubble-name").remove();
             chart.selectAll(".bubble-label").remove();
             
-            chart.selectAll(".bubble-name").data(names).enter().append("text").attr("class", "bubble-name")
-                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-                .attr('y',chart_height/8)
-                .attr("dx",-4)
-                .text(function(d) { return d; });
+//            chart.selectAll(".bubble-name").data(names).enter().append("text").attr("class", "bubble-name")
+//                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
+//                .attr('y',chart_height/8)
+//                .attr("dx",-4)
+//                .text(function(d) { return d; });
             
             chart.selectAll(".bubble-label").data(points).enter().append("text").attr("class", "bubble-label")
                 .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
@@ -514,14 +561,14 @@ var markovChain = (function() {
             var points = model.get_current_state_array();
             var names = Object.keys(model.get_current_state());
             
-            chart.selectAll(".bottom-bubble-name").remove();
+//            chart.selectAll(".bottom-bubble-name").remove();
             chart.selectAll(".bottom-bubble-label").remove();
             
-            chart.selectAll(".bottom-bubble-name").data(names).enter().append("text").attr("class", "bottom-bubble-name")
-                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
-                .attr('y',(7/8)*chart_height)
-                .attr("dx",-4)
-                .text(function(d) { return d; });
+//            chart.selectAll(".bottom-bubble-name").data(names).enter().append("text").attr("class", "bottom-bubble-name")
+//                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
+//                .attr('y',(7/8)*chart_height)
+//                .attr("dx",-4)
+//                .text(function(d) { return d; });
 //            
 //            chart.selectAll(".bottom-bubble-label").data(points).enter().append("text").attr("class", "bottom-bubble-label")
 //                .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
@@ -646,7 +693,7 @@ var markovChain = (function() {
                                             else{ return ""}})
                 .style("stroke","orange");
             
-            
+            //set up labels that show the probability of a transition occuring between states
             chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
                 .attr("x", function(d,i){ return i*(chart_width/(numpoints-1))})
                 .attr('dx',"-0.3em")
@@ -665,13 +712,13 @@ var markovChain = (function() {
                 .text(function(d,i) { return d[i+1]; });
             
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
-                .attr("x", function(d,i){console.log(i); return (i-1)*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
+                .attr("x", function(d,i){return (i-1)*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
                 .attr('dx',".5em")
                 .attr('dy',"0.9em")
                 .attr("y", chart_height/2)
                 .attr("text-anchor","start")
                 .attr("fill","orange")
-                .text(function(d,i) { console.log(d); return d[i-1]; });
+                .text(function(d,i) { return d[i-1]; });
             
         }
         
