@@ -4,7 +4,6 @@ var markovChain = (function() {
     
 ////////////////////////////////// global variables 
     
-    //d3 chart components
     
 ////////////////////////////////// helper functions    
     
@@ -543,6 +542,8 @@ var markovChain = (function() {
             
             $('.input-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
             
+            model.transition();
+            
             $('.check').on('click',function(){
                 var answers = [];
                 
@@ -597,7 +598,10 @@ var markovChain = (function() {
             
             var points = model.get_current_state_array();
             var numpoints = points.length;
-            var transmodel = model.get_transition_model();
+            var transmodel = [];
+            for(var i=0; i< Object.keys(model.get_transition_model()).length ; i++){
+                transmodel.push(model.get_transition_model()[i]);
+            }
             
             chart.append("defs").append("marker")
                 .attr("id", "arrowhead")
@@ -641,11 +645,34 @@ var markovChain = (function() {
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
                 .style("stroke","orange");
-
+            
+            
             chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
-                .attr("x", function(d,i){return i*(chart_width/numpoints)})
+                .attr("x", function(d,i){ return i*(chart_width/(numpoints-1))})
+                .attr('dx',"-0.3em")
+                .attr('dy',"0.9em")
                 .attr("y", chart_height/2)
-                .text(function(d) { console.log(d); return d; });
+                .attr("text-anchor","end")
+                .text(function(d,i) {  return d[i]; });
+            
+            chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
+                .attr("x", function(d,i){return i*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
+                .attr('dx',"-0.3em")
+                .attr('dy',"0.9em")
+                .attr("y", chart_height/2)
+                .attr("text-anchor","end")
+                .attr("fill","blue")
+                .text(function(d,i) { return d[i+1]; });
+            
+            chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
+                .attr("x", function(d,i){console.log(i); return (i-1)*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
+                .attr('dx',".5em")
+                .attr('dy',"0.9em")
+                .attr("y", chart_height/2)
+                .attr("text-anchor","start")
+                .attr("fill","orange")
+                .text(function(d,i) { console.log(d); return d[i-1]; });
+            
         }
         
         function updateArrowLabels(){
