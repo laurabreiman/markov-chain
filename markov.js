@@ -382,19 +382,10 @@ var markovChain = (function() {
             +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
             +" <span class='text-error'>red</span> or <span class='muted'>white</span> is added to the bag."
             +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
-<<<<<<< HEAD
-<<<<<<< HEAD
-            +"<p class='text-info'><small>Fill in the blank with appropriate probabilities."
-            +" You may change number of blocks on the right column and start over.</small></p></div>"
-            +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'controls'></div></div><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'></div></div><div class ='row-fluid'><div class = 'graph-container'></div></div></div>");
-=======
-=======
->>>>>>> 972c24db6624186efad0ea8162ff650296f38748
             +"<p class='text-info'><small>We've already done one transition for you:)<br>Fill in the blank with appropriate probabilities."
             +"You may change number of blocks on the right column and start over.</small></p></div>"
-            +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'><div class = 'controls'></div></div></div><div class ='row-fluid'><div class = 'graph-container'></div></div></div>");
->>>>>>> 972c24db6624186efad0ea8162ff650296f38748
-    
+            +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'controls'></div></div><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'></div></div><div class ='row-fluid'><div class = 'graph-container'></div></div></div>");
+
         $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button># of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
         
         $(".span8").append("<div class = 'row-fluid'><div class = 'input-row'></div></div>");
@@ -805,6 +796,8 @@ var markovChain = (function() {
             graph.selectAll(".x-line").data(x_scale.ticks(1)).enter().append("line").attr("class", "x-line").attr('x1', x_scale).attr('x2', x_scale).attr('y1', 0).attr('y2',chart_height);
             
             graph.selectAll(".y-scale-label").data(y_scale.ticks(6)).enter().append("text").attr("class", "y-scale-label").attr("x",x_scale(0)).attr('y',y_scale).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text(String);
+            
+            graph.selectAll(".time-label").data().enter().append("text").attr("class", "y-scale-label").attr("x",x_scale(0)).attr('y',y_scale).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
             
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
