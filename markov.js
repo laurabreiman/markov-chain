@@ -427,10 +427,16 @@ var markovChain = (function() {
         var chart_width = outer_width - margin.left - margin.right;
         var chart_height = outer_height -margin.top - margin.bottom;
         
+        var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
+        var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
+        
+        var graph;
+
         setupGraph();
         updateDisplay();
         setupSideLabels();
         setupProbVsTime();
+        updateGraph();
 
         function transition(){
             model.transition(true);
@@ -871,16 +877,16 @@ var markovChain = (function() {
                 .attr("transform","translate(" + margin.left + "," + margin.top + ")");
     
         }
+
+        // var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
+        // var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
         
         function setupProbVsTime(){
             $(".graph-container").empty();
-            var graph = d3.select(".graph-container").append("svg")
+            graph = d3.select(".graph-container").append("svg")
                 .attr("class","graph").attr("height", outer_height)
                 .attr("width",outer_width).append("g")
                 .attr("transform","translate(" + margin.left + "," + margin.top + ")");
-            
-            var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
-            var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
 
             graph.selectAll(".y-line").data(y_scale.ticks(1)).enter().append("line")
                 .attr("class", "y-line")
@@ -904,9 +910,9 @@ var markovChain = (function() {
                 .text(String);
             
             graph.selectAll(".time-label").data([]).enter().append("text").attr("class", "time-label").attr("x",chart_width).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
-            
-<<<<<<< HEAD
-=======
+        }
+
+        function updateGraph(){    
             //var data_array = model.get_states_array();
             var data_array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
             var restructured_data = [];
@@ -948,11 +954,10 @@ var markovChain = (function() {
             // var first_line = graph.selectAll(".prob-line").data([data1]).enter().append("path");
             // first_line.attr("d", d3.svg.line().x(function(d){console.log("this",d,d.x,x_scale(d.x));return x_scale(d.x);}).y(function(d){console.log("this",d,d.y,y_scale(d.y));return y_scale(d.y);}));
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
->>>>>>> b982be70600e84374d0e1977464732b62de29827
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
         
-        return {updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph};
+        return {updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
     }
     
     
