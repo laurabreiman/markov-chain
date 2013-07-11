@@ -433,7 +433,8 @@ var markovChain = (function() {
                             .range(['white','red']);//d3.scale.category10();
         
         var graph;
-
+        var state = 1;
+        
         setupGraph();
         updateDisplay();
         setupSideLabels();
@@ -466,9 +467,9 @@ var markovChain = (function() {
         function setupSideLabels(){
             $('.side-labels').empty();
             $('.side-labels').append("<div class='num-label'># of reds in bag</div>");
-            $('.side-labels').append("<div class='first-prob'>P(S<sub>1</sub>=s)</div>");
+            $('.side-labels').append("<div class='first-prob'>P(S<sub>"+state+"</sub>=s)</div>");
             $('.side-labels').append("<div class='num2-label'># of reds in bag</div>");
-            $('.side-labels').append("<div class='second-prob'>P(S<sub>2</sub>=s)</div>");
+            $('.side-labels').append("<div class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</div>");
             $('.num-label').offset({top: $(".bubble-name").offset().top});
             $('.first-prob').offset({top: $(".bubble-label").offset().top});
             $('.num2-label').offset({top: $(".bottom-bubble-name").offset().top});       
@@ -552,6 +553,48 @@ var markovChain = (function() {
                 //.style("fill-opacity",function(d){return d;});
             
             updateBottomLabels();
+        }
+        
+        function nextState(){
+            var points = model.get_current_state_array();
+            var pointdict = model.get_current_state();
+            var newpoints =[];
+            
+            for(var i in pointdict){
+                newpoints.push([i,points[i]])
+            }
+            
+            chart.selectAll(".bottom-node")
+                  .data(newpoints)
+                  .attr("class", "bottom-node").transition().duration(1000)
+                .attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
+            
+            chart.selectAll(".top-node")
+                  .data(newpoints)
+                  .attr("class", "top-node").transition().duration(1000)
+                .attr("transform", function(d,i,j) {return "translate(" +  (-100) + "," + chart_height/20 + ")"; });
+            
+            setTimeout(removeNodes,1001)
+            
+        }
+        
+        function removeNodes(){
+            $(".top-node").attr("class", "remove");
+            $(".top_bubble").attr("class","remove");
+            $(".bubble-name").attr("class","remove");
+            
+            $(".bottom-node").attr("class", "top-node");
+            $(".bottom-bubble").attr("class","top_bubble");
+            $(".bottom-bubble-name").attr("class","bubble-name");
+            
+            $('.remove').remove();
+            
+            updateBottomBubbles();
+            state++;
+            updateTopLabels();
+            $('.textbox-row').closest('.row-fluid').remove()
+            updateFirstInputRow();
+            setupSideLabels();
         }
         
         function updateBottomBubbles(){
@@ -777,7 +820,8 @@ var markovChain = (function() {
     
                 if(results[results.length-1] == 1){
                     $(this).remove();
-                    //displayOnSInputRow();
+                    model.observe(observation,true);
+                    nextState();
                 }
             });
         }
@@ -964,7 +1008,7 @@ var markovChain = (function() {
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
         
-        return {updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
+        return {newState: newState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
     }
     
     
@@ -975,6 +1019,7 @@ var markovChain = (function() {
         var controller = Controller(model);
         var view = View(div, model, controller);
         
+        //view.newState();
     }; 
     
     exports.setup = setup;
