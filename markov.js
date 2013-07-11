@@ -656,7 +656,7 @@ var markovChain = (function() {
                 var results = controller.checkOnS(answers,observation);
             }
             else{// if(indexOfCheck == 3){
-                var results = controller.checkOnS(answers,observation);
+                var results = controller.checkObs(answers,observation);
             }   
             
             $('.input-row .icon').remove();
