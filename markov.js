@@ -217,7 +217,7 @@ var markovChain = (function() {
         prob_OnS()[o][s] will return the desired probability.
         */
         function prob_OnS(){
-            var n = Object.getOwnPropertyNames(current_state).length
+            var n = Object.getOwnPropertyNames(transition(false)).length
             var assocArray = {};
             var r = {}; var w = {};
             for (var i = 0; i < n; i++){
@@ -618,8 +618,7 @@ var markovChain = (function() {
                 var results = checkView(0,"none");
     
                 if(results[results.length-1] == 1){
-                    $('.input-row .obs-entry').attr("disabled","true");
-                    model.transition(true);
+                    //model.transition(true);
                     console.log(model.get_current_state());
                     $(this).remove();
                     $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
@@ -658,6 +657,7 @@ var markovChain = (function() {
                 if(results[i] == "right"){
                     $('.input-row .'+i).after('<i class="icon icon-large icon-ok" id="icon'+i+'"></i>');
                     $(".input-row #icon"+i).offset({left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
+                    $('.input-row .'+i).attr("disabled",true);
                 }
                 else{
                     $('.input-row .'+i).after('<i class="icon icon-large icon-remove" id="icon'+i+'"></i>');
@@ -699,7 +699,6 @@ var markovChain = (function() {
                 var results = checkView(1,observation);
     
                 if(results[results.length-1] == 1){
-                    $('.input-row .obs-entry').attr("disabled",true);
                     $(this).remove();
                     displayOnSInputRow(observation);
                 }
@@ -732,7 +731,7 @@ var markovChain = (function() {
     
                 if(results[results.length-1] == 1){
                     $(this).remove();
-                    displayNormInputRow();
+                    displayNormInputRow(observation);
                 }
             });
         }
@@ -903,10 +902,6 @@ var markovChain = (function() {
                 .attr("dx","-0.1em")
                 .text(String);
             
-            graph.selectAll(".time-label").data([]).enter().append("text").attr("class", "time-label").attr("x",chart_width).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
-            
-<<<<<<< HEAD
-=======
             //var data_array = model.get_states_array();
             var data_array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
             var restructured_data = [];
@@ -948,7 +943,6 @@ var markovChain = (function() {
             // var first_line = graph.selectAll(".prob-line").data([data1]).enter().append("path");
             // first_line.attr("d", d3.svg.line().x(function(d){console.log("this",d,d.x,x_scale(d.x));return x_scale(d.x);}).y(function(d){console.log("this",d,d.y,y_scale(d.y));return y_scale(d.y);}));
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
->>>>>>> b982be70600e84374d0e1977464732b62de29827
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
         
