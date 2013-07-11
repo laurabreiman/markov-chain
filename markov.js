@@ -282,7 +282,7 @@ var markovChain = (function() {
             
             if (updateCurrent){
                 current_state = next_state;
-                //states_array.push(current_state);
+                states_array.push(current_state);
             }
             else {return next_state;}           
         }
@@ -408,7 +408,23 @@ var markovChain = (function() {
             +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
             +"<p class='text-info'><small>We've already done one transition for you:)<br>Fill in the blank with appropriate probabilities."
             +"You may change number of blocks on the right column and start over.</small></p></div>"
-            +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'controls'></div></div><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'></div></div><div class ='row-fluid'><div class = 'graph-container'></div></div></div>");
+            +"<div class = 'container-fluid well'>"
+            +   "<div class = 'row-fluid'>"
+            +       "<div class = 'controls'></div>"
+            +   "</div>"
+            +   "<div class = 'row-fluid'>"
+            +       "<div class ='span1'>"
+            +           "<div class='side-labels'></div>"
+            +       "</div>"
+            +       "<div class = 'span8'>"
+            +           "<div class = 'chart-container'></div>"
+            +       "</div>"
+            +       "<div class = 'span3'><div class = 'graph-container'></div></div>"
+            +   "</div>"
+            // +   "<div class ='row-fluid'>"
+            // +       "<div class = 'graph-container'></div>"
+            // +   "</div>"
+            +"</div>");
 
         $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small next-state'>Next State</button><button class='btn btn-small previous-state'>Previous State</button># of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
         
@@ -429,9 +445,16 @@ var markovChain = (function() {
         var margin = { top: 30, right: 20, bottom: 20, left: 20 }
         var chart_width = outer_width - margin.left - margin.right;
         var chart_height = outer_height -margin.top - margin.bottom;
-        
-        var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
-        var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
+
+        var graph_container_width = parseInt($(".span3").css("width"))        
+        var graph_container_height = 160;
+
+        var graph_margin = { top: 30, right: 20, bottom: 35, left: 20 }
+        var graph_width = graph_container_width - graph_margin.left - graph_margin.right;
+        var graph_height = graph_container_height - graph_margin.top - graph_margin.bottom;
+
+        var x_scale = d3.scale.linear().domain([0,10]).range([0,graph_width]);
+        var y_scale = d3.scale.linear().domain([0,1]).range([graph_height,0]);
         var color_scale = d3.scale.linear()
                             .domain([0, model.get_current_state_array().length-1])
                             .range(['white','red']);//d3.scale.category10();
@@ -443,11 +466,11 @@ var markovChain = (function() {
         updateDisplay();
         setupSideLabels();
         setupProbVsTime();
-        updateGraph();
 
         function transition(){
             model.transition(true);
             transitionTop();
+            updateGraph();
         }
 
         function newChain(){
@@ -464,6 +487,8 @@ var markovChain = (function() {
                 updateDisplay();
                 
                 setupSideLabels();
+
+                updateGraph();
 
             }
         }
@@ -579,6 +604,8 @@ var markovChain = (function() {
                 .attr("transform", function(d,i,j) {return "translate(" +  (-100) + "," + chart_height/20 + ")"; });
             
             setTimeout(removeNodes,1001)
+
+            updateGraph();
             
             $('.previous-state').attr("disabled", false);
         }
@@ -943,14 +970,14 @@ var markovChain = (function() {
         //set up svg with axes and labels
         function setupGraph(){
             
-            $(".chart-container").empty();
-            chart = d3.select(".chart-container").append("svg")
-                .attr("class","chart")
-                .attr("height", outer_height)
-                .attr("width",outer_width)
-                .append("g")
-                .attr("transform","translate(" + margin.left + "," + margin.top + ")");
-    
+        $(".chart-container").empty();
+        chart = d3.select(".chart-container").append("svg")
+        .attr("class","chart")
+        .attr("height", outer_height)
+        .attr("width",outer_width)
+        .append("g")
+        .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+        console.log('w:',outer_width,', h:',outer_height);
         }
 
         // var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
@@ -959,21 +986,21 @@ var markovChain = (function() {
         function setupProbVsTime(){
             $(".graph-container").empty();
             graph = d3.select(".graph-container").append("svg")
-                .attr("class","graph").attr("height", outer_height)
-                .attr("width",outer_width).append("g")
+                .attr("class","graph").attr("height", graph_container_height)
+                .attr("width",parseInt(graph_container_width)).append("g")
                 .attr("transform","translate(" + margin.left + "," + margin.top + ")");
 
             graph.selectAll(".y-line").data(y_scale.ticks(1)).enter().append("line")
                 .attr("class", "y-line")
                 .attr('x1', 0)
-                .attr('x2', chart_width)
+                .attr('x2', graph_width)
                 .attr('y1', y_scale)
                 .attr('y2',y_scale);
             
             graph.selectAll(".x-line").data(x_scale.ticks(1)).enter().append("line")
                 .attr("class", "x-line").attr('x1', x_scale)
                 .attr('x2', x_scale).attr('y1', 0)
-                .attr('y2',chart_height);
+                .attr('y2',graph_height);
             
             graph.selectAll(".y-scale-label").data(y_scale.ticks(6)).enter().append("text")
                 .attr("class", "y-scale-label")
@@ -984,12 +1011,21 @@ var markovChain = (function() {
                 .attr("dx","-0.1em")
                 .text(String);
             
-            graph.selectAll(".time-label").data([]).enter().append("text").attr("class", "time-label").attr("x",chart_width).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","-0.1em").text("Time");
+            graph.append("text")
+                .attr("class", "time-label")
+                .attr("x",graph_width/2)
+                .attr('y',y_scale(0))
+                .attr("text-anchor","middle")
+                .attr("dy","2em")
+                //.attr("dx","-0.1em")
+                .text("Time");
         }
 
-        function updateGraph(){    
-            //var data_array = model.get_states_array();
-            var data_array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
+        function updateGraph(){
+            $(".graph").empty();
+            setupProbVsTime();
+            var data_array = model.get_states_array();
+            //var data_array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
             var restructured_data = [];
             for (var i = 0; i < Object.keys(data_array[0]).length; i++) {
                 var inner_array = [];
@@ -998,11 +1034,38 @@ var markovChain = (function() {
                 }
                 restructured_data.push(inner_array);
             }
+
+            //console.log(model.get_states_array());
+            //console.log(restructured_data.length);
+
+            var x_new_scale = d3.scale.linear().domain([0,Object.keys(restructured_data[0]).length-1]).range([0,graph_width]);
+
+            if (Object.keys(restructured_data[0]).length <= 15) {
+                graph.selectAll(".x-scale-label").data(x_new_scale.ticks(Object.keys(restructured_data[0]).length-1)).enter().append("text")
+                    .attr("class", "x-scale-label")
+                    .attr("x",x_new_scale)
+                    .attr('y',y_scale(0))
+                    .attr("text-anchor","middle")
+                    .attr("dy","0.9em")
+                    //.attr("dx","-0.1em")
+                    .text(String);
+            }
+            else {
+                graph.selectAll(".x-scale-label").data([0,Object.keys(restructured_data[0]).length-1]).enter().append("text")
+                    .attr("class", "x-scale-label")
+                    .attr("x",x_new_scale)
+                    .attr('y',y_scale(0))
+                    .attr("text-anchor","middle")
+                    .attr("dy","0.9em")
+                    //.attr("dx","-0.1em")
+                    .text(String);                
+            }
+
             //console.log('data1',data1);
             var line = d3.svg.line()
                 .x(function(d){
                     //console.log("this",d,d.px,x_scale(d.px));
-                    return x_scale(d.px);
+                    return x_new_scale(d.px);
                 })
                 .y(function(d){
                     //console.log("this",d,d.y,y_scale(d.y));
@@ -1011,6 +1074,7 @@ var markovChain = (function() {
 
             for (var i = 0; i < restructured_data.length; i++){
                 graph.append("path")
+                    .attr("class","line-graph")
                     .attr("d",line(restructured_data[i]))
                     .attr("stroke-width",3)  
                     .attr("fill","none")
@@ -1031,7 +1095,11 @@ var markovChain = (function() {
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
         
+<<<<<<< HEAD
         return {nextState: nextState, prevState: prevState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
+=======
+        return {updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
+>>>>>>> 1ab53b8f72937a0b9a8b789f4146a5fb2dfbee0a
     }
     
     
