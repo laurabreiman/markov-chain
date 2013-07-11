@@ -185,8 +185,8 @@ var markovChain = (function() {
         function make_obs(){
             var n = Object.getOwnPropertyNames(current_state).length;
             var prob_red = 0;
-            for (var i in current_state){
-                prob_red += current_state[i]*i/(n-1);
+            for (var i in transition(false)){
+                prob_red += transition(false)[i]*i/(n-1);
             }
             var r = Math.random();
             console.log(r);
@@ -217,7 +217,7 @@ var markovChain = (function() {
         prob_OnS()[o][s] will return the desired probability.
         */
         function prob_OnS(){
-            var n = Object.getOwnPropertyNames(current_state).length
+            var n = Object.getOwnPropertyNames(transition(false)).length
             var assocArray = {};
             var r = {}; var w = {};
             for (var i = 0; i < n; i++){
@@ -374,8 +374,6 @@ var markovChain = (function() {
             return result;
         }
         
-        return {checkAnswers: checkAnswers, checkOgS: checkOgS, checkOnS: checkOnS};
-
         /*
         function that takes in an array of probabilites and an observation string
         returns an array like ["right","wrong","wrong"...0] based on the probability of Obs=obs & state=s
@@ -396,7 +394,7 @@ var markovChain = (function() {
             return result;
         }
         
-        return {checkAnswers: checkAnswers, checkOgS: checkOgS, checkOnS: checkOnS};
+        return {checkAnswers: checkAnswers, checkOgS: checkOgS, checkOnS: checkOnS, checkObs: checkObs};
 
     }
     
@@ -624,8 +622,7 @@ var markovChain = (function() {
                 var results = checkView(0,"none");
     
                 if(results[results.length-1] == 1){
-                    $('.input-row .obs-entry').attr("disabled","true");
-                    model.transition(true);
+                    //model.transition(true);
                     console.log(model.get_current_state());
                     $(this).remove();
                     $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
@@ -664,6 +661,7 @@ var markovChain = (function() {
                 if(results[i] == "right"){
                     $('.input-row .'+i).after('<i class="icon icon-large icon-ok" id="icon'+i+'"></i>');
                     $(".input-row #icon"+i).offset({left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
+                    $('.input-row .'+i).attr("disabled",true);
                 }
                 else{
                     $('.input-row .'+i).after('<i class="icon icon-large icon-remove" id="icon'+i+'"></i>');
@@ -705,7 +703,6 @@ var markovChain = (function() {
                 var results = checkView(1,observation);
     
                 if(results[results.length-1] == 1){
-                    $('.input-row .obs-entry').attr("disabled",true);
                     $(this).remove();
                     displayOnSInputRow(observation);
                 }
@@ -738,7 +735,7 @@ var markovChain = (function() {
     
                 if(results[results.length-1] == 1){
                     $(this).remove();
-                    displayNormInputRow();
+                    displayNormInputRow(observation);
                 }
             });
         }
