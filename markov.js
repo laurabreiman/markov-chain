@@ -32,6 +32,7 @@ var markovChain = (function() {
     return result;
 };
     
+    
 //    function setAllValsZero( assocArray ){
 //        for(var i in assocArray){
 //            assocArray[i] = 0;
@@ -411,7 +412,7 @@ var markovChain = (function() {
 
         $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button># of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
         
-        $(".span8").append("<div class = 'row-fluid'><div class = 'input-row'></div></div>");
+        //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
         
         $(".transition").on("click",transition);
         $(".new-chain").on("click",newChain);
@@ -448,12 +449,14 @@ var markovChain = (function() {
             }
             
             else{
+                $('.textbox-row').closest('.row-fluid').remove()
                 $('.side-labels').empty();
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
                 updateDisplay();
                 
                 setupSideLabels();
+
             }
         }
         
@@ -604,7 +607,7 @@ var markovChain = (function() {
         }
         
         function updateFirstInputRow(){
-            $('.input-row').empty();
+            $(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
@@ -638,7 +641,8 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
                 
             for(var i=0; i<num_entries; i++){
-                answers.push(parseFloat($('.input-row .'+i).val()));
+                var input = $('.input-row .'+i).val()
+                answers.push(calculator.evaluate(calculator.parse(input)));
             }
             console.log(indexOfCheck);
             if(indexOfCheck == 0){
@@ -679,7 +683,7 @@ var markovChain = (function() {
         }
         
         function displayOgSInputRow(observation){
-            $(".span8").append("<div class='row-fluid'><div class ='input-obs-given-row'></div></div>");
+            $(".span8").append("<div class='row-fluid'><div class ='textbox-row input-obs-given-row'></div></div>");
             
             $('.side-labels').append("<div class='obs-given-p'>P(O="+observation+"|S<sub>2</sub>=s)</div>");
             
@@ -710,7 +714,7 @@ var markovChain = (function() {
         }
         
         function displayOnSInputRow(observation){
-            $(".span8").append("<div class='row-fluid'><div class ='input-ons-row'></div></div>");
+            $(".span8").append("<div class='row-fluid'><div class ='textbox-row input-ons-row'></div></div>");
             
             $('.side-labels').append("<div class='ons-label'>P(O="+observation+",S<sub>2</sub>=s)</div>");
             
@@ -741,7 +745,7 @@ var markovChain = (function() {
         }
         
         function displayNormInputRow(observation){
-            $(".span8").append("<div class='row-fluid'><div class ='input-norm-row'></div></div>");
+            $(".span8").append("<div class='row-fluid'><div class ='textbox-row input-norm-row'></div></div>");
             
             $('.side-labels').append("<div class='norm-label'>P(S<sub>2</sub>=s|O="+observation+")</div>");
             
