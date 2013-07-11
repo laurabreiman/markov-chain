@@ -430,11 +430,11 @@ var markovChain = (function() {
         
         //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
         
-        $(".next-state").on("click",nextState);
+        $(".next-state").on("click",transition);
         $(".previous-state").on("click",prevState);
         $(".new-chain").on("click",newChain);
         
-        $('.next-state').attr("disabled", true);
+        //$('.next-state').attr("disabled", true);
         $('.previous-state').attr("disabled", true);
         
         var chart;
