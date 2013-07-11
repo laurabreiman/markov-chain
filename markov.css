@@ -17,8 +17,10 @@ text {
     margin-top: 10px;
 }
 */
-
-.transition{
+.previous-state{
+    float: right;
+}
+.next-state{
     float: right;
 }
 

@@ -410,12 +410,16 @@ var markovChain = (function() {
             +"You may change number of blocks on the right column and start over.</small></p></div>"
             +"<div class = 'container-fluid well'><div class = 'row-fluid'><div class = 'controls'></div></div><div class = 'row-fluid'><div class ='span2'><div class='side-labels'></div></div><div class = 'span8'><div class = 'chart-container'></div></div><div class = 'span2'></div></div><div class ='row-fluid'><div class = 'graph-container'></div></div></div>");
 
-        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small transition'>Transition</button># of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
+        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small next-state'>Next State</button><button class='btn btn-small previous-state'>Previous State</button># of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
         
         //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
         
-        $(".transition").on("click",transition);
+        $(".next-state").on("click",nextState);
+        $(".previous-state").on("click",prevState);
         $(".new-chain").on("click",newChain);
+        
+        $('.next-state').attr("disabled", true);
+        $('.previous-state').attr("disabled", true);
         
         var chart;
         
@@ -576,6 +580,7 @@ var markovChain = (function() {
             
             setTimeout(removeNodes,1001)
             
+            $('.previous-state').attr("disabled", false);
         }
         
         function removeNodes(){
@@ -595,6 +600,28 @@ var markovChain = (function() {
             $('.textbox-row').closest('.row-fluid').remove()
             updateFirstInputRow();
             setupSideLabels();
+        }
+        
+        function prevState(){
+            var points = model.get_current_state_array();
+            var pointdict = model.get_current_state();
+            var newpoints =[];
+            
+            for(var i in pointdict){
+                newpoints.push([i,points[i]])
+            }
+            
+            chart.selectAll(".top-node")
+                  .data(newpoints)
+                  .transition().duration(1000)
+                .attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," +  (10/11)*chart_height + ")"; });
+            
+            chart.selectAll(".bottom-node")
+                  .data(newpoints)
+                  .transition().duration(1000)
+                .attr("transform", function(d,i,j) {return "translate(" +  (-100) + "," + (10/11)*chart_height + ")"; });
+            
+            setTimeout(removeNodes,1001)
         }
         
         function updateBottomBubbles(){
@@ -913,10 +940,6 @@ var markovChain = (function() {
             
         }
         
-//        function updateArrowLabels(){
-//            
-//        }
-        
         //set up svg with axes and labels
         function setupGraph(){
             
@@ -1008,7 +1031,7 @@ var markovChain = (function() {
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
         
-        return {newState: newState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
+        return {nextState: nextState, prevState: prevState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
     }
     
     
