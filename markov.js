@@ -443,10 +443,11 @@ var markovChain = (function() {
         var chart_height = outer_height -margin.top - margin.bottom;
 
         var graph_container_width = parseInt($(".span3").css("width"))        
-        var graph_container_height = 150;
+        var graph_container_height = 160;
 
-        var graph_width = graph_container_width - margin.left - margin.right;
-        var graph_height = graph_container_height - margin.top - margin.bottom;
+        var graph_margin = { top: 30, right: 20, bottom: 35, left: 20 }
+        var graph_width = graph_container_width - graph_margin.left - graph_margin.right;
+        var graph_height = graph_container_height - graph_margin.top - graph_margin.bottom;
 
         var x_scale = d3.scale.linear().domain([0,10]).range([0,graph_width]);
         var y_scale = d3.scale.linear().domain([0,1]).range([graph_height,0]);
@@ -461,11 +462,11 @@ var markovChain = (function() {
         updateDisplay();
         setupSideLabels();
         setupProbVsTime();
-        updateGraph();
 
         function transition(){
             model.transition(true);
             transitionTop();
+            updateGraph();
         }
 
         function newChain(){
@@ -482,6 +483,8 @@ var markovChain = (function() {
                 updateDisplay();
                 
                 setupSideLabels();
+
+                updateGraph();
 
             }
         }
@@ -597,6 +600,8 @@ var markovChain = (function() {
                 .attr("transform", function(d,i,j) {return "translate(" +  (-100) + "," + chart_height/20 + ")"; });
             
             setTimeout(removeNodes,1001)
+
+            updateGraph();
             
         }
         
@@ -985,30 +990,20 @@ var markovChain = (function() {
             
             graph.append("text")
                 .attr("class", "time-label")
-                .attr("x",chart_width)
+                .attr("x",graph_width/2)
                 .attr('y',y_scale(0))
                 .attr("text-anchor","middle")
-                .attr("dy","0.9em")
+                .attr("dy","2em")
                 //.attr("dx","-0.1em")
                 .text("Time");
         }
 
         function updateGraph(){
-            //var data_array = model.get_states_array();
-            var data_array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
+            $(".graph").empty();
+            setupProbVsTime();
+            var data_array = model.get_states_array();
+            //var data_array = [{0:1,1:0,2:0},{0:0.5,1:0.5,2:0},{0:3/8,1:0.5,2:1/8}];
             var restructured_data = [];
-
-            var x_new_scale = d3.scale.linear().domain([0,Object.keys(data_array[0]).length-1]).range([0,graph_width]);
-
-            graph.selectAll(".x-scale-label").data(x_new_scale.ticks(Object.keys(data_array[0]).length)).enter().append("text")
-                .attr("class", "x-scale-label")
-                .attr("x",x_scale)
-                .attr('y',y_scale(0))
-                .attr("text-anchor","end")
-                .attr("dy","0.3em")
-                .attr("dx","-0.1em")
-                .text(String);
-
             for (var i = 0; i < Object.keys(data_array[0]).length; i++) {
                 var inner_array = [];
                 for (var j = 0; j < data_array.length; j++) {
@@ -1016,6 +1011,22 @@ var markovChain = (function() {
                 }
                 restructured_data.push(inner_array);
             }
+
+            console.log(model.get_states_array());
+            console.log(restructured_data.length);
+
+
+            var x_new_scale = d3.scale.linear().domain([0,Object.keys(restructured_data[0]).length-1]).range([0,graph_width]);
+
+            graph.selectAll(".x-scale-label").data(x_new_scale.ticks(Object.keys(restructured_data[0]).length-1)).enter().append("text")
+                .attr("class", "x-scale-label")
+                .attr("x",x_new_scale)
+                .attr('y',y_scale(0))
+                .attr("text-anchor","middle")
+                .attr("dy","0.9em")
+                //.attr("dx","-0.1em")
+                .text(String);
+
             //console.log('data1',data1);
             var line = d3.svg.line()
                 .x(function(d){
@@ -1029,6 +1040,7 @@ var markovChain = (function() {
 
             for (var i = 0; i < restructured_data.length; i++){
                 graph.append("path")
+                    .attr("class","line-graph")
                     .attr("d",line(restructured_data[i]))
                     .attr("stroke-width",3)  
                     .attr("fill","none")
@@ -1049,7 +1061,7 @@ var markovChain = (function() {
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
         
-        return {newState: newState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
+        return {updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
     }
     
     
