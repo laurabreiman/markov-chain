@@ -269,9 +269,9 @@ var markovChain = (function() {
             }
             
             var total = 0;
-            for(var i in current_state){
-                next_state[i] += current_state[i]*observation_model[i][obs]
-                total += current_state[i]*observation_model[i][obs];
+            for(var i in transition(false)){
+                next_state[i] += transition(false)[i]*observation_model[i][obs]
+                total += transition(false)[i]*observation_model[i][obs];
                 //console.log(i,current_state[i],observation_model[i][obs]);
             }
             //console.log(total);
@@ -282,7 +282,7 @@ var markovChain = (function() {
             
             if (updateCurrent){
                 current_state = next_state;
-                states_array.push(current_state);
+                //states_array.push(current_state);
             }
             else {return next_state;}           
         }
