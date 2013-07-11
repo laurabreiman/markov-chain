@@ -1094,12 +1094,8 @@ var markovChain = (function() {
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
-        
-<<<<<<< HEAD
         return {nextState: nextState, prevState: prevState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
-=======
-        return {updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
->>>>>>> 1ab53b8f72937a0b9a8b789f4146a5fb2dfbee0a
+
     }
     
     
