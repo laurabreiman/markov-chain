@@ -1072,6 +1072,27 @@ var markovChain = (function() {
                     return y_scale(d.py);
                 });
 
+            //     graph.append("path")
+            //         .attr("class","line-graph")
+            //         .attr("d",line(restructured_data[0]))
+            //         .attr("stroke-width",3)  
+            //         .attr("fill","none")
+            //         .attr("stroke", "black");
+            //     graph.append("path")
+            //         .attr("class","line-graph")
+            //         .attr("d",line(restructured_data[0]))
+            //         .attr("stroke-width",2)  
+            //         .attr("fill","none")
+            //         .attr("stroke", color_scale(0));
+            // for (var i = 1; i < restructured_data.length; i++){
+            //     graph.append("path")
+            //         .attr("class","line-graph")
+            //         .attr("d",line(restructured_data[i]))
+            //         .attr("stroke-width",3)  
+            //         .attr("fill","none")
+            //         .attr("stroke", color_scale(i));
+            // }
+
             for (var i = 0; i < restructured_data.length; i++){
                 graph.append("path")
                     .attr("class","line-graph")
