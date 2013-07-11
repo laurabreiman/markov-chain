@@ -1012,20 +1012,31 @@ var markovChain = (function() {
                 restructured_data.push(inner_array);
             }
 
-            console.log(model.get_states_array());
-            console.log(restructured_data.length);
-
+            //console.log(model.get_states_array());
+            //console.log(restructured_data.length);
 
             var x_new_scale = d3.scale.linear().domain([0,Object.keys(restructured_data[0]).length-1]).range([0,graph_width]);
 
-            graph.selectAll(".x-scale-label").data(x_new_scale.ticks(Object.keys(restructured_data[0]).length-1)).enter().append("text")
-                .attr("class", "x-scale-label")
-                .attr("x",x_new_scale)
-                .attr('y',y_scale(0))
-                .attr("text-anchor","middle")
-                .attr("dy","0.9em")
-                //.attr("dx","-0.1em")
-                .text(String);
+            if (Object.keys(restructured_data[0]).length <= 15) {
+                graph.selectAll(".x-scale-label").data(x_new_scale.ticks(Object.keys(restructured_data[0]).length-1)).enter().append("text")
+                    .attr("class", "x-scale-label")
+                    .attr("x",x_new_scale)
+                    .attr('y',y_scale(0))
+                    .attr("text-anchor","middle")
+                    .attr("dy","0.9em")
+                    //.attr("dx","-0.1em")
+                    .text(String);
+            }
+            else {
+                graph.selectAll(".x-scale-label").data([0,Object.keys(restructured_data[0]).length-1]).enter().append("text")
+                    .attr("class", "x-scale-label")
+                    .attr("x",x_new_scale)
+                    .attr('y',y_scale(0))
+                    .attr("text-anchor","middle")
+                    .attr("dy","0.9em")
+                    //.attr("dx","-0.1em")
+                    .text(String);                
+            }
 
             //console.log('data1',data1);
             var line = d3.svg.line()
