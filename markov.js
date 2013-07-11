@@ -428,6 +428,9 @@ var markovChain = (function() {
         
         var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
         var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
+        var color_scale = d3.scale.linear()
+                            .domain([0, model.get_current_state_array().length-1])
+                            .range(['white','red']);//d3.scale.category10();
         
         var graph;
 
@@ -481,6 +484,10 @@ var markovChain = (function() {
         }
         
         function updateTopBubbles(){
+            color_scale = d3.scale.linear()
+                            .domain([0, model.get_current_state_array().length-1])
+                            .range(['white','red']);
+            
             chart.selectAll(".top-node").remove();
             chart.selectAll(".top_bubble").remove();
             chart.selectAll(".bubble-name").remove();
@@ -502,9 +509,9 @@ var markovChain = (function() {
             node.append("circle")
                 .attr("class", "top_bubble")
                 .attr("r", function(d){return d[1]*(chart_height/16)+8})
-                .style("fill","blue")
+                .style("fill",function(d,i){return color_scale(i)})
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return d[1];});
+                //.style("fill-opacity",function(d){return d[1];});
             
             node.append("text")
                 .attr("class","bubble-name")
@@ -521,7 +528,7 @@ var markovChain = (function() {
             
             chart.selectAll(".top_bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/16)+8})
-                .style("fill-opacity",function(d){return d;});
+                //.style("fill-opacity",function(d){return d;});
             
             updateTopLabels();
         }
@@ -532,7 +539,7 @@ var markovChain = (function() {
             
             chart.selectAll(".bottom_bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/16)+8})
-                .style("fill-opacity",function(d){return d;});
+                //.style("fill-opacity",function(d){return d;});
             
             updateBottomLabels();
         }
@@ -542,7 +549,7 @@ var markovChain = (function() {
             
             chart.selectAll(".bottom-bubble").data(points).transition().duration(500)
                 .attr("r", function(d){return d*(chart_height/16)+8})
-                .style("fill-opacity",function(d){return d;});
+                //.style("fill-opacity",function(d){return d;});
             
             updateBottomLabels();
         }
@@ -570,9 +577,9 @@ var markovChain = (function() {
             node.append("circle")
                 .attr("class", "bottom-bubble")
                 .attr("r", function(d){return d[1]*(chart_height/16)+8})
-                .style("fill","blue")
+                .style("fill",function(d,i){return color_scale(i)})
                 .style("stroke","black")
-                .style("fill-opacity",function(d){return d[1];});
+                //.style("fill-opacity",function(d){return d[1];});
             
             node.append("text")
                 .attr("class","bottom-bubble-name")
@@ -925,7 +932,6 @@ var markovChain = (function() {
                 restructured_data.push(inner_array);
             }
             //console.log('data1',data1);
-            var color = d3.scale.category10();
             var line = d3.svg.line()
                 .x(function(d){
                     //console.log("this",d,d.px,x_scale(d.px));
@@ -941,7 +947,7 @@ var markovChain = (function() {
                     .attr("d",line(restructured_data[i]))
                     .attr("stroke-width",3)  
                     .attr("fill","none")
-                    .attr("stroke", color(i));
+                    .attr("stroke", color_scale(i));
             }
 
             // graph.selectAll(".line").data(restructured_data[1]).enter().append("path")
