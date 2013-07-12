@@ -541,7 +541,7 @@ var markovChain = (function() {
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
                     .attr("class", "top_bubble")
-                    .attr("x", function(d,i){ console.log(d); return (chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/16)+8)/(numpoints-1))})
+                    .attr("x", function(d,i){ console.log(d); return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/16)+8)/(numpoints-1))})
                     .attr("width", function(d){return (d[1]*(chart_height/16)+8)/(numpoints-1)})
                     .attr("height", function(d){return d[1]*(chart_height/16)+8})
                     .style("fill",function(d,i){if(a<i){return "red"} else {return "white"}})
@@ -576,7 +576,7 @@ var markovChain = (function() {
             chart.selectAll(".top_bubble").data(newstate).transition().duration(500)
                 .attr("width", function(d){return (d*(chart_height/16)+8)/(numpoints-1)})
                 .attr("height", function(d){return d*(chart_height/16)+8})
-                .attr("x", function(d,i){ return (chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/16)+8)/(numpoints-1))})
+                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/16)+8)/(numpoints-1))})
                 //.attr("r", function(d){return d*(chart_height/16)+8})
                 //.style("fill-opacity",function(d){return d;});
             
@@ -596,12 +596,10 @@ var markovChain = (function() {
                 }
             }
             
-            console.log(newstate);
-            
             chart.selectAll(".bottom-bubble").data(newstate).transition().duration(500)
                 .attr("width", function(d){return (d*(chart_height/16)+8)/(numpoints-1)})
                 .attr("height", function(d){return d*(chart_height/16)+8})
-                .attr("x", function(d,i){ return (chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/16)+8)/(numpoints-1))})
+                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/16)+8)/(numpoints-1))})
                 //.attr("r", function(d){return d*(chart_height/16)+8})
                 //.style("fill-opacity",function(d){return d;});
             
@@ -619,12 +617,11 @@ var markovChain = (function() {
                 }
             }
             
-            console.log(newstate);
             
             chart.selectAll(".bottom-bubble").data(newstate).transition().duration(500)
                 .attr("width", function(d){return (d*(chart_height/16)+8)/(numpoints-1)})
                 .attr("height", function(d){return d*(chart_height/16)+8})
-                .attr("x", function(d,i){ return (chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/16)+8)/(numpoints-1))})
+                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/16)+8)/(numpoints-1))})
                 //.attr("r", function(d){return d*(chart_height/16)+8})
                 //.style("fill-opacity",function(d){return d;});
             
@@ -741,7 +738,7 @@ var markovChain = (function() {
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
                     .attr("class", "bottom-bubble")
-                    .attr("x", function(d,i){ console.log(d); return (chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/16)+8)/(numpoints-1))})
+                    .attr("x", function(d,i){ return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/16)+8)/(numpoints-1))})
                     .attr("y", (10/11)*chart_height)
                     .attr("width", function(d){return (d[1]*(chart_height/16)+8)/(numpoints-1)})
                     .attr("height", function(d){return d[1]*(chart_height/16)+8})
@@ -764,6 +761,7 @@ var markovChain = (function() {
                 .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
                 .attr('y',chart_height/4)
                 .attr("dx",-4)
+                .attr("text-anchor","middle")
                 .text(function(d) { return round_number(d,4); });
         }
         
@@ -796,7 +794,6 @@ var markovChain = (function() {
     
                 if(results[results.length-1] == 1){
                     //model.transition(true);
-                    console.log(model.get_current_state());
                     $(this).remove();
                     $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
                     
@@ -814,7 +811,7 @@ var markovChain = (function() {
                 var input = $('.input-row .'+i).val()
                 answers.push(calculator.evaluate(calculator.parse(input)));
             }
-            console.log(indexOfCheck);
+
             if(indexOfCheck == 0){
                 transitionBottom(answers);
                 var results = controller.checkAnswers(answers);
