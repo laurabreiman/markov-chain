@@ -536,7 +536,15 @@ var markovChain = (function() {
                   .data(newpoints)
                 .enter().append("g")
                   .attr("class", "top-node")
-                .attr("y", function(d,i,j) {return chart_height/20; });
+                .attr("y", function(d,i,j) {return chart_height/20; })
+                .on("mouseenter", function(d,i){
+                        var index = i;
+                        console.log("line"+index);
+                        $(".line"+index).attr("class", "line-graph selected-line line"+index);
+                    })
+                .on("mouseout", function(d,i){
+                        $(".selected-line").attr("class", "line-graph line"+i);
+                    });
                 //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
@@ -631,21 +639,28 @@ var markovChain = (function() {
         function nextState(){
             var points = model.get_current_state_array();
             var pointdict = model.get_current_state();
-            var newpoints =[];
+            var numpoints = points.length;
+            var newstate = [];
             
-            for(var i in pointdict){
-                newpoints.push([i,points[i]])
+            for(var i=0; i<numpoints; i++){
+                for(var j=0; j<numpoints-1; j++){
+                    newstate.push(points[i])
+                }
             }
             
             chart.selectAll(".bottom-node")
-                  .data(newpoints)
-                  .attr("class", "bottom-node").transition().duration(1000)
-                .attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
+                .data(newstate)
+                .transition().duration(1000)
+                .attr("y", $(".top-node").attr("y"));//chart_height/20);
             
+            chart.selectAll(".bottom-bubble")
+                .transition().duration(1000)
+                .attr("y", $(".top-node").attr("y"));//chart_height/20);
+
             chart.selectAll(".top-node")
-                  .data(newpoints)
-                  .attr("class", "top-node").transition().duration(1000)
-                .attr("transform", function(d,i,j) {return "translate(" +  (-100) + "," + chart_height/20 + ")"; });
+                  .data(newstate)
+                  .transition().duration(1000)
+                .attr("transform", function(d,i,j) {return "translate(" +  (-1000) + "," + chart_height/20 + ")"; });
             
             setTimeout(removeNodes,1001)
 
@@ -1166,7 +1181,7 @@ var markovChain = (function() {
 
             for (var i = 0; i < restructured_data.length; i++){
                 graph.append("path")
-                    .attr("class","line-graph")
+                    .attr("class","line-graph line"+i)
                     .attr("d",line(restructured_data[i]))
                     .attr("stroke-width",3)  
                     .attr("fill","none")
@@ -1198,7 +1213,7 @@ var markovChain = (function() {
         var controller = Controller(model);
         var view = View(div, model, controller);
         
-        //view.newState();
+        //view.nextState();
     }; 
     
     exports.setup = setup;

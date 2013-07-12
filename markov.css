@@ -66,3 +66,8 @@ span{
 .graph-container{
     background-color: gray;
 }
+
+.selected-line{
+    stroke-width: 8px;
+/*    stroke: yellow;*/
+}
