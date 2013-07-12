@@ -530,6 +530,13 @@ var markovChain = (function() {
             chart.selectAll(".top_bubble").remove();
             chart.selectAll(".bubble-name").remove();
             
+           chart.append("rect")
+                .attr("class","grouping-rect")
+                .attr("x",-0.5*margin.left)
+                .attr("y",-0.5*margin.top)
+                .attr("width",chart_width+0.5*(margin.left+margin.right))
+                .attr("height",0.5*margin.top+chart_height/12+10);
+
             var points = model.get_current_state_array();
             var pointdict = model.get_current_state();
             var newpoints =[];
