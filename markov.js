@@ -324,15 +324,18 @@ var markovChain = (function() {
         function checkAnswers(answers){
             var correctAns = model.transition(false);
             console.log(model.transition(false));
-            var result = [];
+            var result = []; var sum = 0;
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
+                sum += answers[i];
                 if (round_number(answers[i],3) == round_number(correctAns[i],3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
+            if (sum != 1){result[answers.length+1] = "sum_error";}
+            else {result[answers.length+1] = "sum_correct";}
             return result;
         }
         /*
@@ -351,6 +354,7 @@ var markovChain = (function() {
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
+            result[answers.length+1] = NaN;
             console.log(result);
             return result;
         }
@@ -372,7 +376,8 @@ var markovChain = (function() {
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            return result;
+            result[answers.length+1] = NaN;
+           return result;
         }
         
         /*
@@ -381,17 +386,20 @@ var markovChain = (function() {
         with the last entry a flag of whether it was all right (1) or not (0)
         */
         function checkObs(answers, obs){
-            var result = [];
+            var result = []; var sum = 0;
             var correctAns = model.observe(obs,false);
             console.log('ans',correctAns);
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
+                sum += answers[i];
                 if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
+            if (sum != 1){result[answers.length+1] = "sum_error";}
+            else {result[answers.length+1] = "sum_correct";}
             return result;
         }
         
@@ -721,17 +729,20 @@ var markovChain = (function() {
             }
             
             $('.input-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
-            
             model.transition();
             
             $('.check').on('click',function(){
                 
                 var results = checkView(0,"none");
-    
-                if(results[results.length-1] == 1){
+                if(results[results.length-1] == "sum_error"){
+                    $('.check-row').append("<div class='trans_feedback'>should sum to 1.</div>");
+                    $('.trans_feedback').css("color","red");
+                }
+                else{$('.trans_feedback').remove();}
+                if(results[results.length-2] == 1){
                     //model.transition(true);
                     console.log(model.get_current_state());
-                    $(this).remove();
+                    $(this).remove(); $('.trans_feedback').remove();
                     $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
                     
                     $('.observation').on("click",makeObservation);
@@ -761,11 +772,12 @@ var markovChain = (function() {
             }
             else{// if(indexOfCheck == 3){
                 var results = controller.checkObs(answers,observation);
-            }   
+            } 
+            console.log('results',results);  
             
             $('.input-row .icon').remove();
             
-            for(var i = 0; i<results.length-1 ; i++){
+            for(var i = 0; i<results.length-2 ; i++){
                 if(results[i] == "right"){
                     $('.input-row .'+i).after('<i class="icon icon-large icon-ok" id="icon'+i+'"></i>');
                     $(".input-row #icon"+i).offset({left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
@@ -810,7 +822,7 @@ var markovChain = (function() {
                 
                 var results = checkView(1,observation);
     
-                if(results[results.length-1] == 1){
+                if(results[results.length-2] == 1){
                     $(this).remove();
                     displayOnSInputRow(observation);
                 }
@@ -841,7 +853,7 @@ var markovChain = (function() {
                 
                 var results = checkView(2,observation);
     
-                if(results[results.length-1] == 1){
+                if(results[results.length-2] == 1){
                     $(this).remove();
                     displayNormInputRow(observation);
                 }
@@ -871,9 +883,14 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(3,observation);
-    
-                if(results[results.length-1] == 1){
+                if(results[results.length-1] == "sum_error"){
+                    $('.input-row .check-row').append('<div class="obs_feedback">should sum to 1.</div>');
+                    $('.obs_feedback').css("color","red");
+                }
+                else{$('.obs_feedback').remove();}
+                if(results[results.length-2] == 1){
                     $(this).remove();
+                    $('.obs_feedback').remove();
                     model.observe(observation,true);
                     nextState();
                 }
@@ -912,7 +929,7 @@ var markovChain = (function() {
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y2", (13/16)*chart_height)
-                .style("stroke","#133AAC")
+                .style("stroke","black")
                 //.attr("stroke-width",6)
                 .style("stroke-width",function(d,i){return 10*transmodel[i][i];})
                 .style("stroke-linecap","butt")
@@ -928,7 +945,7 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=points.length-1){ return "url(#arrowhead)"}
                                           else{ return ""}})
-                .style("stroke","#133AAC")
+                .style("stroke","blue")
                 .style("stroke-width",function(d,i){if(i!=points.length-1){return 10*transmodel[i][i+1];}
                                                     else{return ""}});
             
@@ -942,7 +959,7 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
-                .style("stroke","#133AAC")
+                .style("stroke","orange")
                 .style("stroke-width",function(d,i){if(i!=0){return 10*transmodel[i][i-1];}});
             
             //set up labels that show the probability of a transition occuring between states
@@ -956,20 +973,20 @@ var markovChain = (function() {
             
             chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
                 .attr("x", function(d,i){return i*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
-                .attr('dx',"-0.8em")
-                .attr('dy',"0.9em")
+                .attr('dx',"-6em")
+                .attr('dy',"-2.5em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","end")
-                .attr("fill","#133AAC")
+                .attr("fill","blue")
                 .text(function(d,i) { return round_number(d[i+1],3); });
             
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
                 .attr("x", function(d,i){return (i-1)*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
-                .attr('dx',".9em")
-                .attr('dy',"0.9em")
+                .attr('dx',"6em")
+                .attr('dy',"-2.5em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","start")
-                .attr("fill","#133AAC")
+                .attr("fill","orange")
                 .text(function(d,i) { return round_number(d[i-1],3); });
             
         }
