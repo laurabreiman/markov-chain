@@ -506,9 +506,9 @@ var markovChain = (function() {
         
         function setupSideLabels(){
             $('.side-labels').empty();
-            $('.side-labels').append("<label class='num-label'>States at time="+state+"</label>");
+            $('.side-labels').append("<label class='num-label'>States at<br><strong>time = "+state+"</strong></label>");
             $('.side-labels').append("<label class='first-prob'>P(S<sub>"+state+"</sub>=s)</label>");
-            $('.side-labels').append("<label class='num2-label'>Blocks in bag</label>");
+            $('.side-labels').append("<label class='num2-label'>States at<br><strong>time = "+(state+1)+"</strong></label>");
             $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
             $('.num-label').offset({top: $(".top_bubble").offset().top});
             $('.first-prob').offset({top: $(".bubble-label").offset().top});
@@ -549,7 +549,7 @@ var markovChain = (function() {
                 .attr("x",-1*margin.left)
                 .attr("y",10/11*chart_height-0.5*margin.top)
                 .attr("width",chart_width+margin.left+margin.right)
-                .attr("height",0.5*margin.top+chart_height/12+10)
+                .attr("height",margin.top+chart_height/12+10)
                 .attr("fill","#e4e4e4")
                 // .attr("stroke","black")
                 // .attr("stroke-width",2)
