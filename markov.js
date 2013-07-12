@@ -545,14 +545,13 @@ var markovChain = (function() {
             for(var i in pointdict){
                 newpoints.push([i,points[i]])
             }
-            console.log(newpoints);
             
             var node = chart.selectAll(".top-node")
                   .data(newpoints)
                 .enter().append("g")
                   .attr("class", "top-node")
                 .attr("y", function(d,i,j) {return chart_height/20; })
-                .on("mouseenter", function(d,i){
+                .on("mouseover", function(d,i){
                         var index = i;
                         console.log("line"+index);
                         $(".line"+index).attr("class", "line-graph selected-line line"+index);
@@ -564,9 +563,9 @@ var markovChain = (function() {
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
                     .attr("class", "top_bubble")
-                    .attr("x", function(d,i){ console.log(d); return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/16)+8)/(numpoints-1))})
-                    .attr("width", function(d){return (d[1]*(chart_height/16)+8)/(numpoints-1)})
-                    .attr("height", function(d){return d[1]*(chart_height/16)+8})
+                    .attr("x", function(d,i){ console.log(d); return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/12)+10)/(numpoints-1))})
+                    .attr("width", function(d){return (d[1]*(chart_height/12)+10)/(numpoints-1)})
+                    .attr("height", function(d){return d[1]*(chart_height/12)+10})
                     .style("fill",function(d,i){if(a<i){return "red"} else {return "white"}})
                     .style("stroke","black")
                     //.style("fill-opacity",function(d){return d[1];});
@@ -597,9 +596,9 @@ var markovChain = (function() {
             console.log(newstate);
             
             chart.selectAll(".top_bubble").data(newstate).transition().duration(500)
-                .attr("width", function(d){return (d*(chart_height/16)+8)/(numpoints-1)})
-                .attr("height", function(d){return d*(chart_height/16)+8})
-                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/16)+8)/(numpoints-1))})
+                .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
+                .attr("height", function(d){return d*(chart_height/12)+10})
+                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/12)+10)/(numpoints-1))})
                 //.attr("r", function(d){return d*(chart_height/16)+8})
                 //.style("fill-opacity",function(d){return d;});
             
@@ -620,9 +619,9 @@ var markovChain = (function() {
             }
             
             chart.selectAll(".bottom-bubble").data(newstate).transition().duration(500)
-                .attr("width", function(d){return (d*(chart_height/16)+8)/(numpoints-1)})
-                .attr("height", function(d){return d*(chart_height/16)+8})
-                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/16)+8)/(numpoints-1))})
+                .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
+                .attr("height", function(d){return d*(chart_height/12)+10})
+                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/12)+10)/(numpoints-1))})
                 //.attr("r", function(d){return d*(chart_height/16)+8})
                 //.style("fill-opacity",function(d){return d;});
             
@@ -642,9 +641,9 @@ var markovChain = (function() {
             
             
             chart.selectAll(".bottom-bubble").data(newstate).transition().duration(500)
-                .attr("width", function(d){return (d*(chart_height/16)+8)/(numpoints-1)})
-                .attr("height", function(d){return d*(chart_height/16)+8})
-                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/16)+8)/(numpoints-1))})
+                .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
+                .attr("height", function(d){return d*(chart_height/12)+10})
+                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/12)+10)/(numpoints-1))})
                 //.attr("r", function(d){return d*(chart_height/16)+8})
                 //.style("fill-opacity",function(d){return d;});
             
@@ -768,10 +767,10 @@ var markovChain = (function() {
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
                     .attr("class", "bottom-bubble")
-                    .attr("x", function(d,i){ return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/16)+8)/(numpoints-1))})
+                    .attr("x", function(d,i){ return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/12)+10)/(numpoints-1))})
                     .attr("y", (10/11)*chart_height)
-                    .attr("width", function(d){return (d[1]*(chart_height/16)+8)/(numpoints-1)})
-                    .attr("height", function(d){return d[1]*(chart_height/16)+8})
+                    .attr("width", function(d){return (d[1]*(chart_height/12)+10)/(numpoints-1)})
+                    .attr("height", function(d){return d[1]*(chart_height/12)+10})
                     .style("fill",function(d,i){if(a<i){return "red"} else {return "white"}})
                     .style("stroke","black")
                     //.style("fill-opacity",function(d){return d[1];});
