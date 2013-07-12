@@ -66,11 +66,11 @@ span{
     stroke-width: 8px;
 }
 
-/*
-.selected-arrow{
-    stroke: black;
+.num-label,
+.num2-label{
+    background-color: #e4e4e4;
 }
-*/
+
 #faded-arrow{
     stroke-opacity: 15%;
 }

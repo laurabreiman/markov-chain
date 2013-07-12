@@ -469,7 +469,7 @@ var markovChain = (function() {
 //                            .range(['white','red']);
         
         var graph;
-        var state = 1;
+        var state = 0;
         
         setupGraph();
         updateDisplay();
@@ -506,10 +506,10 @@ var markovChain = (function() {
         
         function setupSideLabels(){
             $('.side-labels').empty();
-            $('.side-labels').append("<div class='num-label'>Blocks in bag</div>");
-            $('.side-labels').append("<div class='first-prob'>P(S<sub>"+state+"</sub>=s)</div>");
-            $('.side-labels').append("<div class='num2-label'>Blocks in bag</div>");
-            $('.side-labels').append("<div class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</div>");
+            $('.side-labels').append("<label class='num-label'>States at<br><strong>time = "+state+"</strong></label>");
+            $('.side-labels').append("<label class='first-prob'>P(S<sub>"+state+"</sub>=s)</label>");
+            $('.side-labels').append("<label class='num2-label'>States at<br><strong>time = "+(state+1)+"</strong></label>");
+            $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
             $('.num-label').offset({top: $(".top_bubble").offset().top});
             $('.first-prob').offset({top: $(".bubble-label").offset().top});
             $('.num2-label').offset({top: $(".bottom-bubble").offset().top});       
@@ -533,6 +533,28 @@ var markovChain = (function() {
             chart.selectAll(".top_bubble").remove();
             chart.selectAll(".bubble-name").remove();
             
+            chart.append("rect")
+                .attr("class","grouping-rect")
+                .attr("x",-1*margin.left)
+                .attr("y",-0.5*margin.top)
+                .attr("width",chart_width+margin.left+margin.right)
+                .attr("height",margin.top+chart_height/12+10)
+                .attr("fill","#e4e4e4")
+                //.attr("stroke","black")
+                //.attr("stroke-width",2)
+                .attr("rx",40);
+
+            chart.append("rect")
+                .attr("class","grouping-rect")
+                .attr("x",-1*margin.left)
+                .attr("y",10/11*chart_height-0.5*margin.top)
+                .attr("width",chart_width+margin.left+margin.right)
+                .attr("height",margin.top+chart_height/12+10)
+                .attr("fill","#e4e4e4")
+                // .attr("stroke","black")
+                // .attr("stroke-width",2)
+                .attr("rx",40);
+
             var points = model.get_current_state_array();
             var pointdict = model.get_current_state();
             var newpoints =[];
@@ -1131,7 +1153,7 @@ var markovChain = (function() {
                 .attr("y",0)
                 .attr("width",graph_width)
                 .attr("height",graph_height)
-                .attr("fill","#E9E0DB");
+                .attr("fill","#e4e4e4");
             
             graph.selectAll(".y-scale-label").data(y_scale.ticks(6)).enter().append("text")
                 .attr("class", "y-scale-label")
