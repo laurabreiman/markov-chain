@@ -66,3 +66,8 @@ span{
     stroke-width: 8px;
 /*    stroke: yellow;*/
 }
+
+.num-label,
+.num2-label{
+    background-color: #e4e4e4;
+}
