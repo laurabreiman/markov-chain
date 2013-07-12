@@ -994,7 +994,7 @@ var markovChain = (function() {
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y2", (13/16)*chart_height)
-                .style("stroke","black")
+                .style("stroke","#1FBED6")
                 //.attr("stroke-width",6)
                 .style("stroke-width",function(d,i){return 10*transmodel[i][i];})
                 .style("stroke-linecap","butt")
@@ -1010,7 +1010,7 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=points.length-1){ return "url(#arrowhead)"}
                                           else{ return ""}})
-                .style("stroke","blue")
+                .style("stroke","#97C30A")
                 .style("stroke-width",function(d,i){if(i!=points.length-1){return 10*transmodel[i][i+1];}
                                                     else{return ""}});
             
@@ -1024,7 +1024,7 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
-                .style("stroke","orange")
+                .style("stroke","#FF717E")
                 .style("stroke-width",function(d,i){if(i!=0){return 10*transmodel[i][i-1];}});
             
             //set up labels that show the probability of a transition occuring between states
@@ -1034,6 +1034,7 @@ var markovChain = (function() {
                 .attr('dy',"0.9em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","end")
+                .attr("fill","#1FBED6")
                 .text(function(d,i) {  return round_number(d[i],3); });
             
             chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
@@ -1042,7 +1043,7 @@ var markovChain = (function() {
                 .attr('dy',"-2.5em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","end")
-                .attr("fill","blue")
+                .attr("fill","#97C30A")
                 .text(function(d,i) { return round_number(d[i+1],3); });
             
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
@@ -1051,7 +1052,7 @@ var markovChain = (function() {
                 .attr('dy',"-2.5em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","start")
-                .attr("fill","orange")
+                .attr("fill","#FF717E")
                 .text(function(d,i) { return round_number(d[i-1],3); });
             
         }
@@ -1090,6 +1091,13 @@ var markovChain = (function() {
                 .attr("class", "x-line").attr('x1', x_scale)
                 .attr('x2', x_scale).attr('y1', 0)
                 .attr('y2',graph_height);
+
+            graph.append("rect")
+                .attr("x",0)
+                .attr("y",0)
+                .attr("width",graph_width)
+                .attr("height",graph_height)
+                .attr("fill","#E9E0DB");
             
             graph.selectAll(".y-scale-label").data(y_scale.ticks(6)).enter().append("text")
                 .attr("class", "y-scale-label")
