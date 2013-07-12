@@ -64,5 +64,11 @@ span{
 }
 .selected-line{
     stroke-width: 8px;
-/*    stroke: yellow;*/
+}
+
+.selected-arrow{
+    stroke: black;
+}
+#faded-arrow{
+    stroke-opacity: 15%;
 }
