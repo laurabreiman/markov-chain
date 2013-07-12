@@ -894,7 +894,7 @@ var markovChain = (function() {
             for(var i=0; i< Object.keys(model.get_transition_model()).length ; i++){
                 transmodel.push(model.get_transition_model()[i]);
             }
-            
+            console.log(transmodel);
             chart.append("defs").append("marker")
                 .attr("id", "arrowhead")
                 .attr("refX", 6) 
@@ -902,6 +902,7 @@ var markovChain = (function() {
                 .attr("markerWidth", 10)
                 .attr("markerHeight", 6)
                 .attr("orient", "auto")
+                .attr("stroke","inherit")
                 .append("path")
                     .attr("d", "M 0,0 V 4 L6,2 Z");
             
@@ -911,7 +912,10 @@ var markovChain = (function() {
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y2", (13/16)*chart_height)
-                .style("stroke","black")
+                .style("stroke","#133AAC")
+                //.attr("stroke-width",6)
+                .style("stroke-width",function(d,i){return 10*transmodel[i][i];})
+                .style("stroke-linecap","butt")
                 .attr("marker-end", "url(#arrowhead)");
             
             chart.selectAll(".diagRight").data(points).enter().append("line")
@@ -924,7 +928,9 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=points.length-1){ return "url(#arrowhead)"}
                                           else{ return ""}})
-                .style("stroke","blue");
+                .style("stroke","#133AAC")
+                .style("stroke-width",function(d,i){if(i!=points.length-1){return 10*transmodel[i][i+1];}
+                                                    else{return ""}});
             
             chart.selectAll(".diagLeft").data(points).enter().append("line")
                 .attr("class", "diagLeft")
@@ -936,7 +942,8 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
-                .style("stroke","orange");
+                .style("stroke","#133AAC")
+                .style("stroke-width",function(d,i){if(i!=0){return 10*transmodel[i][i-1];}});
             
             //set up labels that show the probability of a transition occuring between states
             chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
@@ -953,7 +960,7 @@ var markovChain = (function() {
                 .attr('dy',"0.9em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","end")
-                .attr("fill","blue")
+                .attr("fill","#133AAC")
                 .text(function(d,i) { return round_number(d[i+1],3); });
             
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
@@ -962,7 +969,7 @@ var markovChain = (function() {
                 .attr('dy',"0.9em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","start")
-                .attr("fill","orange")
+                .attr("fill","#133AAC")
                 .text(function(d,i) { return round_number(d[i-1],3); });
             
         }
