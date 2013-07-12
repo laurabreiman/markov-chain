@@ -463,9 +463,10 @@ var markovChain = (function() {
 
         var x_scale = d3.scale.linear().domain([0,10]).range([0,graph_width]);
         var y_scale = d3.scale.linear().domain([0,1]).range([graph_height,0]);
-        var color_scale = d3.scale.linear()
-                            .domain([0, model.get_current_state_array().length-1])
-                            .range(['white','red']);//d3.scale.category10();
+        var color_scale = d3.scale.category10();
+//                    d3.scale.linear()
+//                            .domain([-1, model.get_current_state_array().length-1])
+//                            .range(['white','red']);
         
         var graph;
         var state = 0;
@@ -479,6 +480,8 @@ var markovChain = (function() {
             model.transition(true);
             transitionTop();
             updateGraph();
+            state++;
+            setupSideLabels();
         }
 
         function newChain(){
@@ -522,9 +525,9 @@ var markovChain = (function() {
         }
         
         function updateTopBubbles(){
-            color_scale = d3.scale.linear()
-                            .domain([0, model.get_current_state_array().length-1])
-                            .range(['white','red']);
+//            //color_scale = d3.scale.linear()
+//                            .domain([0, model.get_current_state_array().length-1])
+//                            .range(['white','red']);
             
             chart.selectAll(".top-node").remove();
             chart.selectAll(".top_bubble").remove();
@@ -568,11 +571,16 @@ var markovChain = (function() {
                 .attr("y", function(d,i,j) {return chart_height/20; })
                 .on("mouseover", function(d,i){
                         var index = i;
-                        console.log("line"+index);
                         $(".line"+index).attr("class", "line-graph selected-line line"+index);
+                        $(".arrow"+index).attr("class", "selected-arrow");
+                        $(".arrow").attr("id", "faded-arrow")
+                        $("[id=faded-arrow]").attr("marker-end","");
                     })
                 .on("mouseout", function(d,i){
                         $(".selected-line").attr("class", "line-graph line"+i);
+                        $(".selected-arrow").attr("class","arrow arrow"+i);
+                        $("[id=faded-arrow]").attr("id","")
+                        $(".arrow").attr("marker-end","url(#arrowhead)")
                     });
                 //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
             for(var a =0; a < numpoints-1; a++){
@@ -786,6 +794,14 @@ var markovChain = (function() {
                     .attr("y", (10/11)*chart_height)
                     .attr("width", function(d){return (d[1]*(chart_height/12)+10)/(numpoints-1)})
                     .attr("height", function(d){return d[1]*(chart_height/12)+10})
+                    .on("mouseover", function(d,i){
+                        var index = i;
+                        console.log("line"+index);
+                        $(".line"+index).attr("class", "line-graph selected-line line"+index);
+                    })
+                .on("mouseout", function(d,i){
+                        $(".selected-line").attr("class", "line-graph line"+i);
+                    })
                     .style("fill",function(d,i){if(a<i){return "red"} else {return "white"}})
                     .style("stroke","black")
                     //.style("fill-opacity",function(d){return d[1];});
@@ -990,7 +1006,7 @@ var markovChain = (function() {
                 }
                 else{$('.obs_feedback').remove();}
                 if(results[results.length-2] == 1){
-                    $(this).remove();
+                    $(this).html("Next State");
                     $('.obs_feedback').remove();
                     model.observe(observation,true);
                     nextState();
@@ -1025,18 +1041,19 @@ var markovChain = (function() {
                     .attr("d", "M 0,0 V 4 L6,2 Z");
             
             chart.selectAll(".arrow").data(points).enter().append("line")
-                .attr("class", "arrow")
+                .attr("class", function(d,i){return "arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y2", (13/16)*chart_height)
+                .attr("stroke",function(d,i){return color_scale(i)})//"#1FBED6")
                 //.attr("stroke-width",6)
                 .style("stroke-width",function(d,i){return 10*transmodel[i][i];})
                 .style("stroke-linecap","butt")
                 .attr("marker-end", "url(#arrowhead)");
             
             chart.selectAll(".diagRight").data(points).enter().append("line")
-                .attr("class", "diagRight")
+                .attr("class", function(d,i){return "diagRight arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){if(i!=points.length-1){return chart_width*((i+1)/(points.length-1))}
@@ -1045,11 +1062,12 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=points.length-1){ return "url(#arrowhead)"}
                                           else{ return ""}})
+                .attr("stroke",function(d,i){return color_scale(i)})//"#97C30A")
                 .style("stroke-width",function(d,i){if(i!=points.length-1){return 10*transmodel[i][i+1];}
                                                     else{return ""}});
             
             chart.selectAll(".diagLeft").data(points).enter().append("line")
-                .attr("class", "diagLeft")
+                .attr("class", function(d,i){return "diagLeft arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){if(i!=0){return chart_width*((i-1)/(points.length-1))}
@@ -1058,6 +1076,7 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
+                .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
                 .style("stroke-width",function(d,i){if(i!=0){return 10*transmodel[i][i-1];}});
             
             //set up labels that show the probability of a transition occuring between states
@@ -1067,6 +1086,7 @@ var markovChain = (function() {
                 .attr('dy',"0.9em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","end")
+                .attr("fill",function(d,i){return color_scale(i)})//"#1FBED6")
                 .text(function(d,i) {  return round_number(d[i],3); });
             
             chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
@@ -1075,6 +1095,7 @@ var markovChain = (function() {
                 .attr('dy',"-2.5em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","end")
+                .attr("fill",function(d,i){return color_scale(i)})//"#97C30A")
                 .text(function(d,i) { return round_number(d[i+1],3); });
             
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
@@ -1083,6 +1104,7 @@ var markovChain = (function() {
                 .attr('dy',"-2.5em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","start")
+                .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
                 .text(function(d,i) { return round_number(d[i-1],3); });
             
         }

@@ -64,10 +64,16 @@ span{
 }
 .selected-line{
     stroke-width: 8px;
-/*    stroke: yellow;*/
 }
 
 .num-label,
 .num2-label{
     background-color: #e4e4e4;
+}
+
+.selected-arrow{
+    stroke: black;
+}
+#faded-arrow{
+    stroke-opacity: 15%;
 }
