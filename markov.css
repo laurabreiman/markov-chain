@@ -66,9 +66,14 @@ span{
     stroke-width: 8px;
 }
 
+/*
 .selected-arrow{
     stroke: black;
 }
+*/
 #faded-arrow{
+    stroke-opacity: 15%;
+}
+#faded-line{
     stroke-opacity: 15%;
 }

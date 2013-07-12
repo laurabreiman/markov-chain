@@ -549,7 +549,8 @@ var markovChain = (function() {
                 .attr("y", function(d,i,j) {return chart_height/20; })
                 .on("mouseover", function(d,i){
                         var index = i;
-                        $(".line"+index).attr("class", "line-graph selected-line line"+index);
+                        $(".line"+index).attr("class", "selected-line line"+index);
+                        $("path.line-graph").attr("id", "faded-line")
                         $(".arrow"+index).attr("class", "selected-arrow");
                         $(".arrow").attr("id", "faded-arrow")
                         $("[id=faded-arrow]").attr("marker-end","");
@@ -558,6 +559,7 @@ var markovChain = (function() {
                         $(".selected-line").attr("class", "line-graph line"+i);
                         $(".selected-arrow").attr("class","arrow arrow"+i);
                         $("[id=faded-arrow]").attr("id","")
+                        $("[id=faded-line]").attr("id","")
                         $(".arrow").attr("marker-end","url(#arrowhead)")
                     });
                 //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
@@ -986,8 +988,10 @@ var markovChain = (function() {
                 if(results[results.length-2] == 1){
                     $(this).html("Next State");
                     $('.obs_feedback').remove();
-                    model.observe(observation,true);
-                    nextState();
+                    $(this).on("click", function(){
+                        model.observe(observation,true);
+                        nextState();
+                    });
                 }
             });
         }
