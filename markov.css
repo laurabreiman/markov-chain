@@ -10,6 +10,7 @@ text {
 .tooltip-inner {
     max-width: 300pt;
 }
+
 .chart-container line {
 /*    stroke-dasharray: 2,2;*/
 }
