@@ -480,6 +480,7 @@ var markovChain = (function() {
             state++;
             setupSideLabels();
             updateArrows();
+            animateTransitionBlocks();
         }
 
         function newChain(){
@@ -702,7 +703,8 @@ var markovChain = (function() {
                 .attr("transform", function(d,i,j) {return "translate(" +  (-1000) + "," + chart_height/20 + ")"; });
             
             setTimeout(removeNodes,1001)
-
+            
+            animateTransitionBlocks();
             updateGraph();
             
             $('.previous-state').attr("disabled", false);
@@ -966,6 +968,7 @@ var markovChain = (function() {
             $('.observation').remove();
             var observation = model.make_obs();
             $(".check-row").append("<div class='row-fluid'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
+            observeBlock(observation);
             displayOgSInputRow(observation);
         }
         
@@ -1183,16 +1186,32 @@ var markovChain = (function() {
         }
         
         function setupUnknownBlocks(){
-            $(".block-row").remove();
-            $("img").after("<div class='row-fluid block-row'></div>")
+            $(".block").remove();
             var numblocks = model.get_current_state_array().length -1;
             for(var i=0; i<numblocks; i++){
-                $(".block-row").append("<div class='block gray-block'></div>");
+                $(".image-container").append("<div class='block gray-block block"+i+"'>?</div>");
+                $(".block"+i).css("top",""+(15*i+50)+"");
             }
+            
         }
         
         function observeBlock(observation){
-            
+            console.log(observation);
+            $('.block0').animate({top:-5},"slow");
+            $('.block0').removeClass("gray-block");
+            $('.block0').addClass(observation+"-block");
+            $('.block0').animate({top:50},"slow");
+            $('.block0').html("");
+        }
+        
+        function animateTransitionBlocks(){
+            $('.block0').html("?")
+            $('.block0').attr("class","block0 block gray-block");
+            $('.block0').animate({top:-5},"fast");
+            $('.block0').animate({left:300},"slow");
+            $('.block0').animate({left:35},"slow");
+            $('.block0').animate({top:50},"fast")
+
         }
         
         //set up svg with axes and labels
@@ -1345,7 +1364,7 @@ var markovChain = (function() {
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
-        return {nextState: nextState, prevState: prevState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph};
+        return {nextState: nextState, prevState: prevState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks};
 
     }
     
@@ -1357,7 +1376,6 @@ var markovChain = (function() {
         var controller = Controller(model);
         var view = View(div, model, controller);
         
-        //view.nextState();
     }; 
     
     exports.setup = setup;
