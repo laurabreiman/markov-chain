@@ -88,7 +88,6 @@ var markovChain = (function() {
             transition_model={};
             //special cases: state 0 and n-1
             transition_model[0] = {0: 0.5, 1: 0.5};
-            console.log('trans for',0,"=",transition_model[0]); 
                        
             transition_model[total_blocks] = {};
             transition_model[total_blocks][total_blocks] = 0.5;
@@ -100,9 +99,7 @@ var markovChain = (function() {
                 assocArray[i] = 0.5;
                 assocArray[i+1] = 0.5-i/(total_blocks)*0.5;
                 transition_model[i] = assocArray;
-                console.log('trans for',i,'=', assocArray);
             }
-            console.log('trans for',total_blocks,"=",transition_model[total_blocks]);
 
             //change observation_model
             // for (var i in observation_model){
@@ -190,8 +187,6 @@ var markovChain = (function() {
                 prob_red += transition(false)[i]*i/(n-1);
             }
             var r = Math.random();
-            console.log(r);
-            console.log(prob_red);
             if (r < prob_red){return "red";}
             else {return "white";}
         }
@@ -323,7 +318,6 @@ var markovChain = (function() {
         */
         function checkAnswers(answers){
             var correctAns = model.transition(false);
-            console.log(model.transition(false));
             var result = []; var sum = 0;
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
@@ -355,7 +349,6 @@ var markovChain = (function() {
             }
             result[answers.length] = allCorrect;
             result[answers.length+1] = NaN;
-            console.log(result);
             return result;
         }
 
@@ -597,6 +590,7 @@ var markovChain = (function() {
                     .attr("height", function(d){return d[1]*(chart_height/12)+10})
                     .style("fill",function(d,i){if(a<i){return "red"} else {return "white"}})
                     .style("stroke","black")
+                    .attr("y", function(d,i,j) {return chart_height/100; })
                     //.style("fill-opacity",function(d){return d[1];});
             }
             
@@ -744,7 +738,7 @@ var markovChain = (function() {
             $('.remove').remove();
             
             updateTopBubbles();
-            state++;
+            state--;
             updateTopLabels();
             $('.textbox-row').closest('.row-fluid').remove()
             updateFirstInputRow();
@@ -760,10 +754,10 @@ var markovChain = (function() {
                 newpoints.push([i,points[i]])
             }
             
-            chart.selectAll(".top-node")
+            chart.selectAll(".top_bubble")
                   .data(newpoints)
                   .transition().duration(1000)
-                .attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," +  (10/11)*chart_height + ")"; });
+                .attr("y",(10/11)*chart_height);
             
             chart.selectAll(".bottom-node")
                   .data(newpoints)
@@ -803,11 +797,12 @@ var markovChain = (function() {
                     .attr("height", function(d){return d[1]*(chart_height/12)+10})
                     .on("mouseover", function(d,i){
                         var index = i;
-                        console.log("line"+index);
-                        $(".line"+index).attr("class", "line-graph selected-line line"+index);
+                        $(".line"+index).attr("class", "selected-line line"+index);
+                        $("path.line-graph").attr("id", "faded-line");
                     })
                 .on("mouseout", function(d,i){
                         $(".selected-line").attr("class", "line-graph line"+i);
+                        $("[id=faded-line]").attr("id","");
                     })
                     .style("fill",function(d,i){if(a<i){return "red"} else {return "white"}})
                     .style("stroke","black")
@@ -878,8 +873,6 @@ var markovChain = (function() {
                 }
                 else{$('.trans_feedback').remove();}
                 if(results[results.length-2] == 1){
-                    //model.transition(true);
-                    console.log(model.get_current_state());
                     $(this).remove(); $('.trans_feedback').remove();
                     $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
                     
@@ -912,7 +905,6 @@ var markovChain = (function() {
                 transitionBottom(answers);
                 var results = controller.checkObs(answers,observation);
             } 
-            console.log('results',results);  
             
             $('.input-row .icon').remove();
             
@@ -1053,7 +1045,7 @@ var markovChain = (function() {
             for(var i=0; i< Object.keys(model.get_transition_model()).length ; i++){
                 transmodel.push(model.get_transition_model()[i]);
             }
-            console.log(transmodel);
+            
             chart.append("defs").append("marker")
                 .attr("id", "arrowhead")
                 .attr("refX", 6) 
@@ -1147,7 +1139,6 @@ var markovChain = (function() {
         .attr("width",outer_width)
         .append("g")
         .attr("transform","translate(" + margin.left + "," + margin.top + ")");
-        console.log('w:',outer_width,', h:',outer_height);
         }
 
         // var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
@@ -1212,9 +1203,6 @@ var markovChain = (function() {
                 restructured_data.push(inner_array);
             }
 
-            //console.log(model.get_states_array());
-            //console.log(restructured_data.length);
-
             var x_new_scale = d3.scale.linear().domain([0,Object.keys(restructured_data[0]).length-1]).range([0,graph_width]);
 
             if (Object.keys(restructured_data[0]).length <= 15) {
@@ -1238,7 +1226,6 @@ var markovChain = (function() {
                     .text(String);                
             }
 
-            //console.log('data1',data1);
             var line = d3.svg.line()
                 .x(function(d){
                     //console.log("this",d,d.px,x_scale(d.px));
