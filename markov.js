@@ -771,7 +771,7 @@ var markovChain = (function() {
                 newpoints.push([i,points[i]])
             }
             
-            chart.selectAll(".top_bubble")
+            chart.selectAll(".top-node")
                   .data(newpoints)
                   .transition().duration(1000)
                 .attr("y",(10/11)*chart_height);
@@ -895,6 +895,14 @@ var markovChain = (function() {
                     
                     $('.observation').on("click",makeObservation);
                 }
+            });
+            $(document).keypress(function(event){
+
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if(keycode == '13'){
+                    $('.check').click();   
+                }
+            
             });
         }
         
