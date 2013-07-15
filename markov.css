@@ -3,6 +3,13 @@ text {
     font-size: 12px;
 }
 
+.tooltip {
+    font-size: 15pt;
+}
+
+.tooltip-inner {
+    max-width: 300pt;
+}
 .chart-container line {
 /*    stroke-dasharray: 2,2;*/
 }

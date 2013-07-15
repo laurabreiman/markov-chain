@@ -510,9 +510,9 @@ var markovChain = (function() {
         
         function setupSideLabels(){
             $('.side-labels').empty();
-            $('.side-labels').append("<label class='num-label'>States at<br><strong>time = "+state+"</strong></label>");
+            $('.side-labels').append("<label class='num-label'>States at<br><strong>Time = "+state+"</strong></label>");
             $('.side-labels').append("<label class='first-prob'>P(S<sub>"+state+"</sub>=s)</label>");
-            $('.side-labels').append("<label class='num2-label'>States at<br><strong>time = "+(state+1)+"</strong></label>");
+            $('.side-labels').append("<label class='num2-label'>States at<br><strong>Time = "+(state+1)+"</strong></label>");
             $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
             $('.num-label').offset({top: $(".top_bubble").offset().top});
             $('.first-prob').offset({top: $(".bubble-label").offset().top});
@@ -852,6 +852,10 @@ var markovChain = (function() {
             }
             
             for(var i=0; i <num_entries; i++){
+                $('.obs-entry.'+i).attr("title","= \u03A3 P(S<sub>"+(state+1)+"</sub>="+i+"|S<sub>"+state+"</sub>=r) \xD7 P(S<sub>"+state+"</sub>=r)");
+                $('.obs-entry.'+i).tooltip({placement:'right', html:true});
+                //$('.obs-entry.'+i).tooltip({title: function() {return "hi";}});
+
                 $('.obs-entry.'+i).focusin(function(){
                     var index = parseInt($(this).attr("id"));
                     $('.arrow').attr("id","faded-arrow");
@@ -873,6 +877,7 @@ var markovChain = (function() {
                 
                 var results = checkView(0,"none");
                 if(results[results.length-1] == "sum_error"){
+                    $('.trans_feedback').remove();
                     $('.check-row').append("<div class='trans_feedback'>should sum to 1.</div>");
                     $('.trans_feedback').css("color","red");
                 }
@@ -941,14 +946,19 @@ var markovChain = (function() {
         function displayOgSInputRow(observation){
             $(".span8").append("<div class='row-fluid'><div class ='textbox-row input-obs-given-row'></div></div>");
             
-            $('.side-labels').append("<div class='obs-given-p'>P(O="+observation+"|S<sub>2</sub>=s)</div>");
+            $('.side-labels').append("<div class='obs-given-p'>P(O="+observation+"|S<sub>"+(state+1)+"</sub>=s)</div>");
             
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
                 $('.input-obs-given-row').append("<input class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+")'>");
                 $('.input-obs-given-row .'+i+'').offset({left: $(".input-obs-given-row").offset().left + i*(chart_width)/(num_entries-1)});
-                $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
+                $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
+
+                $('.obs-entry.'+i).attr("title","= # of "+observation+" blocks \xF7 # of total blocks");
+                $('.obs-entry.'+i).tooltip({placement:'right', html:true});
+ 
+
             }
             
             $('.obs-given-p').offset({top: $(".input-obs-given-row").offset().top});
@@ -972,14 +982,18 @@ var markovChain = (function() {
         function displayOnSInputRow(observation){
             $(".span8").append("<div class='row-fluid'><div class ='textbox-row input-ons-row'></div></div>");
             
-            $('.side-labels').append("<div class='ons-label'>P(O="+observation+",S<sub>2</sub>=s)</div>");
+            $('.side-labels').append("<div class='ons-label'>P(O="+observation+",S<sub>"+(state+1)+"</sub>=s)</div>");
             
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
                 $('.input-ons-row').append("<input class='obs-entry "+i+"' placeholder='P("+observation+","+i+")'>");
                 $('.input-ons-row .'+i+'').offset({left: $(".input-ons-row").offset().left + i*(chart_width)/(num_entries-1)});
-                $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
+                $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
+
+                $('.obs-entry.'+i).attr("title","=  P(O="+observation+"|S<sub>"+(state+1)+"</sub>="+i+") \xD7 P(S<sub>"+(state+1)+"</sub>="+i+")");
+                $('.obs-entry.'+i).tooltip({placement:'right', html:true});
+
             }
             
             $('.ons-label').offset({top: $(".input-ons-row").offset().top});
@@ -1003,14 +1017,18 @@ var markovChain = (function() {
         function displayNormInputRow(observation){
             $(".span8").append("<div class='row-fluid'><div class ='textbox-row input-norm-row'></div></div>");
             
-            $('.side-labels').append("<div class='norm-label'>P(S<sub>2</sub>=s|O="+observation+")</div>");
+            $('.side-labels').append("<div class='norm-label'>P(S<sub>"+(state+1)+"</sub>=s|O="+observation+")</div>");
             
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
                 $('.input-norm-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+"|"+observation+")'>");
                 $('.input-norm-row .'+i+'').offset({left: $(".input-norm-row").offset().left + i*(chart_width)/(num_entries-1)});
-                $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
+                $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
+
+                $('.obs-entry.'+i).attr("title","=  P(O="+observation+",S<sub>"+(state+1)+"</sub>="+i+") \xF7 \u03A3 P(O="+observation+",S<sub>"+(state+1)+"</sub>=r)");
+                $('.obs-entry.'+i).tooltip({placement:'right', html:true});
+
             }
             
             $('.norm-label').offset({top: $(".input-norm-row").offset().top});
@@ -1024,6 +1042,7 @@ var markovChain = (function() {
                 
                 var results = checkView(3,observation);
                 if(results[results.length-1] == "sum_error"){
+                    $('.obs_feedback').remove();
                     $('.input-row .check-row').append('<div class="obs_feedback">should sum to 1.</div>');
                     $('.obs_feedback').css("color","red");
                 }
