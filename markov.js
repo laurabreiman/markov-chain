@@ -471,6 +471,7 @@ var markovChain = (function() {
         updateDisplay();
         setupSideLabels();
         setupProbVsTime();
+        setupUnknownBlocks();
 
         function transition(){
             model.transition(true);
@@ -519,6 +520,7 @@ var markovChain = (function() {
             updateArrows();
             updateBottomBubbles();
             updateFirstInputRow();
+            setupUnknownBlocks();
         }
         
         function updateTopBubbles(){
@@ -816,10 +818,17 @@ var markovChain = (function() {
                         var index = i;
                         $(".line"+index).attr("class", "selected-line line"+index);
                         $("path.line-graph").attr("id", "faded-line");
+                        $('.arrow').attr("id","faded-arrow");
+                        $('.straight.arrow'+index).attr("id","");
+                        $('.diagRight.arrow'+(index-1)).attr("id","");
+                        $('.diagLeft.arrow'+(index+1)).attr("id","");
+                        $("[id=faded-arrow]").attr("marker-end","");
                     })
                 .on("mouseout", function(d,i){
                         $(".selected-line").attr("class", "line-graph line"+i);
                         $("[id=faded-line]").attr("id","");
+                        $("[id=faded-arrow]").attr("marker-end","url(#arrowhead)");
+                        $("[id=faded-arrow]").attr("id","");
                     })
                     .style("fill",function(d,i){if(a<i){return "red"} else {return "white"}})
                     .style("stroke","black")
@@ -1170,6 +1179,19 @@ var markovChain = (function() {
                 .attr("text-anchor","start")
                 .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
                 .text(function(d,i) { return round_number(d[i-1],3); });
+            
+        }
+        
+        function setupUnknownBlocks(){
+            $(".block-row").remove();
+            $("img").after("<div class='row-fluid block-row'></div>")
+            var numblocks = model.get_current_state_array().length -1;
+            for(var i=0; i<numblocks; i++){
+                $(".block-row").append("<div class='block gray-block'></div>");
+            }
+        }
+        
+        function observeBlock(observation){
             
         }
         

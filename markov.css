@@ -91,3 +91,17 @@ span{
 #faded-line{
     stroke-opacity: 15%;
 }
+.block{
+    width: 20px;
+    height: 10px;
+    border: 1px solid black;
+}
+.gray-block{
+    background-color:gray;
+}
+.red-block{
+    background-color:red;
+}
+.white-block{
+    background-color:white;
+}
