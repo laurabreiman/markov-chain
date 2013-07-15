@@ -873,7 +873,7 @@ var markovChain = (function() {
             }
             
             for(var i=0; i <num_entries; i++){
-                $('.obs-entry.'+i).attr("title","= \u03A3 P(S<sub>"+(state+1)+"</sub>="+i+"|S<sub>"+state+"</sub>=r) \xD7 P(S<sub>"+state+"</sub>=r)");
+                $('.obs-entry.'+i).attr("title","= P(S<sub>"+(state+1)+"</sub>="+i+"r|S<sub>"+state+"</sub>=0r) \xD7 P(S<sub>"+state+"</sub>=0r)<br>+ P(S<sub>"+(state+1)+"</sub>="+i+"r|S<sub>"+state+"</sub>=1r) \xD7 P(S<sub>"+state+"</sub>=1r)<br>+ ...");
                 $('.obs-entry.'+i).tooltip({placement:'right', html:true});
                 //$('.obs-entry.'+i).tooltip({title: function() {return "hi";}});
 
@@ -981,7 +981,7 @@ var markovChain = (function() {
                 $('.input-obs-given-row .'+i+'').offset({left: $(".input-obs-given-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
-                $('.obs-entry.'+i).attr("title","= # of "+observation+" blocks \xF7 # of total blocks");
+                $('.obs-entry.'+i).attr("title","= # of "+observation+" blocks<br>\xF7 # of total blocks");
                 $('.obs-entry.'+i).tooltip({placement:'right', html:true});
  
 
@@ -1017,7 +1017,7 @@ var markovChain = (function() {
                 $('.input-ons-row .'+i+'').offset({left: $(".input-ons-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
-                $('.obs-entry.'+i).attr("title","=  P(O="+observation+"|S<sub>"+(state+1)+"</sub>="+i+") \xD7 P(S<sub>"+(state+1)+"</sub>="+i+")");
+                $('.obs-entry.'+i).attr("title","=  P(O="+observation+"|S<sub>"+(state+1)+"</sub>="+i+"r) \xD7 P(S<sub>"+(state+1)+"</sub>="+i+"r)");
                 $('.obs-entry.'+i).tooltip({placement:'right', html:true});
 
             }
@@ -1052,7 +1052,7 @@ var markovChain = (function() {
                 $('.input-norm-row .'+i+'').offset({left: $(".input-norm-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
-                $('.obs-entry.'+i).attr("title","=  P(O="+observation+",S<sub>"+(state+1)+"</sub>="+i+") \xF7 \u03A3 P(O="+observation+",S<sub>"+(state+1)+"</sub>=r)");
+                $('.obs-entry.'+i).attr("title","=  P(O="+observation+",S<sub>"+(state+1)+"</sub>="+i+"r)<br>\xF7 &Sigma; P(O="+observation+",S<sub>"+(state+1)+"</sub>=state)");
                 $('.obs-entry.'+i).tooltip({placement:'right', html:true});
 
             }
@@ -1169,7 +1169,7 @@ var markovChain = (function() {
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","end")
                 .attr("fill",function(d,i){return color_scale(i)})//"#97C30A")
-                .text(function(d,i) { return round_number(d[i+1],3); });
+                .text(function(d,i) {if (!isNaN(d[i+1])) {return round_number(d[i+1],3); }});
             
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
                 .attr("x", function(d,i){return (i-1)*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
@@ -1178,7 +1178,7 @@ var markovChain = (function() {
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","start")
                 .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
-                .text(function(d,i) { return round_number(d[i-1],3); });
+                .text(function(d,i) {if (!isNaN(d[i-1])) {return round_number(d[i-1],3); }});
             
         }
         

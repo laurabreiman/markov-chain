@@ -4,11 +4,12 @@ text {
 }
 
 .tooltip {
-    font-size: 15pt;
+    font-size: 12pt;
 }
 
 .tooltip-inner {
     max-width: 300pt;
+    text-align: left;
 }
 
 .chart-container line {
