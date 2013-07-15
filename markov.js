@@ -485,6 +485,7 @@ var markovChain = (function() {
             updateGraph();
             state++;
             setupSideLabels();
+            updateArrows();
         }
 
         function newChain(){
@@ -576,13 +577,13 @@ var markovChain = (function() {
                         var index = i;
                         $(".line"+index).attr("class", "selected-line line"+index);
                         $("path.line-graph").attr("id", "faded-line")
-                        $(".arrow"+index).attr("class", "selected-arrow");
                         $(".arrow").attr("id", "faded-arrow")
+                        $(".arrow"+index).attr("id", "selected-arrow");
                         $("[id=faded-arrow]").attr("marker-end","");
                     })
                 .on("mouseout", function(d,i){
                         $(".selected-line").attr("class", "line-graph line"+i);
-                        $(".selected-arrow").attr("class","arrow arrow"+i);
+                        $("#selected-arrow").attr("id","");
                         $("[id=faded-arrow]").attr("id","")
                         $("[id=faded-line]").attr("id","")
                         $(".arrow").attr("marker-end","url(#arrowhead)")
@@ -728,6 +729,7 @@ var markovChain = (function() {
             $('.textbox-row').closest('.row-fluid').remove()
             updateFirstInputRow();
             setupSideLabels();
+            updateArrows();
         }
         
         function removeNodesPrev(){
@@ -840,13 +842,28 @@ var markovChain = (function() {
         }
         
         function updateFirstInputRow(){
-            $(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
+            $(".span8").append("<div class = 'row-fluid'><div class = 'first-row textbox-row input-row'></div></div>");
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+")'>");
+                $('.input-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+")' id='"+i+"'>");
                 $('.input-row .'+i).offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
+            }
+            
+            for(var i=0; i <num_entries; i++){
+                $('.obs-entry.'+i).focusin(function(){
+                    var index = parseInt($(this).attr("id"));
+                    $('.arrow').attr("id","faded-arrow");
+                    $('.straight.arrow'+index).attr("id","");
+                    $('.diagRight.arrow'+(index-1)).attr("id","");
+                    $('.diagLeft.arrow'+(index+1)).attr("id","");
+                    $("[id=faded-arrow]").attr("marker-end","");
+                })
+                $('.obs-entry.'+i).focusout(function(){
+                    $('.arrow').attr("id","");
+                    $('.arrow').attr("marker-end","url(#arrowhead)")
+                })
             }
             
             $('.input-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
@@ -903,6 +920,7 @@ var markovChain = (function() {
                 if(results[i] == "right"){
                     $('.input-row .'+i).after('<i class="icon icon-large icon-ok" id="icon'+i+'"></i>');
                     $(".input-row #icon"+i).offset({left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
+                    $('.input-row .'+i).val(answers[i]);
                     $('.input-row .'+i).attr("disabled",true);
                 }
                 else{
@@ -1048,15 +1066,16 @@ var markovChain = (function() {
                     .attr("d", "M 0,0 V 4 L6,2 Z");
             
             chart.selectAll(".arrow").data(points).enter().append("line")
-                .attr("class", function(d,i){return "arrow arrow"+i})
+                .attr("class", function(d,i){return "straight arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y2", (13/16)*chart_height)
                 .attr("stroke",function(d,i){return color_scale(i)})//"#1FBED6")
                 //.attr("stroke-width",6)
-                .style("stroke-width",function(d,i){return 10*transmodel[i][i];})
+                .style("stroke-width",function(d,i){if(d!=0){return 15*transmodel[i][i]*d} else{return 1};})
                 .style("stroke-linecap","butt")
+                .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
                 .attr("marker-end", "url(#arrowhead)");
             
             chart.selectAll(".diagRight").data(points).enter().append("line")
@@ -1070,7 +1089,8 @@ var markovChain = (function() {
                 .attr("marker-end", function(d,i){if(i!=points.length-1){ return "url(#arrowhead)"}
                                           else{ return ""}})
                 .attr("stroke",function(d,i){return color_scale(i)})//"#97C30A")
-                .style("stroke-width",function(d,i){if(i!=points.length-1){return 10*transmodel[i][i+1];}
+                .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
+                .style("stroke-width",function(d,i){if(i!=points.length-1){ if(d!=0 && i!=points.length-1){ return 15*transmodel[i][i+1]*d};}
                                                     else{return ""}});
             
             chart.selectAll(".diagLeft").data(points).enter().append("line")
@@ -1084,7 +1104,8 @@ var markovChain = (function() {
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
                 .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
-                .style("stroke-width",function(d,i){if(i!=0){return 10*transmodel[i][i-1];}});
+                .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
+                .style("stroke-width",function(d,i){if(d!=0 && i!=0){return 15*transmodel[i][i-1]*d;} else{ return 1}});
             
             //set up labels that show the probability of a transition occuring between states
             chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")

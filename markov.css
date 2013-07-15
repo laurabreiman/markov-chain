@@ -4,7 +4,7 @@ text {
 }
 
 .chart-container line {
-    //stroke-dasharray: 2,2;
+/*    stroke-dasharray: 2,2;*/
 }
 
 .num-states{
@@ -78,6 +78,7 @@ span{
 
 #faded-arrow{
     stroke-opacity: 15%;
+    marker-end: "";
 }
 #faded-line{
     stroke-opacity: 15%;
