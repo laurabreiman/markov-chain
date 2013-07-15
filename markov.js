@@ -585,7 +585,7 @@ var markovChain = (function() {
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
                     .attr("class", "top_bubble")
-                    .attr("x", function(d,i){ console.log(d); return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/12)+10)/(numpoints-1))})
+                    .attr("x", function(d,i){return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/12)+10)/(numpoints-1))})
                     .attr("width", function(d){return (d[1]*(chart_height/12)+10)/(numpoints-1)})
                     .attr("height", function(d){return d[1]*(chart_height/12)+10})
                     .style("fill",function(d,i){if(a<i){return "red"} else {return "white"}})
@@ -716,6 +716,23 @@ var markovChain = (function() {
             $(".bottom-bubble-name").attr("class","bubble-name");
             
             $('.remove').remove();
+                            
+            chart.selectAll(".top-node").on("mouseover", function(d,i){
+                        var index = i;
+                        console.log(index);
+                        $(".line"+index).attr("class", "selected-line line"+index);
+                        $("path.line-graph").attr("id", "faded-line")
+                        $(".arrow").attr("id", "faded-arrow")
+                        $(".arrow"+index).attr("id", "selected-arrow");
+                        $("[id=faded-arrow]").attr("marker-end","");
+                    })
+                .on("mouseout", function(d,i){
+                        $(".selected-line").attr("class", "line-graph line"+i);
+                        $("#selected-arrow").attr("id","");
+                        $("[id=faded-arrow]").attr("id","")
+                        $("[id=faded-line]").attr("id","")
+                        $(".arrow").attr("marker-end","url(#arrowhead)")
+                    });
             
             updateBottomBubbles();
             state++;
