@@ -481,6 +481,7 @@ var markovChain = (function() {
             state++;
             setupSideLabels();
             updateArrows();
+            updateArrowTextbox();
             animateTransitionBlocks();
         }
 
@@ -531,6 +532,7 @@ var markovChain = (function() {
             $(".first-transition").on("click", function(){
                 $('.input-row').remove();
                 updateArrows();
+                updateArrowTextbox();
                 updateBottomBubbles();
                 updateFirstInputRow();
                 animateTransitionBlocks();
@@ -540,6 +542,7 @@ var markovChain = (function() {
         function updateDisplay(){
             updateTopBubbles();
             updateArrows();
+            updateArrowTextbox();
             updateBottomBubbles();
             updateFirstInputRow();
             setupUnknownBlocks();
@@ -1179,33 +1182,54 @@ var markovChain = (function() {
             //set up labels that show the probability of a transition occuring between states
             chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
                 .attr("x", function(d,i){ return i*(chart_width/(numpoints-1))})
-                .attr('dx',"-0.3em")
-                .attr('dy',"0.9em")
-                .attr("y", (11/20)*chart_height)
+                .attr('dx',"-0.32em")
+                .attr("y", (29/64)*chart_height)
                 .attr("text-anchor","end")
                 .attr("fill",function(d,i){return color_scale(i)})//"#1FBED6")
                 .text(function(d,i) {  return round_number(d[i],3); });
             
             chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
-                .attr("x", function(d,i){return i*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
-                .attr('dx',"-6em")
-                .attr('dy',"-2.5em")
-                .attr("y", (11/20)*chart_height)
-                .attr("text-anchor","end")
+                .attr("x", function(d,i){return (i+1/4)*(chart_width/(numpoints-1))})
+                .attr('dx',2/numpoints+"em")
+                .attr("y", (29/64)*chart_height)
+                //.attr("text-anchor","end")
                 .attr("fill",function(d,i){return color_scale(i)})//"#97C30A")
                 .text(function(d,i) {if (!isNaN(d[i+1])) {return round_number(d[i+1],3); }});
             
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
-                .attr("x", function(d,i){return (i-1)*(chart_width/(numpoints-1))+(chart_width/(2*(numpoints-1)))})
-                .attr('dx',"6em")
-                .attr('dy',"-2.5em")
-                .attr("y", (11/20)*chart_height)
-                .attr("text-anchor","start")
-                .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
+                .attr("x", function(d,i){return (i-1/4)*(chart_width/(numpoints-1))})
+                .attr('dx',-2/numpoints+"em")
+                .attr("y", (29/64)*chart_height)
+                .attr("text-anchor","end")
+                .attr("fill",function(d,i){return color_scale(i)})//"#FF717E")
                 .text(function(d,i) {
                     console.log(d,i-1);
                     if (!isNaN(d[i-1])) {return round_number(d[i-1],3); }});
             
+        }
+
+        function updateArrowTextbox(){
+            // var points = model.get_current_state_array();
+            // var numpoints = points.length;
+            // var transmodel = [];
+            // for(var i=0; i< Object.keys(model.get_transition_model()).length ; i++){
+            //     transmodel.push(model.get_transition_model()[i]);
+            // }
+            // console.log(transmodel);
+
+            // var left = $('.chart').position().left;
+            // var top = $('.chart').position().top;
+            // console.log(left,top);
+            // for(var i=0; i<transmodel.length; i++){
+            //     $('.chart-container').append("<input class='trans-textbox' placeholder='haha'>");
+            //     $('.trans-textbox').css("position", "absolute")
+            //                         .css("top", top+(29/64)*chart_height+16)
+            //                         .css("left",function(i){ return left-16+i*(chart_width/(numpoints-1))});
+            //     $('.chart-container').append("<input class='diagRight-textbox' placeholder='haha'>");
+            //     $('.diagRight-textbox').css("position", "absolute")
+            //                         .css("top", top+(29/64)*chart_height+16)
+            //                         .css("left",function(i){ return left+32/numpoints+16+(i+1/4)*(chart_width/(numpoints-1))});
+            // }
         }
         
         function setupUnknownBlocks(){
@@ -1399,7 +1423,7 @@ var markovChain = (function() {
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
-        return {nextState: nextState, prevState: prevState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks};
+        return {nextState: nextState, prevState: prevState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, updateArrowTextbox: updateArrowTextbox, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks};
 
     }
     

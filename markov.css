@@ -115,3 +115,8 @@ span{
 .first-transition{
     align-self:center;
 }
+.trans-textbox,
+.diagRight-textbox,
+.diagLeft-textbox{
+    width:28px;
+}
