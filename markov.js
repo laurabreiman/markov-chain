@@ -1178,7 +1178,9 @@ var markovChain = (function() {
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","start")
                 .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
-                .text(function(d,i) {if (!isNaN(d[i-1])) {return round_number(d[i-1],3); }});
+                .text(function(d,i) {
+                    console.log(d,i-1);
+                    if (!isNaN(d[i-1])) {return round_number(d[i-1],3); }});
             
         }
         
