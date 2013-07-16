@@ -1114,6 +1114,13 @@ var markovChain = (function() {
             });
         }
         
+        /*function that updates the transition arrows between states at time n and states at time n+1. 
+            arrows are scaled in width based on the probability of transition times the probability of state n
+            arrows are grouped in color based on source state (colors from d3 category10 colors)
+            gets the data from the model
+            uses svg/d3 elements to draw the arrows and position arrow labels
+            called whenever a transition is made
+        */
         function updateArrows(){
             //clears the svg so that we can draw new arrows
             chart.selectAll(".arrow").remove();
@@ -1136,7 +1143,7 @@ var markovChain = (function() {
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y2", (13/16)*chart_height)
-                .attr("stroke",function(d,i){return color_scale(i)})//"#1FBED6")
+                .attr("stroke",function(d,i){return color_scale(i)})
                 //.attr("stroke-width",6)
                 .style("stroke-width",function(d,i){if(d!=0){return Math.min(20*transmodel[i][i]*d,8)} else{return 1};})
                 .style("stroke-linecap","butt")
@@ -1154,7 +1161,7 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=points.length-1){ return "url(#arrowhead)"}
                                           else{ return ""}})
-                .attr("stroke",function(d,i){return color_scale(i)})//"#97C30A")
+                .attr("stroke",function(d,i){return color_scale(i)})
                 .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
                 .style("stroke-width",function(d,i){if(i!=points.length-1){ if(d!=0 && i!=points.length-1){ return Math.min(15*transmodel[i][i+1]*d,8)};}
                                                     else{return ""}});
@@ -1170,7 +1177,7 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
-                .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
+                .attr("stroke",function(d,i){return color_scale(i)})
                 .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
                 .style("stroke-width",function(d,i){if(d!=0 && i!=0){return Math.min(15*transmodel[i][i-1]*d,8);} else{ return 1}});
             
