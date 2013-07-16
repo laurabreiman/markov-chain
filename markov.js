@@ -495,10 +495,11 @@ var markovChain = (function() {
                 $('.side-labels').empty();
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
+                
                 updateDisplay();
                 
                 setupSideLabels();
-
+                setupKnownBlocks([parseInt($(".num-whites").val()),parseInt($(".num-reds").val())]);
                 updateGraph();
 
             }
@@ -534,6 +535,7 @@ var markovChain = (function() {
                 updateBottomBubbles();
                 updateFirstInputRow();
                 animateTransitionBlocks();
+                setupSideLabels();
             })
         }
         
@@ -542,7 +544,6 @@ var markovChain = (function() {
             updateArrows();
             updateBottomBubbles();
             updateFirstInputRow();
-            setupUnknownBlocks();
         }
         
         function updateTopBubbles(){
