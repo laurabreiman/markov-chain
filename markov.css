@@ -78,6 +78,7 @@ span{
 .image-container{
     height: 100px;
     width: 100px;
+    position: relative;
 }
 
 .num-label,
@@ -93,9 +94,14 @@ span{
     stroke-opacity: 15%;
 }
 .block{
+    position: absolute;
     width: 20px;
     height: 10px;
     border: 1px solid black;
+    left: 35px;
+    text-align:center;
+    font-size:9px;
+    line-height:normal;
 }
 .gray-block{
     background-color:gray;
