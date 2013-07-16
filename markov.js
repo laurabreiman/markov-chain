@@ -4,7 +4,6 @@ var markovChain = (function() {
     
 ////////////////////////////////// global variables 
     
-    
 ////////////////////////////////// helper functions    
     
     //rounds a number (number) to the specified amount of decimal points (decimals)
@@ -100,7 +99,7 @@ var markovChain = (function() {
                 assocArray[i+1] = 0.5-i/(total_blocks)*0.5;
                 transition_model[i] = assocArray;
             }
-            console.log(transition_model);
+
             //change observation_model
             // for (var i in observation_model){
             //     delete observation_model[i];
@@ -479,9 +478,15 @@ var markovChain = (function() {
             transitionTop();
             updateGraph();
             state++;
-            setupSideLabels();
             updateArrows();
+            setupUnknownBlocks();
             animateTransitionBlocks();
+            if($(".first-transition").length >0){
+                $('.input-row').remove();
+                updateFirstInputRow();
+                updateBottomBubbles();
+            }
+            setupSideLabels();
         }
 
         function newChain(){
@@ -1202,9 +1207,8 @@ var markovChain = (function() {
                 .attr('dy',"-2.5em")
                 .attr("y", (11/20)*chart_height)
                 .attr("text-anchor","start")
-                .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
+                .attr("fill",function(d,i){return color_scale(i)})//"#FF717E")
                 .text(function(d,i) {
-                    console.log(d,i-1);
                     if (!isNaN(d[i-1])) {return round_number(d[i-1],3); }});
             
         }
