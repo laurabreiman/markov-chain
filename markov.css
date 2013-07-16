@@ -112,3 +112,6 @@ span{
 .white-block{
     background-color:white;
 }
+.first-transition{
+    align-self:center;
+}

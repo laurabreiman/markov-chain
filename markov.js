@@ -467,11 +467,12 @@ var markovChain = (function() {
         var graph;
         var state = 0;
         
-        setupGraph();
-        updateDisplay();
-        setupSideLabels();
-        setupProbVsTime();
-        setupUnknownBlocks();
+//        setupGraph();
+//        updateDisplay();
+//        setupSideLabels();
+//        setupProbVsTime();
+//        setupUnknownBlocks();
+        startDisplay();
 
         function transition(){
             model.transition(true);
@@ -507,13 +508,33 @@ var markovChain = (function() {
             $('.side-labels').empty();
             $('.side-labels').append("<label class='num-label'>States at<br><strong>Time = "+state+"</strong></label>");
             $('.side-labels').append("<label class='first-prob'>P(S<sub>"+state+"</sub>=s)</label>");
-            $('.side-labels').append("<label class='num2-label'>States at<br><strong>Time = "+(state+1)+"</strong></label>");
-            $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
             $('.num-label').offset({top: $(".top_bubble").offset().top});
             $('.first-prob').offset({top: $(".bubble-label").offset().top});
-            $('.num2-label').offset({top: $(".bottom-bubble").offset().top});       
-            $('.second-prob').offset({top: $(".input-row").offset().top});
+            
+            if($('.bottom-bubble').length >0){
+                $('.side-labels').append("<label class='num2-label'>States at<br><strong>Time = "+(state+1)+"</strong></label>");
+                $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
+                $('.num2-label').offset({top: $(".bottom-bubble").offset().top});       
+                $('.second-prob').offset({top: $(".input-row").offset().top});
+            }
             //$('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
+        }
+        
+        function startDisplay(){
+            setupGraph();
+            updateTopBubbles();
+            setupSideLabels();
+            setupKnownBlocks([2,0]);
+            $(".span8").append("<div class = 'row-fluid'><div class = 'first-row textbox-row input-row'></div></div>");
+            $('.input-row').append("<div class='row-fluid check-row'></div>");
+            $('.check-row').append("<button class='btn btn-small first-transition'>First Transition</button>");
+            $(".first-transition").on("click", function(){
+                $('.input-row').remove();
+                updateArrows();
+                updateBottomBubbles();
+                updateFirstInputRow();
+                animateTransitionBlocks();
+            })
         }
         
         function updateDisplay(){
@@ -1121,7 +1142,7 @@ var markovChain = (function() {
                 .attr("y2", (13/16)*chart_height)
                 .attr("stroke",function(d,i){return color_scale(i)})//"#1FBED6")
                 //.attr("stroke-width",6)
-                .style("stroke-width",function(d,i){if(d!=0){return 15*transmodel[i][i]*d} else{return 1};})
+                .style("stroke-width",function(d,i){if(d!=0){return Math.min(20*transmodel[i][i]*d,8)} else{return 1};})
                 .style("stroke-linecap","butt")
                 .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
                 .attr("marker-end", "url(#arrowhead)");
@@ -1138,7 +1159,7 @@ var markovChain = (function() {
                                           else{ return ""}})
                 .attr("stroke",function(d,i){return color_scale(i)})//"#97C30A")
                 .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
-                .style("stroke-width",function(d,i){if(i!=points.length-1){ if(d!=0 && i!=points.length-1){ return 15*transmodel[i][i+1]*d};}
+                .style("stroke-width",function(d,i){if(i!=points.length-1){ if(d!=0 && i!=points.length-1){ return Math.min(15*transmodel[i][i+1]*d,8)};}
                                                     else{return ""}});
             
             chart.selectAll(".diagLeft").data(points).enter().append("line")
@@ -1153,7 +1174,7 @@ var markovChain = (function() {
                                             else{ return ""}})
                 .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
                 .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
-                .style("stroke-width",function(d,i){if(d!=0 && i!=0){return 15*transmodel[i][i-1]*d;} else{ return 1}});
+                .style("stroke-width",function(d,i){if(d!=0 && i!=0){return Math.min(15*transmodel[i][i-1]*d,8);} else{ return 1}});
             
             //set up labels that show the probability of a transition occuring between states
             chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
@@ -1197,8 +1218,20 @@ var markovChain = (function() {
             
         }
         
+        function setupKnownBlocks(whites_reds){
+            $(".block").remove();
+            for(var i=0; i<whites_reds[0]; i++){
+                $(".image-container").append("<div class='block white-block block"+i+"'></div>");
+                $(".block"+i).css("top",""+(15*i+50)+"");
+            }
+            for(var i=whites_reds[0]; i<whites_reds[0]+whites_reds[1]; i++){
+                $(".image-container").append("<div class='block red-block block"+i+"'></div>");
+                $(".block"+i).css("top",""+(15*i+50)+"");
+            }
+        }
+        
         function observeBlock(observation){
-            console.log(observation);
+            setupUnknownBlocks();
             $('.block0').animate({top:-5},"slow");
             $('.block0').removeClass("gray-block");
             $('.block0').addClass(observation+"-block");
