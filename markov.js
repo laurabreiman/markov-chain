@@ -4,7 +4,6 @@ var markovChain = (function() {
     
 ////////////////////////////////// global variables 
     
-    
 ////////////////////////////////// helper functions    
     
     //rounds a number (number) to the specified amount of decimal points (decimals)
@@ -100,7 +99,7 @@ var markovChain = (function() {
                 assocArray[i+1] = 0.5-i/(total_blocks)*0.5;
                 transition_model[i] = assocArray;
             }
-            console.log(transition_model);
+
             //change observation_model
             // for (var i in observation_model){
             //     delete observation_model[i];
@@ -442,7 +441,7 @@ var markovChain = (function() {
         $('.previous-state').attr("disabled", true);
         
         var chart;
-        
+
         var outer_height = 300;
         var outer_width = parseInt($(".span8").css("width"));
     
@@ -479,10 +478,16 @@ var markovChain = (function() {
             transitionTop();
             updateGraph();
             state++;
-            setupSideLabels();
             updateArrows();
             updateArrowTextbox();
+            setupUnknownBlocks();
             animateTransitionBlocks();
+            if($(".first-transition").length >0){
+                $('.input-row').remove();
+                updateFirstInputRow();
+                updateBottomBubbles();
+            }
+            setupSideLabels();
         }
 
         function newChain(){
@@ -496,10 +501,11 @@ var markovChain = (function() {
                 $('.side-labels').empty();
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
+                
                 updateDisplay();
                 
                 setupSideLabels();
-
+                setupKnownBlocks([parseInt($(".num-whites").val()),parseInt($(".num-reds").val())]);
                 updateGraph();
 
             }
@@ -536,6 +542,7 @@ var markovChain = (function() {
                 updateBottomBubbles();
                 updateFirstInputRow();
                 animateTransitionBlocks();
+                setupSideLabels();
             })
         }
         
@@ -545,7 +552,6 @@ var markovChain = (function() {
             updateArrowTextbox();
             updateBottomBubbles();
             updateFirstInputRow();
-            setupUnknownBlocks();
         }
         
         function updateTopBubbles(){
@@ -1111,14 +1117,21 @@ var markovChain = (function() {
             });
         }
         
+        /*function that updates the transition arrows between states at time n and states at time n+1. 
+            arrows are scaled in width based on the probability of transition times the probability of state n
+            arrows are grouped in color based on source state (colors from d3 category10 colors)
+            gets the data from the model
+            uses svg/d3 elements to draw the arrows and position arrow labels
+            called whenever a transition is made
+        */
         function updateArrows(){
+            //clears the svg so that we can draw new arrows
             chart.selectAll(".arrow").remove();
-            chart.selectAll(".diagRight").remove();
-            chart.selectAll(".diagLeft").remove();
             chart.selectAll(".trans-label").remove();
             chart.selectAll(".diagRight-label").remove();
             chart.selectAll(".diagLeft-label").remove();
             
+            //gets the data from the model about the current states
             var points = model.get_current_state_array();
             var numpoints = points.length;
             var transmodel = [];
@@ -1126,30 +1139,21 @@ var markovChain = (function() {
                 transmodel.push(model.get_transition_model()[i]);
             }
             
-            chart.append("defs").append("marker")
-                .attr("id", "arrowhead")
-                .attr("refX", 6) 
-                .attr("refY", 2)
-                .attr("markerWidth", 10)
-                .attr("markerHeight", 6)
-                .attr("orient", "auto")
-                .attr("stroke","inherit")
-                .append("path")
-                    .attr("d", "M 0,0 V 4 L6,2 Z");
-            
+            //draws the vertical downwards arrows
             chart.selectAll(".arrow").data(points).enter().append("line")
                 .attr("class", function(d,i){return "straight arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y2", (13/16)*chart_height)
-                .attr("stroke",function(d,i){return color_scale(i)})//"#1FBED6")
+                .attr("stroke",function(d,i){return color_scale(i)})
                 //.attr("stroke-width",6)
                 .style("stroke-width",function(d,i){if(d!=0){return Math.min(20*transmodel[i][i]*d,8)} else{return 1};})
                 .style("stroke-linecap","butt")
                 .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
                 .attr("marker-end", "url(#arrowhead)");
             
+            //draws the right diagonal arrows
             chart.selectAll(".diagRight").data(points).enter().append("line")
                 .attr("class", function(d,i){return "diagRight arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
@@ -1160,11 +1164,12 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=points.length-1){ return "url(#arrowhead)"}
                                           else{ return ""}})
-                .attr("stroke",function(d,i){return color_scale(i)})//"#97C30A")
+                .attr("stroke",function(d,i){return color_scale(i)})
                 .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
                 .style("stroke-width",function(d,i){if(i!=points.length-1){ if(d!=0 && i!=points.length-1){ return Math.min(15*transmodel[i][i+1]*d,8)};}
                                                     else{return ""}});
             
+            //draws the left diagonal arrows
             chart.selectAll(".diagLeft").data(points).enter().append("line")
                 .attr("class", function(d,i){return "diagLeft arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
@@ -1175,19 +1180,21 @@ var markovChain = (function() {
                                           else{ return (2/6)*chart_height}})
                 .attr("marker-end", function(d,i){if(i!=0){ return "url(#arrowhead)"}
                                             else{ return ""}})
-                .attr("stroke",function(d,i){return color_scale(i)})//"#FF717E")
+                .attr("stroke",function(d,i){return color_scale(i)})
                 .attr("stroke-dasharray", function(d){if(d==0){return "2,2"} else{return "";}})
                 .style("stroke-width",function(d,i){if(d!=0 && i!=0){return Math.min(15*transmodel[i][i-1]*d,8);} else{ return 1}});
             
-            //set up labels that show the probability of a transition occuring between states
+//////////////set up labels that show the probability of a transition occuring between states
+            //labels on the vertical arrows
             chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
                 .attr("x", function(d,i){ return i*(chart_width/(numpoints-1))})
                 .attr('dx',"-0.32em")
                 .attr("y", (29/64)*chart_height)
                 .attr("text-anchor","end")
-                .attr("fill",function(d,i){return color_scale(i)})//"#1FBED6")
+                .attr("fill",function(d,i){return color_scale(i)})
                 .text(function(d,i) {  return round_number(d[i],3); });
             
+            //labels on the diagonal right arrows
             chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
                 .attr("x", function(d,i){return (i+1/4)*(chart_width/(numpoints-1))})
                 .attr('dx',2/numpoints+"em")
@@ -1196,6 +1203,7 @@ var markovChain = (function() {
                 .attr("fill",function(d,i){return color_scale(i)})//"#97C30A")
                 .text(function(d,i) {if (!isNaN(d[i+1])) {return round_number(d[i+1],3); }});
             
+            //labels on the diagonal left arrows
             chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
                 .attr("x", function(d,i){return (i-1/4)*(chart_width/(numpoints-1))})
                 .attr('dx',-2/numpoints+"em")
@@ -1203,7 +1211,6 @@ var markovChain = (function() {
                 .attr("text-anchor","end")
                 .attr("fill",function(d,i){return color_scale(i)})//"#FF717E")
                 .text(function(d,i) {
-                    console.log(d,i-1);
                     if (!isNaN(d[i-1])) {return round_number(d[i-1],3); }});
             
         }
@@ -1276,14 +1283,27 @@ var markovChain = (function() {
         //set up svg with axes and labels
         function setupGraph(){
             
-        $(".chart-container").empty();
-        chart = d3.select(".chart-container").append("svg")
-        .attr("class","chart")
-        .attr("height", outer_height)
-        .attr("width",outer_width)
-        .append("g")
-        .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+            $(".chart-container").empty();
+            chart = d3.select(".chart-container").append("svg")
+                .attr("class","chart")
+                .attr("height", outer_height)
+                .attr("width",outer_width)
+                .append("g")
+                .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+                
+            //draws an arrowhead 
+            chart.append("defs").append("marker")
+                    .attr("id", "arrowhead")
+                    .attr("refX", 6) 
+                    .attr("refY", 2)
+                    .attr("markerWidth", 10)
+                    .attr("markerHeight", 6)
+                    .attr("orient", "auto")
+                    .attr("stroke","inherit")
+                    .append("path")
+                        .attr("d", "M 0,0 V 4 L6,2 Z");
         }
+        
 
         // var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
         // var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
