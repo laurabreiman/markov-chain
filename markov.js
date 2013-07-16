@@ -44,7 +44,7 @@ var markovChain = (function() {
     function Model(){
         var states_array = [{0: 1, 1: 0, 2: 0}];
         //var initial_state = {0: 1, 1: 0, 2: 0};
-        var transition_model = {0: {0: .5, 1: 0.5}, 1: {0: 1/8, 1: 1/2, 2:  3/8}, 2: {1: 1/4, 2:  3/4}};
+        var transition_model = {0: {0: .5, 1: 0.5}, 1: {0: 1/4, 1: 1/2, 2:  1/4}, 2: {1: 1/2, 2: 1/2}};
         var observation_model = {0: {red: 0, white: 1}, 1: {red: 1/2, white: 1/2}, 2:  {red: 1,white: 0}};
         var current_state = {0: 1, 1: 0, 2: 0};
         //var previous_state = {0: 1, 1: 0, 2: 0};
@@ -100,7 +100,7 @@ var markovChain = (function() {
                 assocArray[i+1] = 0.5-i/(total_blocks)*0.5;
                 transition_model[i] = assocArray;
             }
-
+            console.log(transition_model);
             //change observation_model
             // for (var i in observation_model){
             //     delete observation_model[i];
