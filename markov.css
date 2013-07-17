@@ -81,7 +81,7 @@ img{
 }
 
 .image-container{
-
+    margin-top: 80;
     position: relative;
     align-content:center;
 }
@@ -127,11 +127,11 @@ img{
 .diagLeft-textbox{
     width:28px;
 }*/
-.bubble-label{
-    font-size: 14px;
-}
 
-.continue-row,
+.continue-row{
+    text-align:center;
+    visibility:hidden;
+}
 .start-row{
     text-align:center;
 }
