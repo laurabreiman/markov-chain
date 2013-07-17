@@ -408,7 +408,7 @@ var markovChain = (function() {
             +           "<div class='side-labels'></div>"
             +       "</div>"
             +       "<div class = 'span7'>"
-            +           "<div class = 'chart-container'></div>"
+            +           "<div class = 'chart-container chart0'></div>"
             +      "<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>"
             +       "</div>"
             +       "<div class = 'span3'>"
@@ -439,7 +439,7 @@ var markovChain = (function() {
         //$('.next-state').attr("disabled", true);
         $('.previous-state').attr("disabled", true);
         
-        var chart;
+        var chart = [];
 
         var outer_height = 300;
         var outer_width = parseInt($(".span7").css("width"));
@@ -502,34 +502,34 @@ var markovChain = (function() {
             }
         }
         
-        function firstupdate(){
-            updateArrows();
-            updateBottomBubbles();
+        function firstupdate(current_state){
+            updateArrows(current_state);
+            updateBottomBubbles(current_state);
             // updateFirstInputRow();
-            setupSideLabels();
+            setupSideLabels(current_state);
             updateGraph();
         }
         
-        function setupSideLabels(){
-            $('.side-labels').empty();
-            $('.side-labels').append("<label class='num-label'>States at<br><strong>Time = "+state+"</strong></label>");
-            $('.side-labels').append("<label class='first-prob'>P(S<sub>"+state+"</sub>=s)</label>");
-            $('.num-label').offset({top: $(".top_bubble").offset().top});
-            $('.first-prob').offset({top: $(".bubble-label").offset().top});
+        function setupSideLabels(current_state){
+            console.log("hehr");
+            $('.side-labels').append("<label class='num-label"+state+"'>States at<br><strong>Time = "+state+"</strong></label>");
+            $('.side-labels').append("<label class='first-prob"+state+"'>P(S<sub>"+state+"</sub>=s)</label>");
+            $('.num-label'+current_state).offset({top: $(".top_bubble"+current_state).offset().top});
+            $('.first-prob'+current_state).offset({top: $(".bubble-label"+current_state).offset().top});
             
-            if($('.bottom-bubble').length >0){
-                $('.side-labels').append("<label class='num2-label'>States at<br><strong>Time = "+(state+1)+"</strong></label>");
+            if($('.bottom-bubble'+current_state).length >0){
+                $('.side-labels').append("<label class='num2-label"+state+"'>States at<br><strong>Time = "+(state+1)+"</strong></label>");
                 // $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
-                $('.num2-label').offset({top: $(".bottom-bubble").offset().top});       
+                $('.num2-label'+current_state).offset({top: $(".bottom-bubble"+current_state).offset().top});       
                 // $('.second-prob').offset({top: $(".input-row").offset().top});
             }
             //$('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
         }
         
         function startDisplay(){
-            setupGraph();
-            updateTopBubbles();
-            setupSideLabels();
+            setupGraph(state);
+            updateTopBubbles(state);
+            setupSideLabels(state);
             setupKnownBlocks([2,0]);
             updateGraph();
             $('.start-row').append("<button class='btn btn-large btn-primary first-transition'>Start</button>");
@@ -541,7 +541,7 @@ var markovChain = (function() {
                             $(".arrow-transition").css("visibility","visible")
                             $('.arrow-transition').on("click", function(){
                                 $(this).remove();
-                                firstupdate();
+                                firstupdate(state);
                                 var firstDiv = $("<div hidden class=firstDiv>The numbers next to the arrows<br>represent the transition model<br>from time 0 to time 1.<br></div>");
                                 $('.markov').append(firstDiv);
                                 var firstDivBtn = $("<button hidden class='btn btn-small firstDivBtn'>OK</button>");
@@ -563,24 +563,15 @@ var markovChain = (function() {
             })
         }
         
-        function updateDisplay(){
-            updateTopBubbles();
-            updateArrows();
-            updateArrowTextbox();
-            updateBottomBubbles();
-            updateFirstInputRow();
-        }
-        
-        function updateTopBubbles(){
+        function updateTopBubbles(current_state){
 //            //color_scale = d3.scale.linear()
 //                            .domain([0, model.get_current_state_array().length-1])
 //                            .range(['white','red']);
+            var this_chart = chart[current_state]
+            this_chart.selectAll(".top-node"+current_state).remove();
+            this_chart.selectAll(".top_bubble"+current_state).remove();
             
-            chart.selectAll(".top-node").remove();
-            chart.selectAll(".top_bubble").remove();
-            chart.selectAll(".bubble-name").remove();
-            
-            chart.append("rect")
+            this_chart.append("rect")
                 .attr("class","grouping-rect")
                 .attr("x",-1*margin.left)
                 .attr("y",-0.5*margin.top)
@@ -600,10 +591,10 @@ var markovChain = (function() {
                 newpoints.push([i,points[i]])
             }
             
-            var node = chart.selectAll(".top-node")
+            var node = this_chart.selectAll(".top-node"+current_state)
                   .data(newpoints)
                 .enter().append("g")
-                  .attr("class", "top-node")
+                  .attr("class", "top-node"+current_state)
                 .attr("y", function(d,i,j) {return chart_height/20; })
                 .on("mouseover", function(d,i){
                         var index = i;
@@ -623,7 +614,7 @@ var markovChain = (function() {
                 //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
-                    .attr("class", "top_bubble")
+                    .attr("class", "top_bubble"+current_state)
                     .attr("x", function(d,i){return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/12)+10)/(numpoints-1))})
                     .attr("width", function(d){return (d[1]*(chart_height/12)+10)/(numpoints-1)})
                     .attr("height", function(d){return d[1]*(chart_height/12)+10})
@@ -633,14 +624,7 @@ var markovChain = (function() {
                     //.style("fill-opacity",function(d){return d[1];});
             }
             
-//            node.append("text")
-//                .attr("class","bubble-name")
-//                .attr("x", function(d,i){ return (chart_width)*(i/(points.length-1))})
-//                .attr("dy", ".3em")
-//                .style("text-anchor", "middle")
-//                .text(function(d,i) { return d[0]; });
-//            
-            updateTopLabels();
+            updateTopLabels(current_state);
         }
         
         function transitionTop(){
@@ -668,30 +652,8 @@ var markovChain = (function() {
             updateTopLabels();
         }
         
-        function transitionBottom(){
-            model.transition();
-            var points = model.get_current_state_array();
-            var numpoints = points.length;
-            var newstate = [];
-            
-            for(var i=0; i<numpoints; i++){
-                for(var j=0; j<numpoints-1; j++){
-                    newstate.push(points[i])
-                }
-            }
-            
-            chart.selectAll(".bottom-bubble").data(newstate).transition().duration(500)
-                .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
-                .attr("height", function(d){return d*(chart_height/12)+10})
-                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/12)+10)/(numpoints-1))})
-                //.attr("r", function(d){return d*(chart_height/16)+8})
-                //.style("fill-opacity",function(d){return d;});
-            
-            updateBottomLabels();
-        }
-        
-        function transitionBottom(state){
-            var points = state;
+        function transitionBottom(current_state, blocks_state){
+            var points = blocks_state;
             var numpoints = points.length;
             var newstate = [];
             
@@ -702,14 +664,13 @@ var markovChain = (function() {
             }
             
             
-            chart.selectAll(".bottom-bubble").data(newstate).transition().duration(500)
+            chart[current_state].selectAll(".bottom-bubble"+state).data(newstate).transition().duration(500)
                 .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
                 .attr("height", function(d){return d*(chart_height/12)+10})
                 .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/12)+10)/(numpoints-1))})
                 //.attr("r", function(d){return d*(chart_height/16)+8})
                 //.style("fill-opacity",function(d){return d;});
-            
-            updateBottomLabels();
+
         }
         
         function nextState(){
@@ -718,79 +679,27 @@ var markovChain = (function() {
             var numpoints = points.length;
             var newstate = [];
             
-            for(var i=0; i<numpoints; i++){
-                for(var j=0; j<numpoints-1; j++){
-                    newstate.push(points[i])
-                }
-            }
-            
-            chart.selectAll(".bottom-node")
-                .data(newstate)
-                .transition().duration(1000)
-                .attr("y", $(".top-node").attr("y"));//chart_height/20);
-            
-            chart.selectAll(".bottom-bubble")
-                .transition().duration(1000)
-                .attr("y", $(".top-node").attr("y"));//chart_height/20);
-
-            chart.selectAll(".top-node")
-                  .data(newstate)
-                  .transition().duration(1000)
-                .attr("transform", function(d,i,j) {return "translate(" +  (-1000) + "," + chart_height/20 + ")"; });
-            
-            setTimeout(removeNodes,1001)
-            
-            $(".graph-container").css("visibility","visible");
-            updateGraph();
-            
-            $('.previous-state').attr("disabled", false);
-        }
-        
-        function removeNodes(){
-            $(".top-node").attr("class", "remove");
-            $(".top_bubble").attr("class","remove");
-            $(".bubble-name").attr("class","remove");
-            
-            $(".bottom-node").attr("class", "top-node");
-            $(".bottom-bubble").attr("class","top_bubble");
-            $(".bottom-bubble-name").attr("class","bubble-name");
-            
-            $('.remove').remove();
-                            
-            chart.selectAll(".top-node").on("mouseover", function(d,i){
-                        var index = i;
-                        console.log(index);
-                        $(".line"+index).attr("class", "selected-line line"+index);
-                        $("path.line-graph").attr("id", "faded-line")
-                        $(".arrow").attr("id", "faded-arrow")
-                        $(".arrow"+index).attr("id", "selected-arrow");
-                        $("[id=faded-arrow]").attr("marker-end","");
-                    })
-                .on("mouseout", function(d,i){
-                        $(".selected-line").attr("class", "line-graph line"+i);
-                        $("#selected-arrow").attr("id","");
-                        $("[id=faded-arrow]").attr("id","")
-                        $("[id=faded-line]").attr("id","")
-                        $(".arrow").attr("marker-end","url(#arrowhead)")
-                    });
-            
-            updateBottomBubbles();
             state++;
-            updateTopLabels();
-            $('.textbox-row').closest('.row-fluid').remove()
-            setupSideLabels();
-            updateFirstInputRow();
-            updateArrows();
+                                    
+            $(".span7").append("<div class='chart-container chart"+state+"'></div>");
+            setupGraph(state);
+            updateTopBubbles(state);
+            setupSideLabels(state);
+            $(".span7").append("<div class='row-fluid continue-row'><button class='arrow-transition btn btn-large'>See Transition Model</button></div>");
+            $(".arrow-transition").css("visibility","visible");
+            $(".arrow-transition").on("click",function(){
+                $(this).remove();
+                firstupdate(state);
+                updateFirstInputRow(state);
+            })
         }
         
         function removeNodesPrev(){
             $(".bottom-node").attr("class", "remove");
             $(".bottom-bubble").attr("class","remove");
-            $(".bottom-bubble-name").attr("class","remove");
             
             $(".top-node").attr("class", "bottom-node");
             $(".top_bubble").attr("class","bottom-bubble");
-            $(".bubble-name").attr("class","bottom-bubble-name");
             
             $('.remove').remove();
             
@@ -810,8 +719,12 @@ var markovChain = (function() {
             for(var i in pointdict){
                 newpoints.push([i,points[i]])
             }
-            
             chart.selectAll(".top-node")
+              .data(newpoints)
+              .transition().duration(1000)
+            .attr("y",(10/11)*chart_height);
+            
+            chart.selectAll(".top_bubble")
                   .data(newpoints)
                   .transition().duration(1000)
                 .attr("y",(10/11)*chart_height);
@@ -824,10 +737,11 @@ var markovChain = (function() {
             setTimeout(removeNodesPrev,1001)
         }
         
-        function updateBottomBubbles(){
-            chart.selectAll(".bottom-node").remove();
-            chart.selectAll(".bottom-bubble").remove();
-            chart.selectAll(".bottom-bubble-name").remove();
+        function updateBottomBubbles(current_state){
+            var this_chart = chart[current_state]
+            
+            this_chart.selectAll(".bottom-node"+current_state).remove();
+            this_chart.selectAll(".bottom-bubble"+current_state).remove();
             var pointlength = model.get_current_state_array().length;
             
             var points = model.get_current_state_array();
@@ -839,7 +753,7 @@ var markovChain = (function() {
                 newpoints.push([i,1/pointlength])
             }
             
-            chart.append("rect")
+            this_chart.append("rect")
                 .attr("class","grouping-rect")
                 .attr("x",-1*margin.left)
                 .attr("y",10/11*chart_height-0.5*margin.top)
@@ -850,15 +764,15 @@ var markovChain = (function() {
                 // .attr("stroke-width",2)
                 .attr("rx",40);
             
-            var node = chart.selectAll(".bottom-node")
+            var node = this_chart.selectAll(".bottom-node"+current_state)
                   .data(newpoints)
                 .enter().append("g")
-                  .attr("class", "bottom-node")
+                  .attr("class", "bottom-node"+current_state)
                 .attr("y", (10/11)*chart_height);
                 //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
-                    .attr("class", "bottom-bubble")
+                    .attr("class", "bottom-bubble"+current_state)
                     .attr("x", function(d,i){ return -8+(chart_width)*(i/(points.length-1))+a*((d[1]*(chart_height/12)+10)/(numpoints-1))})
                     .attr("y", (10/11)*chart_height)
                     .attr("width", function(d){return (d[1]*(chart_height/12)+10)/(numpoints-1)})
@@ -883,21 +797,16 @@ var markovChain = (function() {
                     .style("stroke","black")
                     //.style("fill-opacity",function(d){return d[1];});
             }
-            
-
-
-            
-            updateBottomLabels();
         }
         
-        function updateTopLabels(){
+        function updateTopLabels(current_state){
             
             var points = model.get_current_state_array();
             var names = Object.keys(model.get_current_state());
 
-            chart.selectAll(".bubble-label").remove();
+            chart[current_state].selectAll(".bubble-label"+current_state).remove();
             
-            chart.selectAll(".bubble-label").data(points).enter().append("text").attr("class", "bubble-label")
+            chart[current_state].selectAll(".bubble-label"+current_state).data(points).enter().append("text").attr("class", "bubble-label"+current_state)
                 .attr("x",function(d,i){return chart_width*(i/(points.length-1))})
                 .attr('y',chart_height/4)
                 .attr("dx",-4)
@@ -905,19 +814,10 @@ var markovChain = (function() {
                 .text(function(d) { return round_number(d,4); });
         }
         
-        function updateBottomLabels(){
-            
-            var points = model.get_current_state_array();
-            var names = Object.keys(model.get_current_state());
-
-            chart.selectAll(".bottom-bubble-label").remove();
-            
-        }
-        
         function updateFirstInputRow(){
-            $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
-            $(".span7").append("<div class = 'row-fluid'><div class = 'first-row textbox-row input-row'></div></div>");
-            $('.second-prob').offset({top: $(".input-row").offset().top});
+            $('.side-labels').append("<label class='second-prob"+state+"'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
+            $(".span7").append("<div class = 'row-fluid'><div class = 'first-row textbox-row"+state+" input-row'></div></div>");
+            $('.second-prob'+state).offset({top: $(".input-row").offset().top});
 
             var num_entries = model.get_current_state_array().length;
             
@@ -946,7 +846,7 @@ var markovChain = (function() {
                 })
             }
             
-            $('.input-row').after("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-row').after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
             model.transition();
             
             $('.check').on('click',function(){
@@ -954,13 +854,13 @@ var markovChain = (function() {
                 var results = checkView(0,"none");
                 if(results[results.length-1] == "sum_error"){
                     $('.trans_feedback').remove();
-                    $('.check-row').append("<div class='trans_feedback'>should sum to 1.</div>");
+                    $('.check-row'+state).append("<div class='trans_feedback'>should sum to 1.</div>");
                     $('.trans_feedback').css("color","red");
                 }
                 else{$('.trans_feedback').remove();}
                 if(results[results.length-2] == 1){
                     $(this).remove(); $('.trans_feedback').remove();
-                    $('.check-row').append("<button class='btn btn-small observation'>Make Observation</button>");
+                    $('.check-row'+state).append("<button class='btn btn-small observation'>Make Observation</button>");
                     
                     $('.observation').on("click",makeObservation);
                 }
@@ -986,7 +886,7 @@ var markovChain = (function() {
             }
 
             if(indexOfCheck == 0){
-                transitionBottom(answers);
+                transitionBottom(state, answers);
                 var results = controller.checkAnswers(answers);
             }
             else if(indexOfCheck == 1){
@@ -996,7 +896,7 @@ var markovChain = (function() {
                 var results = controller.checkOnS(answers,observation);
             }
             else{// if(indexOfCheck == 3){
-                transitionBottom(answers);
+                transitionBottom(state, answers);
                 var results = controller.checkObs(answers,observation);
             } 
             
@@ -1020,7 +920,7 @@ var markovChain = (function() {
         function makeObservation(){
             $('.observation').remove();
             var observation = model.make_obs();
-            $(".check-row").append("<div class='row-fluid'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
+            $(".check-row"+state).append("<div class='row-fluid'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
             $(".help-text").html("You observe a <span style='color:"+observation+"'>"+observation+"</span> block!");
             observeBlock(observation);
             displayOgSInputRow(observation);
@@ -1046,7 +946,7 @@ var markovChain = (function() {
             
             $('.obs-given-p').offset({top: $(".input-obs-given-row").offset().top});
             
-            $('.input-obs-given-row').after("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-obs-given-row').after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
             
             $('.input-row').removeClass('input-row');
             $('.input-obs-given-row').addClass('input-row');
@@ -1081,7 +981,7 @@ var markovChain = (function() {
             
             $('.ons-label').offset({top: $(".input-ons-row").offset().top});
             
-            $('.input-ons-row').after("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-ons-row').after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
             
             $('.input-row').removeClass('input-row');
             $('.input-ons-row').addClass('input-row');
@@ -1116,7 +1016,7 @@ var markovChain = (function() {
             
             $('.norm-label').offset({top: $(".input-norm-row").offset().top});
             
-            $('.input-norm-row').after("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-norm-row').after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
             
             $('.input-row').removeClass('input-row');
             $('.input-norm-row').addClass('input-row');
@@ -1126,7 +1026,7 @@ var markovChain = (function() {
                 var results = checkView(3,observation);
                 if(results[results.length-1] == "sum_error"){
                     $('.obs_feedback').remove();
-                    $('.input-row .check-row').append('<div class="obs_feedback">should sum to 1.</div>');
+                    $('.input-row .check-row'+state).append('<div class="obs_feedback">should sum to 1.</div>');
                     $('.obs_feedback').css("color","red");
                 }
                 else{$('.obs_feedback').remove();}
@@ -1134,8 +1034,10 @@ var markovChain = (function() {
                     $(this).html("Next State");
                     $('.obs_feedback').remove();
                     $(this).on("click", function(){
+                        $('.input-row').removeClass('input-row');
                         model.observe(observation,true);
                         $(".help-text").html("A random block was removed, and a random block was put in");
+                        $(this).remove();
                         animateTransitionBlocks();
                         setTimeout(nextState,2000);
                     });
@@ -1143,11 +1045,13 @@ var markovChain = (function() {
             });
         }
         
-        function clearArrows(){
-            chart.selectAll(".arrow").remove();
-            chart.selectAll(".trans-label").remove();
-            chart.selectAll(".diagRight-label").remove();
-            chart.selectAll(".diagLeft-label").remove();
+        function clearArrows(current_state){
+            var this_chart = chart[current_state]
+            
+            this_chart.selectAll(".arrow").remove();
+            this_chart.selectAll(".trans-label").remove();
+            this_chart.selectAll(".diagRight-label").remove();
+            this_chart.selectAll(".diagLeft-label").remove();
         }
         
         /*function that updates the transition arrows between states at time n and states at time n+1. 
@@ -1157,9 +1061,11 @@ var markovChain = (function() {
             uses svg/d3 elements to draw the arrows and position arrow labels
             called whenever a transition is made
         */
-        function updateArrows(){
+        function updateArrows(current_state){
+            var this_chart = chart[current_state]
+            
             //clears the svg so that we can draw new arrows
-            clearArrows();
+            clearArrows(current_state);
             
             //gets the data from the model about the current states
             var points = model.get_current_state_array();
@@ -1170,7 +1076,7 @@ var markovChain = (function() {
             }
             
             //draws the vertical downwards arrows
-            chart.selectAll(".arrow").data(points).enter().append("line")
+            this_chart.selectAll(".arrow").data(points).enter().append("line")
                 .attr("class", function(d,i){return "straight arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
@@ -1184,7 +1090,7 @@ var markovChain = (function() {
                 .attr("marker-end", "url(#arrowhead)");
             
             //draws the right diagonal arrows
-            chart.selectAll(".diagRight").data(points).enter().append("line")
+            this_chart.selectAll(".diagRight").data(points).enter().append("line")
                 .attr("class", function(d,i){return "diagRight arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
@@ -1200,7 +1106,7 @@ var markovChain = (function() {
                                                     else{return ""}});
             
             //draws the left diagonal arrows
-            chart.selectAll(".diagLeft").data(points).enter().append("line")
+            this_chart.selectAll(".diagLeft").data(points).enter().append("line")
                 .attr("class", function(d,i){return "diagLeft arrow arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
@@ -1216,7 +1122,7 @@ var markovChain = (function() {
             
 //////////////set up labels that show the probability of a transition occuring between states
             //labels on the vertical arrows
-            chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
+            this_chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
                 .attr("x", function(d,i){ return i*(chart_width/(numpoints-1))})
                 .attr('dx',"-0.32em")
                 .attr("y", (29/64)*chart_height)
@@ -1225,7 +1131,7 @@ var markovChain = (function() {
                 .text(function(d,i) {  return round_number(d[i],3); });
             
             //labels on the diagonal right arrows
-            chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
+            this_chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
                 .attr("x", function(d,i){return (i+1/4)*(chart_width/(numpoints-1))})
                 .attr('dx',2/numpoints+"em")
                 .attr("y", (29/64)*chart_height)
@@ -1234,7 +1140,7 @@ var markovChain = (function() {
                 .text(function(d,i) {if (!isNaN(d[i+1])) {return round_number(d[i+1],3); }});
             
             //labels on the diagonal left arrows
-            chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
+            this_chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
                 .attr("x", function(d,i){return (i-1/4)*(chart_width/(numpoints-1))})
                 .attr('dx',-2/numpoints+"em")
                 .attr("y", (29/64)*chart_height)
@@ -1311,18 +1217,20 @@ var markovChain = (function() {
         }
         
         //set up svg with axes and labels
-        function setupGraph(){
+        function setupGraph(current_state){
             
-            $(".chart-container").empty();
-            chart = d3.select(".chart-container").append("svg")
-                .attr("class","chart")
+            $(".chart-container.chart"+current_state).empty();            
+            var this_chart = d3.select(".chart-container.chart"+current_state).append("svg")
+                .attr("class","chart"+current_state)
                 .attr("height", outer_height)
                 .attr("width",outer_width)
                 .append("g")
-                .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+                .attr("transform","translate(" + margin.left + "," + margin.top + ")")
+
+            chart.push(this_chart);
                 
             //draws an arrowhead 
-            chart.append("defs").append("marker")
+            chart[current_state].append("defs").append("marker")
                     .attr("id", "arrowhead")
                     .attr("refX", 6) 
                     .attr("refY", 2)
