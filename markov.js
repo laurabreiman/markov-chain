@@ -535,7 +535,7 @@ var markovChain = (function() {
             $('.start-row').append("<button class='btn btn-large btn-primary first-transition'>Start</button>");
             $(".first-transition").on("click", function(){
                     $(this).remove()//css("visibility","hidden");
-                    $(".start-row").append("<p>A random block was removed, and a random block was put in</p>");
+                    $(".start-row").append("<p class='help-text'>A random block was removed, and a random block was put in</p>");
                     animateTransitionBlocks();
                     window.setTimeout(function(){
                             $(".arrow-transition").css("visibility","visible")
@@ -1022,6 +1022,7 @@ var markovChain = (function() {
             $('.observation').remove();
             var observation = model.make_obs();
             $(".check-row").append("<div class='row-fluid'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
+            $(".help-text").html("You observe a <span style='color:"+observation+"'>"+observation+"</span> block!");
             observeBlock(observation);
             displayOgSInputRow(observation);
         }
