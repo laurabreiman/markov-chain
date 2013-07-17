@@ -55,6 +55,9 @@ text {
 .hero-unit h2 small {
 	color: black;
 }
+.graph-container{
+    visibility: hidden;
+}
 
 .graph-container line{
     stroke: black;
@@ -147,4 +150,7 @@ img{
     color: white;
     top: 230px;
     left: 15px;
+}
+.textbox-row{
+    width: 80%;
 }
