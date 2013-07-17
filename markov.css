@@ -75,10 +75,15 @@ span{
     stroke-width: 8px;
 }
 
-.image-container{
-    height: 100px;
+img{
+    height: 110px;
     width: 100px;
+}
+
+.image-container{
+
     position: relative;
+    align-content:center;
 }
 
 .num-label,
@@ -98,7 +103,7 @@ span{
     width: 20px;
     height: 10px;
     border: 1px solid black;
-    left: 35px;
+    left: 125px;
     text-align:center;
     font-size:9px;
     line-height:normal;
@@ -114,12 +119,19 @@ span{
 }
 .first-transition{
     align-self:center;
+/*    float: right;*/
 }
-.trans-textbox,
+
+/*.trans-textbox,
 .diagRight-textbox,
 .diagLeft-textbox{
     width:28px;
-}
+}*/
 .bubble-label{
     font-size: 14px;
+}
+
+.continue-row,
+.start-row{
+    text-align:center;
 }

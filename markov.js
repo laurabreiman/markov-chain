@@ -406,12 +406,9 @@ var markovChain = (function() {
             +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
             +" <span style='color:red'>red</span> or <span style='color:white'>white</span> is added to the bag."
             +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
-            +"<p class='text-info'><small>We've already done one transition for you:)<br>Fill in the blank with appropriate probabilities."
+            +"<p class='text-info'><small><br>Fill in the blank with appropriate probabilities."
             +"You may change number of blocks on the right column and start over.</small></p></div>"
             +"<div class = 'container-fluid well'>"
-            +   "<div class = 'row-fluid'>"
-            +       "<div class = 'controls'></div>"
-            +   "</div>"
             +   "<div class = 'row-fluid'>"
             +       "<div class ='span1'>"
             +           "<div class='side-labels'></div>"
@@ -420,8 +417,14 @@ var markovChain = (function() {
             +           "<div class = 'chart-container'></div>"
             +       "</div>"
             +       "<div class = 'span3'>"
+            +           "<div class = 'row-fluid'>"
+            +               "<div class = 'controls2'></div>"
+            +           "</div>"    
             +           "<div class = 'graph-container'></div>"
-            +           "<div class = 'image-container'><img src='bag.png'></div>"       
+            +           "<div align='center' class = 'image-container'><img src='bag.png'></div>"
+            +           "<div class = 'row-fluid start-row'>"
+//            +               "<div class = 'controls'></div>"
+            +           "</div>"               
             +       "</div>"
             +   "</div>"
             // +   "<div class ='row-fluid'>"
@@ -429,7 +432,8 @@ var markovChain = (function() {
             // +   "</div>"
             +"</div>");
 
-        $(".controls").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small next-state'>Next State</button><button class='btn btn-small previous-state'>Previous State</button># of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
+        //$(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
+        $(".controls2").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small next-state'>Next State</button><button class='btn btn-small previous-state'>Previous State</button>")
         
         //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
         
@@ -482,7 +486,7 @@ var markovChain = (function() {
             updateArrowTextbox();
             setupUnknownBlocks();
             animateTransitionBlocks();
-            if($(".first-transition").length >0){
+            if($(".first-transition").length >0 || $(".input-obs-given-row").length>0){
                 $('.input-row').remove();
                 updateFirstInputRow();
                 updateBottomBubbles();
@@ -502,13 +506,36 @@ var markovChain = (function() {
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
                 
-                updateDisplay();
+//                if($(".first-transition").length >0 || $(".input-obs-given-row").length>0){
+//                    $('.input-row').remove();
+//
+//                }
+                clearArrows();
+                updateTopBubbles();
+                
+                $('.start-row').append("<button class='btn btn-large first-transition'>Start</button>");
+                $(".first-transition").on("click", function(){
+                    $(this).remove()//css("visibility","hidden");
+                    $(".start-row").append("<p>A random block was removed, and a random block was put in</p>");
+                    animateTransitionBlocks();
+                    $(".span8").append("<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>")
+//                    setTimeout(firstupdate, 2000);
+                })
                 
                 setupSideLabels();
                 setupKnownBlocks([parseInt($(".num-whites").val()),parseInt($(".num-reds").val())]);
                 updateGraph();
 
             }
+        }
+        
+        function firstupdate(){
+            console.log("sup")
+            updateArrows();
+            updateBottomBubbles();
+            updateFirstInputRow();
+            setupSideLabels();
+            updateGraph();
         }
         
         function setupSideLabels(){
@@ -532,17 +559,22 @@ var markovChain = (function() {
             updateTopBubbles();
             setupSideLabels();
             setupKnownBlocks([2,0]);
-            $(".span8").append("<div class = 'row-fluid'><div class = 'first-row textbox-row input-row'></div></div>");
-            $('.input-row').append("<div class='row-fluid check-row'></div>");
-            $('.check-row').append("<button class='btn btn-small first-transition'>First Transition</button>");
+            updateGraph();
+            $('.start-row').append("<button class='btn btn-large btn-primary first-transition'>Start</button>");
             $(".first-transition").on("click", function(){
-                $('.input-row').remove();
-                updateArrows();
-                updateArrowTextbox();
-                updateBottomBubbles();
-                updateFirstInputRow();
-                animateTransitionBlocks();
-                setupSideLabels();
+                    $(this).remove()//css("visibility","hidden");
+                    $(".start-row").append("<p>A random block was removed, and a random block was put in</p>");
+                    animateTransitionBlocks();
+                    window.setTimeout(function(){
+                            $(".span8").append("<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>")
+                            $('.arrow-transition').on("click", function(){
+                                $(this).remove();
+                                firstupdate()
+                            })
+                    }, 2000)
+
+//                    setTimeout(firstupdate, 2000);
+                            
             })
         }
         
@@ -572,17 +604,6 @@ var markovChain = (function() {
                 .attr("fill","#e4e4e4")
                 //.attr("stroke","black")
                 //.attr("stroke-width",2)
-                .attr("rx",40);
-
-            chart.append("rect")
-                .attr("class","grouping-rect")
-                .attr("x",-1*margin.left)
-                .attr("y",10/11*chart_height-0.5*margin.top)
-                .attr("width",chart_width+margin.left+margin.right)
-                .attr("height",margin.top+chart_height/12+10)
-                .attr("fill","#e4e4e4")
-                // .attr("stroke","black")
-                // .attr("stroke-width",2)
                 .attr("rx",40);
 
             var points = model.get_current_state_array();
@@ -623,7 +644,7 @@ var markovChain = (function() {
                     .attr("height", function(d){return d[1]*(chart_height/12)+10})
                     .style("fill",function(d,i){if(a<i){return "red"} else {return "white"}})
                     .style("stroke","black")
-                    .attr("y", function(d,i,j) {return chart_height/100; })
+                    //.attr("y", function(d,i,j) {return chart_height/100; })
                     //.style("fill-opacity",function(d){return d[1];});
             }
             
@@ -833,6 +854,17 @@ var markovChain = (function() {
                 newpoints.push([i,1/pointlength])
             }
             
+            chart.append("rect")
+                .attr("class","grouping-rect")
+                .attr("x",-1*margin.left)
+                .attr("y",10/11*chart_height-0.5*margin.top)
+                .attr("width",chart_width+margin.left+margin.right)
+                .attr("height",margin.top+chart_height/12+10)
+                .attr("fill","#e4e4e4")
+                // .attr("stroke","black")
+                // .attr("stroke-width",2)
+                .attr("rx",40);
+            
             var node = chart.selectAll(".bottom-node")
                   .data(newpoints)
                 .enter().append("g")
@@ -866,6 +898,9 @@ var markovChain = (function() {
                     .style("stroke","black")
                     //.style("fill-opacity",function(d){return d[1];});
             }
+            
+
+
             
             updateBottomLabels();
         }
@@ -1117,6 +1152,13 @@ var markovChain = (function() {
             });
         }
         
+        function clearArrows(){
+            chart.selectAll(".arrow").remove();
+            chart.selectAll(".trans-label").remove();
+            chart.selectAll(".diagRight-label").remove();
+            chart.selectAll(".diagLeft-label").remove();
+        }
+        
         /*function that updates the transition arrows between states at time n and states at time n+1. 
             arrows are scaled in width based on the probability of transition times the probability of state n
             arrows are grouped in color based on source state (colors from d3 category10 colors)
@@ -1126,10 +1168,7 @@ var markovChain = (function() {
         */
         function updateArrows(){
             //clears the svg so that we can draw new arrows
-            chart.selectAll(".arrow").remove();
-            chart.selectAll(".trans-label").remove();
-            chart.selectAll(".diagRight-label").remove();
-            chart.selectAll(".diagLeft-label").remove();
+            clearArrows();
             
             //gets the data from the model about the current states
             var points = model.get_current_state_array();
@@ -1275,7 +1314,7 @@ var markovChain = (function() {
             $('.block0').attr("class","block0 block gray-block");
             $('.block0').animate({top:-5},"fast");
             $('.block0').animate({left:300},"slow");
-            $('.block0').animate({left:35},"slow");
+            $('.block0').animate({left:125},"slow");
             $('.block0').animate({top:50},"fast")
 
         }
@@ -1454,7 +1493,6 @@ var markovChain = (function() {
         var model = Model();
         var controller = Controller(model);
         var view = View(div, model, controller);
-        
     }; 
     
     exports.setup = setup;
