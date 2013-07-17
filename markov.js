@@ -740,7 +740,6 @@ var markovChain = (function() {
             
             setTimeout(removeNodes,1001)
             
-            animateTransitionBlocks();
             $(".graph-container").css("visibility","visible");
             updateGraph();
             
@@ -779,8 +778,8 @@ var markovChain = (function() {
             state++;
             updateTopLabels();
             $('.textbox-row').closest('.row-fluid').remove()
-            updateFirstInputRow();
             setupSideLabels();
+            updateFirstInputRow();
             updateArrows();
         }
         
@@ -1136,7 +1135,9 @@ var markovChain = (function() {
                     $('.obs_feedback').remove();
                     $(this).on("click", function(){
                         model.observe(observation,true);
-                        nextState();
+                        $(".help-text").html("A random block was removed, and a random block was put in");
+                        animateTransitionBlocks();
+                        setTimeout(nextState,2000);
                     });
                 }
             });
