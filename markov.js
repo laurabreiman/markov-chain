@@ -401,13 +401,13 @@ var markovChain = (function() {
     
     function View(div, model, controller){
         
-        div.append("<div class = 'hero-unit'><h2><small>Illustration of Markov Chain:</small> Lego Game</h2>"
-            +"<p>Two <span style='color:white'>white</span> lego bricks are put into a bag. A transition and an observation happens every round."
-            +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
-            +" <span style='color:red'>red</span> or <span style='color:white'>white</span> is added to the bag."
-            +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
-            +"<p class='text-info'><small><br>Fill in the blank with appropriate probabilities."
-            +"You may change number of blocks on the right column and start over.</small></p></div>"
+        div.append("<div class = 'navbar'><h2><small>Markov Chain:</small> Lego Game</h2></div>"
+//            +"<p>Two <span style='color:white'>white</span> lego bricks are put into a bag. A transition and an observation happens every round."
+//            +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
+//            +" <span style='color:red'>red</span> or <span style='color:white'>white</span> is added to the bag."
+//            +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
+//            +"<p class='text-info'><small><br>Fill in the blank with appropriate probabilities."
+//            +"You may change number of blocks on the right column and start over.</small></p></div>"
             +"<div class = 'container-fluid well'>"
             +   "<div class = 'row-fluid'>"
             +       "<div class ='span1'>"
