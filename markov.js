@@ -419,7 +419,7 @@ var markovChain = (function() {
             +           "<div class = 'row-fluid start-row'>"
 //            +               "<div class = 'controls'></div>"
             +           "</div>"           
-            +           "<div class = 'graph-container' hidden></div>"
+            +           "<div class = 'graph-container'></div>"
             +       "</div>"
             +   "</div>"
             // +   "<div class ='row-fluid'>"
@@ -467,6 +467,7 @@ var markovChain = (function() {
         function transition(){
             model.transition(true);
             transitionTop();
+            $(".graph-container").css("visibility","visible");
             updateGraph();
             state++;
             updateArrows();
@@ -493,28 +494,8 @@ var markovChain = (function() {
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
                 
-//                if($(".first-transition").length >0 || $(".input-obs-given-row").length>0){
-//                    $('.input-row').remove();
-//
-//                }
-                clearArrows();
-                updateTopBubbles();
+                startDisplay();
                 
-                $('.start-row').append("<button class='btn btn-large first-transition'>Start</button>");
-                $(".first-transition").on("click", function(){
-                    $(this).remove()//css("visibility","hidden");
-                    $(".start-row").append("<p>A random block was removed, and a random block was put in</p>");
-                    animateTransitionBlocks();
-                    window.setTimeout(function(){
-                            $(".arrow-transition").css("visibility","visible")
-                            $('.arrow-transition').on("click", function(){
-                                $(this).remove();
-                                firstupdate()
-                            })
-                    }, 2000)
-                })
-                
-                setupSideLabels();
                 setupKnownBlocks([parseInt($(".num-whites").val()),parseInt($(".num-reds").val())]);
                 updateGraph();
 
@@ -747,6 +728,7 @@ var markovChain = (function() {
             setTimeout(removeNodes,1001)
             
             animateTransitionBlocks();
+            $(".graph-container").css("visibility","visible");
             updateGraph();
             
             $('.previous-state').attr("disabled", false);
@@ -949,7 +931,7 @@ var markovChain = (function() {
                 })
             }
             
-            $('.input-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-row').after("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
             model.transition();
             
             $('.check').on('click',function(){
@@ -1048,7 +1030,7 @@ var markovChain = (function() {
             
             $('.obs-given-p').offset({top: $(".input-obs-given-row").offset().top});
             
-            $('.input-obs-given-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-obs-given-row').after("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
             
             $('.input-row').removeClass('input-row');
             $('.input-obs-given-row').addClass('input-row');
@@ -1083,7 +1065,7 @@ var markovChain = (function() {
             
             $('.ons-label').offset({top: $(".input-ons-row").offset().top});
             
-            $('.input-ons-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-ons-row').after("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
             
             $('.input-row').removeClass('input-row');
             $('.input-ons-row').addClass('input-row');
@@ -1118,7 +1100,7 @@ var markovChain = (function() {
             
             $('.norm-label').offset({top: $(".input-norm-row").offset().top});
             
-            $('.input-norm-row').append("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-norm-row').after("<div class='row-fluid check-row'><button class='btn btn-small check'>Check</button></div>");
             
             $('.input-row').removeClass('input-row');
             $('.input-norm-row').addClass('input-row');
