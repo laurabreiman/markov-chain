@@ -401,19 +401,13 @@ var markovChain = (function() {
     
     function View(div, model, controller){
         
-        div.append("<div class = 'navbar'><h2><small>Markov Chain:</small> Lego Game</h2></div>"
-//            +"<p>Two <span style='color:white'>white</span> lego bricks are put into a bag. A transition and an observation happens every round."
-//            +"<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be"
-//            +" <span style='color:red'>red</span> or <span style='color:white'>white</span> is added to the bag."
-//            +" <br>2. Then you pull one brick from the bag, observe color, and replace.</p>"
-//            +"<p class='text-info'><small><br>Fill in the blank with appropriate probabilities."
-//            +"You may change number of blocks on the right column and start over.</small></p></div>"
+        div.append(""//"<div class = 'navbar'><h2><small>Markov Chain:</small> Lego Game</h2></div>"
             +"<div class = 'container-fluid well'>"
             +   "<div class = 'row-fluid'>"
-            +       "<div class ='span1'>"
+            +       "<div class ='span2'>"
             +           "<div class='side-labels'></div>"
             +       "</div>"
-            +       "<div class = 'span8'>"
+            +       "<div class = 'span7'>"
             +           "<div class = 'chart-container'></div>"
             +      "<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>"
             +       "</div>"
@@ -448,7 +442,7 @@ var markovChain = (function() {
         var chart;
 
         var outer_height = 300;
-        var outer_width = parseInt($(".span8").css("width"));
+        var outer_width = parseInt($(".span7").css("width"));
     
         var margin = { top: 30, right: 20, bottom: 20, left: 20 }
         var chart_width = outer_width - margin.left - margin.right;
@@ -464,18 +458,10 @@ var markovChain = (function() {
         var x_scale = d3.scale.linear().domain([0,10]).range([0,graph_width]);
         var y_scale = d3.scale.linear().domain([0,1]).range([graph_height,0]);
         var color_scale = d3.scale.category10();
-//                    d3.scale.linear()
-//                            .domain([-1, model.get_current_state_array().length-1])
-//                            .range(['white','red']);
-        
+
         var graph;
         var state = 0;
         
-//        setupGraph();
-//        updateDisplay();
-//        setupSideLabels();
-//        setupProbVsTime();
-//        setupUnknownBlocks();
         startDisplay();
 
         function transition(){
@@ -519,8 +505,13 @@ var markovChain = (function() {
                     $(this).remove()//css("visibility","hidden");
                     $(".start-row").append("<p>A random block was removed, and a random block was put in</p>");
                     animateTransitionBlocks();
-                    $(".arrow-transition").css("visibility","visible")
-//                    setTimeout(firstupdate, 2000);
+                    window.setTimeout(function(){
+                            $(".arrow-transition").css("visibility","visible")
+                            $('.arrow-transition').on("click", function(){
+                                $(this).remove();
+                                firstupdate()
+                            })
+                    }, 2000)
                 })
                 
                 setupSideLabels();
@@ -531,7 +522,6 @@ var markovChain = (function() {
         }
         
         function firstupdate(){
-            console.log("sup")
             updateArrows();
             updateBottomBubbles();
             updateFirstInputRow();
@@ -931,7 +921,7 @@ var markovChain = (function() {
         }
         
         function updateFirstInputRow(){
-            $(".span8").append("<div class = 'row-fluid'><div class = 'first-row textbox-row input-row'></div></div>");
+            $(".span7").append("<div class = 'row-fluid'><div class = 'first-row textbox-row input-row'></div></div>");
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
@@ -1039,7 +1029,7 @@ var markovChain = (function() {
         }
         
         function displayOgSInputRow(observation){
-            $(".span8").append("<div class='row-fluid'><div class ='textbox-row input-obs-given-row'></div></div>");
+            $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-obs-given-row'></div></div>");
             
             $('.side-labels').append("<div class='obs-given-p'>P(O="+observation+"|S<sub>"+(state+1)+"</sub>=s)</div>");
             
@@ -1075,7 +1065,7 @@ var markovChain = (function() {
         }
         
         function displayOnSInputRow(observation){
-            $(".span8").append("<div class='row-fluid'><div class ='textbox-row input-ons-row'></div></div>");
+            $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-ons-row'></div></div>");
             
             $('.side-labels').append("<div class='ons-label'>P(O="+observation+",S<sub>"+(state+1)+"</sub>=s)</div>");
             
@@ -1110,7 +1100,7 @@ var markovChain = (function() {
         }
         
         function displayNormInputRow(observation){
-            $(".span8").append("<div class='row-fluid'><div class ='textbox-row input-norm-row'></div></div>");
+            $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-norm-row'></div></div>");
             
             $('.side-labels').append("<div class='norm-label'>P(S<sub>"+(state+1)+"</sub>=s|O="+observation+")</div>");
             
