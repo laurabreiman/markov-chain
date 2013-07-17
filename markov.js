@@ -415,16 +415,17 @@ var markovChain = (function() {
             +       "</div>"
             +       "<div class = 'span8'>"
             +           "<div class = 'chart-container'></div>"
+            +      "<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>"
             +       "</div>"
             +       "<div class = 'span3'>"
             +           "<div class = 'row-fluid'>"
             +               "<div class = 'controls2'></div>"
             +           "</div>"    
-            +           "<div class = 'graph-container'></div>"
             +           "<div align='center' class = 'image-container'><img src='bag.png'></div>"
             +           "<div class = 'row-fluid start-row'>"
 //            +               "<div class = 'controls'></div>"
-            +           "</div>"               
+            +           "</div>"           
+            +           "<div class = 'graph-container' hidden></div>"
             +       "</div>"
             +   "</div>"
             // +   "<div class ='row-fluid'>"
@@ -518,7 +519,7 @@ var markovChain = (function() {
                     $(this).remove()//css("visibility","hidden");
                     $(".start-row").append("<p>A random block was removed, and a random block was put in</p>");
                     animateTransitionBlocks();
-                    $(".span8").append("<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>")
+                    $(".arrow-transition").css("visibility","visible")
 //                    setTimeout(firstupdate, 2000);
                 })
                 
@@ -566,7 +567,7 @@ var markovChain = (function() {
                     $(".start-row").append("<p>A random block was removed, and a random block was put in</p>");
                     animateTransitionBlocks();
                     window.setTimeout(function(){
-                            $(".span8").append("<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>")
+                            $(".arrow-transition").css("visibility","visible")
                             $('.arrow-transition').on("click", function(){
                                 $(this).remove();
                                 firstupdate()

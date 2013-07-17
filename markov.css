@@ -81,7 +81,7 @@ img{
 }
 
 .image-container{
-
+    margin-top: 80;
     position: relative;
     align-content:center;
 }
@@ -121,7 +121,10 @@ img{
     align-self:center;
 /*    float: right;*/
 }
-.continue-row,
+.continue-row{
+    text-align:center;
+    visibility:hidden;
+}
 .start-row{
     text-align:center;
 }
