@@ -421,9 +421,9 @@ var markovChain = (function() {
             +               "<div class = 'controls2'></div>"
             +           "</div>"    
             +           "<div class = 'graph-container'></div>"
-            +           "<div class = 'image-container'><img src='bag.png'></div>"
-            +           "<div class = 'row-fluid'>"
-            +               "<div class = 'controls'></div>"
+            +           "<div align='center' class = 'image-container'><img src='bag.png'></div>"
+            +           "<div class = 'row-fluid start-row'>"
+//            +               "<div class = 'controls'></div>"
             +           "</div>"               
             +       "</div>"
             +   "</div>"
@@ -432,7 +432,7 @@ var markovChain = (function() {
             // +   "</div>"
             +"</div>");
 
-        $(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
+        //$(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
         $(".controls2").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small next-state'>Next State</button><button class='btn btn-small previous-state'>Previous State</button>")
         
         //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
@@ -506,20 +506,20 @@ var markovChain = (function() {
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
                 
-                if($(".first-transition").length >0 || $(".input-obs-given-row").length>0){
-                    $('.input-row').remove();
-
-                }
+//                if($(".first-transition").length >0 || $(".input-obs-given-row").length>0){
+//                    $('.input-row').remove();
+//
+//                }
                 clearArrows();
                 updateTopBubbles();
                 
-                $(".span8").append("<div class = 'row-fluid'><div class = 'first-row textbox-row input-row'></div></div>");
-                $('.input-row').append("<div class='row-fluid check-row'></div>");
-                $('.check-row').append("<button class='btn first-transition'>Start</button>");
+                $('.start-row').append("<button class='btn btn-large first-transition'>Start</button>");
                 $(".first-transition").on("click", function(){
-                    $('.input-row').remove();
+                    $(this).remove()//css("visibility","hidden");
+                    $(".start-row").append("<p>A random block was removed, and a random block was put in</p>");
                     animateTransitionBlocks();
-                    setTimeout(firstupdate, 2000);
+                    $(".span8").append("<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>")
+//                    setTimeout(firstupdate, 2000);
                 })
                 
                 setupSideLabels();
@@ -530,10 +530,10 @@ var markovChain = (function() {
         }
         
         function firstupdate(){
+            console.log("sup")
             updateArrows();
             updateBottomBubbles();
             updateFirstInputRow();
-//            setupUnknownBlocks();
             setupSideLabels();
             updateGraph();
         }
@@ -560,13 +560,21 @@ var markovChain = (function() {
             setupSideLabels();
             setupKnownBlocks([2,0]);
             updateGraph();
-            $(".span8").append("<div class = 'row-fluid'><div class = 'first-row textbox-row input-row'></div></div>");
-            $('.input-row').append("<div class='row-fluid check-row'></div>");
-            $('.check-row').append("<button class='btn first-transition'>Start</button>");
+            $('.start-row').append("<button class='btn btn-large btn-primary first-transition'>Start</button>");
             $(".first-transition").on("click", function(){
-                $('.input-row').remove();
-                animateTransitionBlocks();
-                setTimeout(firstupdate, 2000);
+                    $(this).remove()//css("visibility","hidden");
+                    $(".start-row").append("<p>A random block was removed, and a random block was put in</p>");
+                    animateTransitionBlocks();
+                    window.setTimeout(function(){
+                            $(".span8").append("<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>")
+                            $('.arrow-transition').on("click", function(){
+                                $(this).remove();
+                                firstupdate()
+                            })
+                    }, 2000)
+
+//                    setTimeout(firstupdate, 2000);
+                            
             })
         }
         
@@ -596,17 +604,6 @@ var markovChain = (function() {
                 .attr("fill","#e4e4e4")
                 //.attr("stroke","black")
                 //.attr("stroke-width",2)
-                .attr("rx",40);
-
-            chart.append("rect")
-                .attr("class","grouping-rect")
-                .attr("x",-1*margin.left)
-                .attr("y",10/11*chart_height-0.5*margin.top)
-                .attr("width",chart_width+margin.left+margin.right)
-                .attr("height",margin.top+chart_height/12+10)
-                .attr("fill","#e4e4e4")
-                // .attr("stroke","black")
-                // .attr("stroke-width",2)
                 .attr("rx",40);
 
             var points = model.get_current_state_array();
@@ -857,6 +854,17 @@ var markovChain = (function() {
                 newpoints.push([i,1/pointlength])
             }
             
+            chart.append("rect")
+                .attr("class","grouping-rect")
+                .attr("x",-1*margin.left)
+                .attr("y",10/11*chart_height-0.5*margin.top)
+                .attr("width",chart_width+margin.left+margin.right)
+                .attr("height",margin.top+chart_height/12+10)
+                .attr("fill","#e4e4e4")
+                // .attr("stroke","black")
+                // .attr("stroke-width",2)
+                .attr("rx",40);
+            
             var node = chart.selectAll(".bottom-node")
                   .data(newpoints)
                 .enter().append("g")
@@ -890,6 +898,9 @@ var markovChain = (function() {
                     .style("stroke","black")
                     //.style("fill-opacity",function(d){return d[1];});
             }
+            
+
+
             
             updateBottomLabels();
         }
@@ -1303,7 +1314,7 @@ var markovChain = (function() {
             $('.block0').attr("class","block0 block gray-block");
             $('.block0').animate({top:-5},"fast");
             $('.block0').animate({left:300},"slow");
-            $('.block0').animate({left:35},"slow");
+            $('.block0').animate({left:125},"slow");
             $('.block0').animate({top:50},"fast")
 
         }
