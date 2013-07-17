@@ -135,3 +135,17 @@ img{
 .start-row{
     text-align:center;
 }
+
+.firstDiv{
+    background-color: black;
+    position: absolute;
+    width: 200px;
+    height: 100px;
+    opacity: .8;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    color: white;
+    top: 100px;
+    left: 100px;
+}

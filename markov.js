@@ -534,7 +534,7 @@ var markovChain = (function() {
             console.log("sup")
             updateArrows();
             updateBottomBubbles();
-            updateFirstInputRow();
+            // updateFirstInputRow();
             setupSideLabels();
             updateGraph();
         }
@@ -548,9 +548,9 @@ var markovChain = (function() {
             
             if($('.bottom-bubble').length >0){
                 $('.side-labels').append("<label class='num2-label'>States at<br><strong>Time = "+(state+1)+"</strong></label>");
-                $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
+                // $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
                 $('.num2-label').offset({top: $(".bottom-bubble").offset().top});       
-                $('.second-prob').offset({top: $(".input-row").offset().top});
+                // $('.second-prob').offset({top: $(".input-row").offset().top});
             }
             //$('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
         }
@@ -570,7 +570,8 @@ var markovChain = (function() {
                             $(".arrow-transition").css("visibility","visible")
                             $('.arrow-transition').on("click", function(){
                                 $(this).remove();
-                                firstupdate()
+                                firstupdate();
+                                $('.markov').append("<div class=firstDiv>The numbers next to the arrow represent the probability transition model from time-step n to time step n+1</div>")
                             })
                     }, 2000)
 
@@ -931,6 +932,9 @@ var markovChain = (function() {
         }
         
         function updateFirstInputRow(){
+            $('.side-labels').append("<label class='second-prob'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
+            $('.second-prob').offset({top: $(".input-row").offset().top});
+
             $(".span8").append("<div class = 'row-fluid'><div class = 'first-row textbox-row input-row'></div></div>");
             var num_entries = model.get_current_state_array().length;
             
