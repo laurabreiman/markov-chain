@@ -57,7 +57,6 @@ text {
 }
 .graph-container{
     margin-left: 10px;
-    visibility: hidden;
 }
 
 .graph-container line{
@@ -154,4 +153,8 @@ img{
 }
 .textbox-row{
     width: 80%;
+}
+
+body{
+    background-color:#4C4C4C;
 }
