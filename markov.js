@@ -319,16 +319,23 @@ var markovChain = (function() {
             var correctAns = model.transition(false);
             var result = []; var sum = 0;
             var allCorrect = 1;
+            var error = "none";
+            
             for (var i = 0; i < answers.length; i++){
                 sum += answers[i];
+                if(answers[i] <0){
+                    error = "negative_error";
+                }
                 if (round_number(answers[i],3) == round_number(correctAns[i],3)){
-                    result[i] = "right";                 
+                    result[i] = "right";      
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            if (sum != 1){result[answers.length+1] = "sum_error";}
-            else {result[answers.length+1] = "sum_correct";}
+            if (sum != 1){ error = "sum_error"}
+//            else {result[answers.length+1] = "sum_correct";}
+            
+            result[answers.length+1] = error;
             return result;
         }
         /*
@@ -340,14 +347,22 @@ var markovChain = (function() {
             var result = [];
             var correctAns = model.prob_OgS()[obs];
             var allCorrect = 1;
+            var error = "none";
+
             for (var i = 0; i < answers.length; i++){
+                if(answers[i] <0){
+                    error = "negative_error";
+                }
+                if(answers[i] >1){
+                    error = "greater_error";
+                }
                 if (round_number(answers[i],3) == round_number(correctAns[i],3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            result[answers.length+1] = NaN;
+            result[answers.length+1] = error;
             return result;
         }
 
@@ -429,7 +444,7 @@ var markovChain = (function() {
             +"</div>");
 
         $(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
-        $(".controls2").append("<div class='container-fluid'><div class = 'btn-group'><button class='btn btn-small next-state'><a href='#bottom'>Next State</a></button><button class='btn btn-small previous-state'>Previous State</button></div></div>")
+        $(".controls2").append("<div class='container-fluid'><div class = 'btn-group'><a href='#bottom'><button class='btn btn-small next-state'>Next State</button></a><button class='btn btn-small previous-state'>Previous State</button></div></div>")
         
         //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
         
@@ -437,7 +452,7 @@ var markovChain = (function() {
         $(".previous-state").on("click",prevState);
         $(".new-chain").on("click",newChain);
         
-        //$('.next-state').attr("disabled", true);
+        $('.next-state').attr("disabled", true);
         $('.previous-state').attr("disabled", true);
         
         var chart = [];
@@ -693,6 +708,9 @@ var markovChain = (function() {
             
             state++;
             updateGraph();
+            
+            $(".next-state").attr("disabled",false);
+            $(".previous-state").attr("disabled",false);
                                     
             $(".span7").append("<a name='bottom'><div class='chart-container chart"+state+"'></div></a>");
             setupGraph(state);
@@ -853,15 +871,15 @@ var markovChain = (function() {
 
                 $('.obs-entry.'+i).focusin(function(){
                     var index = parseInt($(this).attr("id"));
-                    $('.arrow').attr("id","faded-arrow");
-                    $('.straight.arrow'+index).attr("id","");
-                    $('.diagRight.arrow'+(index-1)).attr("id","");
-                    $('.diagLeft.arrow'+(index+1)).attr("id","");
+                    $('.arrow'+state).attr("id","faded-arrow");
+                    $('.straight.this-arrow'+index).attr("id","");
+                    $('.diagRight.this-arrow'+(index-1)).attr("id","");
+                    $('.diagLeft.this-arrow'+(index+1)).attr("id","");
                     $("[id=faded-arrow]").attr("marker-end","");
                 })
                 $('.obs-entry.'+i).focusout(function(){
-                    $('.arrow').attr("id","");
-                    $('.arrow').attr("marker-end","url(#arrowhead)")
+                    $('.arrow'+state).attr("id","");
+                    $('.arrow'+state).attr("marker-end","url(#arrowhead)")
                 })
             }
             
@@ -871,13 +889,16 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(0,"none");
+                $('.trans_feedback').remove();
+                
                 if(results[results.length-1] == "sum_error"){
-                    $('.trans_feedback').remove();
                     $('.check-row'+state).append("<div class='trans_feedback'>should sum to 1.</div>");
-                    $('.trans_feedback').css("color","red");
                 }
-                else{$('.trans_feedback').remove();}
-                if(results[results.length-2] == 1){
+                else if(results[results.length-1] == "negative_error"){
+                    $('.check-row'+state).append("<div class='trans_feedback'>can't have negative numbers.</div>");
+                }
+                            
+                if(results[results.length-2] == 1){ //if they're all correct
                     $(this).remove(); $('.trans_feedback').remove();
                     $('.check-row'+state).append("<button class='btn btn-small observation'>Make Observation</button>");
                     
@@ -900,7 +921,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
                 
             for(var i=0; i<num_entries; i++){
-                var input = $('.input-row .'+i).val()
+                var input = $('.input-row .'+i).val();
                 answers.push(calculator.evaluate(calculator.parse(input)));
             }
 
@@ -978,8 +999,16 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(1,observation);
-    
-                if(results[results.length-2] == 1){
+                $('.trans_feedback').remove();
+                
+                if(results[results.length-1] == "greater_error"){
+                    $('.check-row'+state).append("<div class='trans_feedback'>can't have probability greater than 1</div>");
+                }
+                else if(results[results.length-1] == "negative_error"){
+                    $('.check-row'+state).append("<div class='trans_feedback'>can't have negative numbers.</div>");
+                }
+                
+                if(results[results.length-2] == 1){ // if they're all correct, move on
                     $(this).remove();
                     displayOnSInputRow(observation);
                 }
