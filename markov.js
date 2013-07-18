@@ -359,7 +359,6 @@ var markovChain = (function() {
         function checkOnS(answers, obs){
             var result = [];
             var correctAns = model.prob_OnS()[obs];
-            console.log(correctAns);
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
                 if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
@@ -380,7 +379,6 @@ var markovChain = (function() {
         function checkObs(answers, obs){
             var result = []; var sum = 0;
             var correctAns = model.observe(obs,false);
-            console.log('ans',correctAns);
             var allCorrect = 1;
             for (var i = 0; i < answers.length; i++){
                 sum += answers[i];
@@ -511,7 +509,6 @@ var markovChain = (function() {
         }
         
         function setupSideLabels(current_state){
-            console.log("hehr");
             $('.side-labels').append("<label class='num-label"+state+"'>States at<br><strong>Time = "+state+"</strong></label>");
             $('.side-labels').append("<label class='first-prob"+state+"'>P(S<sub>"+state+"</sub>=s)</label>");
             $('.num-label'+current_state).offset({top: $(".top_bubble"+current_state).offset().top});
@@ -600,8 +597,8 @@ var markovChain = (function() {
                         var index = i;
                         $(".line"+index).attr("class", "selected-line line"+index);
                         $("path.line-graph").attr("id", "faded-line")
-                        $(".arrow").attr("id", "faded-arrow")
-                        $(".arrow"+index).attr("id", "selected-arrow");
+                        $(".arrow"+current_state).attr("id", "faded-arrow")
+                        $(".arrow"+current_state+".this-arrow"+index).attr("id", "selected-arrow");
                         $("[id=faded-arrow]").attr("marker-end","");
                     })
                 .on("mouseout", function(d,i){
@@ -609,7 +606,7 @@ var markovChain = (function() {
                         $("#selected-arrow").attr("id","");
                         $("[id=faded-arrow]").attr("id","")
                         $("[id=faded-line]").attr("id","")
-                        $(".arrow").attr("marker-end","url(#arrowhead)")
+                        $(".arrow"+current_state).attr("marker-end","url(#arrowhead)")
                     });
                 //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
             for(var a =0; a < numpoints-1; a++){
@@ -638,8 +635,6 @@ var markovChain = (function() {
                     newstate.push(points[i])
                 }
             }
-            
-            console.log(newstate);
             
             chart.selectAll(".top_bubble").data(newstate).transition().duration(500)
                 .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
@@ -781,10 +776,10 @@ var markovChain = (function() {
                         var index = i;
                         $(".line"+index).attr("class", "selected-line line"+index);
                         $("path.line-graph").attr("id", "faded-line");
-                        $('.arrow').attr("id","faded-arrow");
-                        $('.straight.arrow'+index).attr("id","");
-                        $('.diagRight.arrow'+(index-1)).attr("id","");
-                        $('.diagLeft.arrow'+(index+1)).attr("id","");
+                        $('.arrow'+current_state).attr("id","faded-arrow");
+                        $('.straight.this-arrow'+index).attr("id","");
+                        $('.diagRight.this-arrow'+(index-1)).attr("id","");
+                        $('.diagLeft.this-arrow'+(index+1)).attr("id","");
                         $("[id=faded-arrow]").attr("marker-end","");
                     })
                 .on("mouseout", function(d,i){
@@ -1048,10 +1043,10 @@ var markovChain = (function() {
         function clearArrows(current_state){
             var this_chart = chart[current_state]
             
-            this_chart.selectAll(".arrow").remove();
-            this_chart.selectAll(".trans-label").remove();
-            this_chart.selectAll(".diagRight-label").remove();
-            this_chart.selectAll(".diagLeft-label").remove();
+            this_chart.selectAll(".arrow"+current_state).remove();
+            this_chart.selectAll(".trans-label"+current_state).remove();
+            this_chart.selectAll(".diagRight-label"+current_state).remove();
+            this_chart.selectAll(".diagLeft-label"+current_state).remove();
         }
         
         /*function that updates the transition arrows between states at time n and states at time n+1. 
@@ -1076,8 +1071,8 @@ var markovChain = (function() {
             }
             
             //draws the vertical downwards arrows
-            this_chart.selectAll(".arrow").data(points).enter().append("line")
-                .attr("class", function(d,i){return "straight arrow arrow"+i})
+            this_chart.selectAll(".arrow"+current_state).data(points).enter().append("line")
+                .attr("class", function(d,i){return "straight arrow"+current_state+" this-arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){return chart_width*(i/(points.length-1))})
@@ -1091,7 +1086,7 @@ var markovChain = (function() {
             
             //draws the right diagonal arrows
             this_chart.selectAll(".diagRight").data(points).enter().append("line")
-                .attr("class", function(d,i){return "diagRight arrow arrow"+i})
+                .attr("class", function(d,i){return "diagRight arrow"+current_state+" this-arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){if(i!=points.length-1){return chart_width*((i+1)/(points.length-1))}
@@ -1107,7 +1102,7 @@ var markovChain = (function() {
             
             //draws the left diagonal arrows
             this_chart.selectAll(".diagLeft").data(points).enter().append("line")
-                .attr("class", function(d,i){return "diagLeft arrow arrow"+i})
+                .attr("class", function(d,i){return "diagLeft arrow"+current_state+" this-arrow"+i})
                 .attr("x1", function(d,i){return chart_width*(i/(points.length-1))})
                 .attr("y1", (2/6)*chart_height)
                 .attr("x2", function(d,i){if(i!=0){return chart_width*((i-1)/(points.length-1))}
@@ -1122,7 +1117,7 @@ var markovChain = (function() {
             
 //////////////set up labels that show the probability of a transition occuring between states
             //labels on the vertical arrows
-            this_chart.selectAll(".trans-label").data(transmodel).enter().append("text").attr("class", "trans-label")
+            this_chart.selectAll(".trans-label"+current_state).data(transmodel).enter().append("text").attr("class", "trans-label"+current_state)
                 .attr("x", function(d,i){ return i*(chart_width/(numpoints-1))})
                 .attr('dx',"-0.32em")
                 .attr("y", (29/64)*chart_height)
@@ -1131,7 +1126,7 @@ var markovChain = (function() {
                 .text(function(d,i) {  return round_number(d[i],3); });
             
             //labels on the diagonal right arrows
-            this_chart.selectAll(".diagRight-label").data(transmodel).enter().append("text").attr("class", "diagRight-label")
+            this_chart.selectAll(".diagRight-label"+current_state).data(transmodel).enter().append("text").attr("class", "diagRight-label"+current_state)
                 .attr("x", function(d,i){return (i+1/4)*(chart_width/(numpoints-1))})
                 .attr('dx',2/numpoints+"em")
                 .attr("y", (29/64)*chart_height)
@@ -1140,7 +1135,7 @@ var markovChain = (function() {
                 .text(function(d,i) {if (!isNaN(d[i+1])) {return round_number(d[i+1],3); }});
             
             //labels on the diagonal left arrows
-            this_chart.selectAll(".diagLeft-label").data(transmodel).enter().append("text").attr("class", "diagLeft-label")
+            this_chart.selectAll(".diagLeft-label"+current_state).data(transmodel).enter().append("text").attr("class", "diagLeft-label"+current_state)
                 .attr("x", function(d,i){return (i-1/4)*(chart_width/(numpoints-1))})
                 .attr('dx',-2/numpoints+"em")
                 .attr("y", (29/64)*chart_height)
