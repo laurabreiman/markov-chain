@@ -399,8 +399,7 @@ var markovChain = (function() {
     
     function View(div, model, controller){
         
-        div.append(""//"<div class = 'navbar'><h2><small>Markov Chain:</small> Lego Game</h2></div>"
-            +"<div class = 'container-fluid well'>"
+        div.append("<div class = 'container-fluid well'>"
             +   "<div class = 'row-fluid'>"
             +       "<div class ='span2'>"
             +           "<div class='side-labels'></div>"
@@ -409,8 +408,9 @@ var markovChain = (function() {
             +           "<div class = 'chart-container chart0'></div>"
             +      "<div class = 'row-fluid continue-row'><button class='btn btn-large arrow-transition'>See The Transition Model</button></div>"
             +       "</div>"
-            +       "<div class = 'span3'>"
+            +       "<div class = 'span3 bs-docs-sidebar'>"
             +           "<div class ='nav bs-docs-sidenav affix'>"
+            +               "<div class = 'container-fluid'>"
             +               "<div class = 'row-fluid'>"
             +                   "<div class = 'controls'></div>"
             +               "</div>"    
@@ -419,6 +419,7 @@ var markovChain = (function() {
 //            +               "<div class = 'controls'></div>"
             +               "</div>"           
             +               "<div class = 'graph-container'></div>"
+            +               "</div>"
             +           "</div>"
             +       "</div>"
             +   "</div>"
@@ -489,15 +490,10 @@ var markovChain = (function() {
             }
             
             else{
-
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
                 
-                state = 0;
                 startDisplay([parseInt($(".num-whites").val()),parseInt($(".num-reds").val())]);
-                
-                updateGraph();
-
             }
         }
         
@@ -526,12 +522,19 @@ var markovChain = (function() {
         
         function startDisplay(whites_reds){
             cleardisplay();
+            state = 0;
+            $(".span7").prepend("<div class='chart-container chart"+state+"'></div>");
             setupGraph(state);
             updateTopBubbles(state);
             setupSideLabels(state);
             setupKnownBlocks(whites_reds);
             updateGraph();
             $('.start-row').append("<button class='btn btn-large btn-primary first-transition'>Start</button>");
+            
+            if($(".continue-row").length ==0){
+                $(".span7").append("<div class='row-fluid continue-row'><button class='arrow-transition btn btn-large'>See Transition Model</button></div>");
+            }
+            
             $(".first-transition").on("click", function(){
                     $(this).remove()//css("visibility","hidden");
                     $(".start-row").append("<p class='help-text'>A random block was removed, and a random block was put in</p>");
@@ -632,9 +635,7 @@ var markovChain = (function() {
             $('.textbox-row').closest('.row-fluid').remove()
             $('.side-labels').empty();
             $(".start-row").empty();
-            for(var i=0; i<state; i++){
-                $(".chart"+i).remove();
-            }
+            $(".chart-container").remove();
             chart = [];
         }
         
@@ -829,7 +830,7 @@ var markovChain = (function() {
             $('.side-labels').append("<label class='second-prob"+state+"'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
             $('.second-prob'+state).append('<i class="icon icon-question-sign second-prob-icon" rel="tooltip"></i>');
             $(".span7").append("<div class = 'row-fluid'><div class = 'first-row"+state+" textbox-row input-row'></div></div>");
-            $('.second-prob'+state).offset({top: $(".input-row").offset().top});
+            $('.second-prob'+state).offset({top: $(".first-row"+state).offset().top});
 
             $('.second-prob-icon').attr("title","= P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=0r) \xD7 P(S<sub>"+state+"</sub>=0r)<br>+ P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=1r) \xD7 P(S<sub>"+state+"</sub>=1r)<br>+ ...");
             $('.second-prob-icon').tooltip({placement:'bottom', html:true});
@@ -1208,22 +1209,29 @@ var markovChain = (function() {
         function setupUnknownBlocks(){
             $(".block").remove();
             var numblocks = model.get_current_state_array().length -1;
+            
+            $("img").css("height", numblocks*15+75);
+            
             for(var i=0; i<numblocks; i++){
                 $(".image-container").append("<div class='block gray-block block"+i+"'>?</div>");
-                $(".block"+i).css("top",""+(15*i+50)+"");
+                $(".block"+i).css("top",""+(15*i+parseInt($("img").css("height"))/2)+"");
             }
             
         }
         
         function setupKnownBlocks(whites_reds){
             $(".block").remove();
+            var numblocks = model.get_current_state_array().length -1;
+            
+            $("img").css("height", numblocks*15+75);
+            
             for(var i=0; i<whites_reds[0]; i++){
                 $(".image-container").append("<div class='block white-block block"+i+"'></div>");
-                $(".block"+i).css("top",""+(15*i+50)+"");
+                $(".block"+i).css("top",""+(15*i+ parseInt($("img").css("height"))/2)+"");
             }
             for(var i=whites_reds[0]; i<whites_reds[0]+whites_reds[1]; i++){
                 $(".image-container").append("<div class='block red-block block"+i+"'></div>");
-                $(".block"+i).css("top",""+(15*i+50)+"");
+                $(".block"+i).css("top",""+(15*i+parseInt($("img").css("height"))/2)+"");
             }
         }
         
@@ -1232,7 +1240,7 @@ var markovChain = (function() {
             $('.block0').animate({top:-5},"slow");
             $('.block0').removeClass("gray-block");
             $('.block0').addClass(observation+"-block");
-            $('.block0').animate({top:50},"slow");
+            $('.block0').animate({top:parseInt($("img").css("height"))/2},"slow");
             $('.block0').html("");
         }
         
@@ -1242,7 +1250,7 @@ var markovChain = (function() {
                 $('.block0').animate({top:-5},"fast");
                 $('.block0').animate({left:300},"slow");
                 $('.block0').animate({left:137},"slow");
-                $('.block0').animate({top:50},"fast")
+                $('.block0').animate({top:parseInt($("img").css("height"))/2},"fast")
             }
             else{                
                 $('.block0').html("?")
