@@ -817,8 +817,14 @@ var markovChain = (function() {
         
         function updateFirstInputRow(){
             $('.side-labels').append("<label class='second-prob"+state+"'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
+            $('.second-prob'+state).append('<i class="icon icon-question-sign second-prob-icon" rel="tooltip"></i>');
+
             $(".span7").append("<div class = 'row-fluid'><div class = 'first-row textbox-row"+state+" input-row'></div></div>");
             $('.second-prob'+state).offset({top: $(".input-row").offset().top});
+
+            $('.second-prob-icon').attr("title","= P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=0r) \xD7 P(S<sub>"+state+"</sub>=0r)<br>+ P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=1r) \xD7 P(S<sub>"+state+"</sub>=1r)<br>+ ...");
+            $('.second-prob-icon').tooltip({placement:'bottom', html:true});
+
 
             var num_entries = model.get_current_state_array().length;
             
@@ -827,10 +833,10 @@ var markovChain = (function() {
                 $('.input-row .'+i).offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
             }
-            
+
             for(var i=0; i <num_entries; i++){
-                $('.obs-entry.'+i).attr("title","= P(S<sub>"+(state+1)+"</sub>="+i+"r|S<sub>"+state+"</sub>=0r) \xD7 P(S<sub>"+state+"</sub>=0r)<br>+ P(S<sub>"+(state+1)+"</sub>="+i+"r|S<sub>"+state+"</sub>=1r) \xD7 P(S<sub>"+state+"</sub>=1r)<br>+ ...");
-                $('.obs-entry.'+i).tooltip({placement:'right', html:true});
+                // $('.obs-entry.'+i).attr("title","= P(S<sub>"+(state+1)+"</sub>="+i+"r|S<sub>"+state+"</sub>=0r) \xD7 P(S<sub>"+state+"</sub>=0r)<br>+ P(S<sub>"+(state+1)+"</sub>="+i+"r|S<sub>"+state+"</sub>=1r) \xD7 P(S<sub>"+state+"</sub>=1r)<br>+ ...");
+                // $('.obs-entry.'+i).tooltip({placement:'right', html:true});
                 //$('.obs-entry.'+i).tooltip({title: function() {return "hi";}});
 
                 $('.obs-entry.'+i).focusin(function(){
@@ -921,7 +927,7 @@ var markovChain = (function() {
         function makeObservation(){
             $('.observation').remove();
             var observation = model.make_obs();
-            $(".check-row"+state).after("<div class='row-fluid observation'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
+            $(".check-row"+state).after("<div class='row-fluid obs-label obs-label"+state+"'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
             $(".help-text").html("You observe a <span style='color:"+observation+"'>"+observation+"</span> block!");
             observeBlock(observation);
             displayOgSInputRow(observation);
@@ -932,16 +938,20 @@ var markovChain = (function() {
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row"+state+" input-obs-given-row'></div></div>");
             
             $('.side-labels').append("<div class='obs-given-p"+state+"'>P(O="+observation+"|S<sub>"+(state+1)+"</sub>=s)</div>");
+            $('.obs-given-p'+state).append('<i class="icon icon-question-sign obs-given-p-icon" rel="tooltip"></i>');
+            
+            $('.obs-given-p-icon').attr("title","= # of "+observation+" blocks<br>\xF7 # of total blocks");
+            $('.obs-given-p-icon').tooltip({placement:'bottom', html:true});
             
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-obs-given-row').append("<input class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+")'>");
+                $('.input-obs-given-row.textbox-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+")'>");
                 $('.input-obs-given-row .'+i+'').offset({left: $(".input-obs-given-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
-                $('.obs-entry.'+i).attr("title","= # of "+observation+" blocks<br>\xF7 # of total blocks");
-                $('.obs-entry.'+i).tooltip({placement:'right', html:true});
+                // $('.obs-entry.'+i).attr("title","= # of "+observation+" blocks<br>\xF7 # of total blocks");
+                // $('.obs-entry.'+i).tooltip({placement:'right', html:true});
  
 
             }
@@ -969,6 +979,10 @@ var markovChain = (function() {
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row"+state+" input-ons-row'></div></div>");
             
             $('.side-labels').append("<div class='ons-label"+state+"'>P(O="+observation+",S<sub>"+(state+1)+"</sub>=s)</div>");
+            $('.ons-label'+state).append('<i class="icon icon-question-sign ons-label-icon" rel="tooltip"></i>');
+
+            $('.ons-label-icon').attr("title","=  P(O="+observation+"|S<sub>"+(state+1)+"</sub>=s) \xD7 P(S<sub>"+(state+1)+"</sub>=s)");
+            $('.ons-label-icon').tooltip({placement:'bottom', html:true});
             
             var num_entries = model.get_current_state_array().length;
             
@@ -977,8 +991,8 @@ var markovChain = (function() {
                 $('.input-ons-row.textbox-row'+state+' .'+i+'').offset({left: $(".input-ons-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
-                $('.obs-entry.'+i).attr("title","=  P(O="+observation+"|S<sub>"+(state+1)+"</sub>="+i+"r) \xD7 P(S<sub>"+(state+1)+"</sub>="+i+"r)");
-                $('.obs-entry.'+i).tooltip({placement:'right', html:true});
+                // $('.obs-entry.'+i).attr("title","=  P(O="+observation+"|S<sub>"+(state+1)+"</sub>="+i+"r) \xD7 P(S<sub>"+(state+1)+"</sub>="+i+"r)");
+                // $('.obs-entry.'+i).tooltip({placement:'right', html:true});
 
             }
             
@@ -1005,6 +1019,9 @@ var markovChain = (function() {
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row"+state+" input-norm-row'></div></div>");
             
             $('.side-labels').append("<div class='norm-label"+state+"'>P(S<sub>"+(state+1)+"</sub>=s|O="+observation+")</div>");
+            $('.norm-label'+state).append('<i class="icon icon-question-sign norm-label-icon" rel="tooltip"></i>');
+            $('.norm-label-icon').attr("title","=  P(O="+observation+",S<sub>"+(state+1)+"</sub>=s)<br>\xF7 &Sigma; P(O="+observation+",S<sub>"+(state+1)+"</sub>=state)");
+            $('.norm-label-icon').tooltip({placement:'bottom', html:true});
             
             var num_entries = model.get_current_state_array().length;
             
@@ -1013,8 +1030,8 @@ var markovChain = (function() {
                 $('.input-norm-row.textbox-row'+state+' .'+i+'').offset({left: $(".input-norm-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
-                $('.obs-entry.'+i).attr("title","=  P(O="+observation+",S<sub>"+(state+1)+"</sub>="+i+"r)<br>\xF7 &Sigma; P(O="+observation+",S<sub>"+(state+1)+"</sub>=state)");
-                $('.obs-entry.'+i).tooltip({placement:'right', html:true});
+                // $('.obs-entry.'+i).attr("title","=  P(O="+observation+",S<sub>"+(state+1)+"</sub>="+i+"r)<br>\xF7 &Sigma; P(O="+observation+",S<sub>"+(state+1)+"</sub>=state)");
+                // $('.obs-entry.'+i).tooltip({placement:'right', html:true});
 
             }
             
