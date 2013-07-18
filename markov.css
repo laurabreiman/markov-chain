@@ -183,6 +183,6 @@ a:hover{
     text-decoration:none;
 }
 
-.trans_feedback{
+.trans_feedback,.obs_feedback{
     color: red;
 }

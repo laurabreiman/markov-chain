@@ -319,12 +319,12 @@ var markovChain = (function() {
             var correctAns = model.transition(false);
             var result = []; var sum = 0;
             var allCorrect = 1;
-            var error = "none";
+            var error = ["none",-1];//[error name, position that error was found]
             
             for (var i = 0; i < answers.length; i++){
                 sum += answers[i];
                 if(answers[i] <0){
-                    error = "negative_error";
+                    error = ["negative_error",i];
                 }
                 if (round_number(answers[i],3) == round_number(correctAns[i],3)){
                     result[i] = "right";      
@@ -332,7 +332,7 @@ var markovChain = (function() {
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            if (sum != 1){ error = "sum_error"}
+            if (sum != 1){ error[0] = "sum_error"}
 //            else {result[answers.length+1] = "sum_correct";}
             
             result[answers.length+1] = error;
@@ -347,14 +347,14 @@ var markovChain = (function() {
             var result = [];
             var correctAns = model.prob_OgS()[obs];
             var allCorrect = 1;
-            var error = "none";
+            var error = ["none",-1];
 
             for (var i = 0; i < answers.length; i++){
                 if(answers[i] <0){
-                    error = "negative_error";
+                    error = ["negative_error",i];
                 }
                 if(answers[i] >1){
-                    error = "greater_error";
+                    error = ["greater_error",i];
                 }
                 if (round_number(answers[i],3) == round_number(correctAns[i],3)){
                     result[i] = "right";                 
@@ -375,14 +375,22 @@ var markovChain = (function() {
             var result = [];
             var correctAns = model.prob_OnS()[obs];
             var allCorrect = 1;
+            var error = "";
+            
             for (var i = 0; i < answers.length; i++){
+                if(answers[i]<0){
+                    error = "negative_error";
+                }
+                else if(answers[i]>1){
+                    error = "greater_error";
+                }
                 if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            result[answers.length+1] = NaN;
+            result[answers.length+1] = error;
            return result;
         }
         
@@ -395,16 +403,21 @@ var markovChain = (function() {
             var result = []; var sum = 0;
             var correctAns = model.observe(obs,false);
             var allCorrect = 1;
+            var error = "";
+            
             for (var i = 0; i < answers.length; i++){
                 sum += answers[i];
+                if(answers[i] < 0){
+                    error = "negative_error";
+                }
                 if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            if (sum != 1){result[answers.length+1] = "sum_error";}
-            else {result[answers.length+1] = "sum_correct";}
+            if (sum != 1){error = "sum_error";}
+            result[answers.length+1] = error;
             return result;
         }
         
@@ -890,12 +903,14 @@ var markovChain = (function() {
                 
                 var results = checkView(0,"none");
                 $('.trans_feedback').remove();
+                $('.input-row .obs-entry').css("background-color","white");
                 
-                if(results[results.length-1] == "sum_error"){
+                if(results[results.length-1][0] == "sum_error"){
                     $('.check-row'+state).append("<div class='trans_feedback'>should sum to 1.</div>");
                 }
-                else if(results[results.length-1] == "negative_error"){
+                else if(results[results.length-1][0] == "negative_error"){
                     $('.check-row'+state).append("<div class='trans_feedback'>can't have negative numbers.</div>");
+                    $('.input-row .obs-entry.'+results[results.length-1][1]).css("background-color","pink");
                 }
                             
                 if(results[results.length-2] == 1){ //if they're all correct
@@ -1000,12 +1015,15 @@ var markovChain = (function() {
                 
                 var results = checkView(1,observation);
                 $('.trans_feedback').remove();
+                $('.input-row .obs-entry').css("background-color","white");
                 
-                if(results[results.length-1] == "greater_error"){
+                if(results[results.length-1][0] == "greater_error"){
                     $('.check-row'+state).append("<div class='trans_feedback'>can't have probability greater than 1</div>");
+                    $('.input-row .obs-entry.'+results[results.length-1][1]).css("background-color","pink");
                 }
-                else if(results[results.length-1] == "negative_error"){
+                else if(results[results.length-1][0] == "negative_error"){
                     $('.check-row'+state).append("<div class='trans_feedback'>can't have negative numbers.</div>");
+                    $('.input-row .obs-entry.'+results[results.length-1][1]).css("background-color","pink");
                 }
                 
                 if(results[results.length-2] == 1){ // if they're all correct, move on
@@ -1047,7 +1065,13 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(2,observation);
-    
+                $('.obs_feedback').remove();
+                if(results[results.length-1] == "greater_error"){
+                    $('.check-row'+state).append('<div class="obs_feedback">can\'t have probability greater than 1</div>');
+                }
+                else if(results[results.length-1] == "negative_error"){
+                    $('.check-row'+state).append('<div class="obs_feedback">can\'t have negative numbers.</div>');
+                }
                 if(results[results.length-2] == 1){
                     $(this).remove();
                     displayNormInputRow(observation);
@@ -1086,12 +1110,13 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(3,observation);
+                $('.obs_feedback').remove();
                 if(results[results.length-1] == "sum_error"){
-                    $('.obs_feedback').remove();
                     $('.check-row'+state).append('<div class="obs_feedback">should sum to 1.</div>');
-                    $('.obs_feedback').css("color","red");
                 }
-                else{$('.obs_feedback').remove();}
+                else if(results[results.length-1] == "negative_error"){
+                    $('.check-row'+state).append('<div class="obs_feedback">can\'t have negative numbers.</div>');
+                }
                 if(results[results.length-2] == 1){
                     $(this).html("Next State");
                     $('.obs_feedback').remove();
