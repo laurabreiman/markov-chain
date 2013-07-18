@@ -637,6 +637,7 @@ var markovChain = (function() {
             $('.side-labels').empty();
             $(".start-row").empty();
             $(".chart-container").remove();
+            $(".continue-row").remove();
             chart = [];
         }
         
