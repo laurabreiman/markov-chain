@@ -151,7 +151,7 @@ img{
     top: 230px;
     left: 15px;
 }
-.textbox-row{
+.input-norm-row,.input-ons-row,.input-obs-given-row,.first-row{
     width: 80%;
 }
 
