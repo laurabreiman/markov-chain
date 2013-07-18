@@ -1,5 +1,4 @@
 Markov-Chain Applet
-
 ============
 Developed by So yeun (Ashley) Cho (<socho@mit.edu>) and Laura Breiman (<lauracle@mit.edu>)
 Mentor: Robert Miller (<rcm@mit.edu>)
