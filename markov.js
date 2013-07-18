@@ -414,9 +414,9 @@ var markovChain = (function() {
             +               "<div class = 'row-fluid'>"
             +                   "<div class = 'controls'></div>"
             +               "</div>"    
+            +               "<div class = 'row-fluid controls2'></div>"
             +               "<div align='center' class = 'image-container'><img src='bag.png'></div>"
             +               "<div class = 'row-fluid start-row'>"
-//            +               "<div class = 'controls'></div>"
             +               "</div>"           
             +               "<div class = 'graph-container'></div>"
             +               "</div>"
@@ -429,7 +429,7 @@ var markovChain = (function() {
             +"</div>");
 
         $(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
-        $(".controls2").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small next-state'>Next State</button><button class='btn btn-small previous-state'>Previous State</button>")
+        $(".controls2").append("<div class='container-fluid'><div class = 'btn-group'><button class='btn btn-small next-state'><a href='#bottom'>Next State</a></button><button class='btn btn-small previous-state'>Previous State</button></div></div>")
         
         //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
         
@@ -632,7 +632,8 @@ var markovChain = (function() {
         }
         
         function cleardisplay(){
-            $('.textbox-row').closest('.row-fluid').remove()
+            $('.textbox-row').closest('.row-fluid').remove();
+            $(".firstDiv").remove();
             $('.side-labels').empty();
             $(".start-row").empty();
             $(".chart-container").remove();
@@ -692,7 +693,7 @@ var markovChain = (function() {
             state++;
             updateGraph();
                                     
-            $(".span7").append("<div class='chart-container chart"+state+"'></div>");
+            $(".span7").append("<a name='bottom'><div class='chart-container chart"+state+"'></div></a>");
             setupGraph(state);
             updateTopBubbles(state);
             setupSideLabels(state);
@@ -1214,7 +1215,7 @@ var markovChain = (function() {
             
             for(var i=0; i<numblocks; i++){
                 $(".image-container").append("<div class='block gray-block block"+i+"'>?</div>");
-                $(".block"+i).css("top",""+(15*i+parseInt($("img").css("height"))/2)+"");
+                $(".block"+i).css("top",""+(15*i+parseInt($("img").css("height"))/2)+"px");
             }
             
         }
@@ -1227,11 +1228,11 @@ var markovChain = (function() {
             
             for(var i=0; i<whites_reds[0]; i++){
                 $(".image-container").append("<div class='block white-block block"+i+"'></div>");
-                $(".block"+i).css("top",""+(15*i+ parseInt($("img").css("height"))/2)+"");
+                $(".block"+i).css("top",""+(15*i+ parseInt($("img").css("height"))/2)+"px");
             }
             for(var i=whites_reds[0]; i<whites_reds[0]+whites_reds[1]; i++){
                 $(".image-container").append("<div class='block red-block block"+i+"'></div>");
-                $(".block"+i).css("top",""+(15*i+parseInt($("img").css("height"))/2)+"");
+                $(".block"+i).css("top",""+(15*i+parseInt($("img").css("height"))/2)+"px");
             }
         }
         

@@ -88,7 +88,7 @@ img{
 }
 
 .image-container{
-    margin-top: 80;
+    margin-top: 80px;
     position: relative;
     align-content:center;
 }
@@ -164,6 +164,10 @@ img{
 }
 .textbox-row{
     width: 80%;
+}
+
+.btn-group{
+    float:right;
 }
 
 body{
