@@ -537,7 +537,8 @@ var markovChain = (function() {
                     window.setTimeout(function(){
                             $(".arrow-transition").css("visibility","visible")
                             $('.arrow-transition').on("click", function(){
-                                $(this).remove();
+                                $(this).closest('.row-fluid').remove();
+                                $('.num-label'+state).remove(); $('.first-prob'+state).remove() //to prevent duplicate
                                 firstupdate(state);
                                 var firstDiv = $("<div hidden class=firstDiv>The numbers next to the arrows<br>represent the transition model<br>from time 0 to time 1.<br></div>");
                                 $('.markov').append(firstDiv);
@@ -683,7 +684,8 @@ var markovChain = (function() {
             $(".span7").append("<div class='row-fluid continue-row'><button class='arrow-transition btn btn-large'>See Transition Model</button></div>");
             $(".arrow-transition").css("visibility","visible");
             $(".arrow-transition").on("click",function(){
-                $(this).remove();
+                $(this).closest('.row-fluid').remove();
+                $('.num-label'+state).remove(); $('.first-prob'+state).remove(); //to remove the duplicate
                 firstupdate(state);
                 updateFirstInputRow(state);
             })
@@ -915,13 +917,14 @@ var markovChain = (function() {
         function makeObservation(){
             $('.observation').remove();
             var observation = model.make_obs();
-            $(".check-row"+state).append("<div class='row-fluid'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
+            $(".check-row"+state).after("<div class='row-fluid observation'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
             $(".help-text").html("You observe a <span style='color:"+observation+"'>"+observation+"</span> block!");
             observeBlock(observation);
             displayOgSInputRow(observation);
         }
         
         function displayOgSInputRow(observation){
+            $(".check-row"+state).remove();
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-obs-given-row'></div></div>");
             
             $('.side-labels').append("<div class='obs-given-p'>P(O="+observation+"|S<sub>"+(state+1)+"</sub>=s)</div>");
@@ -958,6 +961,7 @@ var markovChain = (function() {
         }
         
         function displayOnSInputRow(observation){
+            $(".check-row"+state).remove();
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-ons-row'></div></div>");
             
             $('.side-labels').append("<div class='ons-label'>P(O="+observation+",S<sub>"+(state+1)+"</sub>=s)</div>");
@@ -993,6 +997,7 @@ var markovChain = (function() {
         }
         
         function displayNormInputRow(observation){
+            $(".check-row"+state).remove();
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-norm-row'></div></div>");
             
             $('.side-labels').append("<div class='norm-label'>P(S<sub>"+(state+1)+"</sub>=s|O="+observation+")</div>");
@@ -1021,7 +1026,7 @@ var markovChain = (function() {
                 var results = checkView(3,observation);
                 if(results[results.length-1] == "sum_error"){
                     $('.obs_feedback').remove();
-                    $('.input-row .check-row'+state).append('<div class="obs_feedback">should sum to 1.</div>');
+                    $('.check-row'+state).append('<div class="obs_feedback">should sum to 1.</div>');
                     $('.obs_feedback').css("color","red");
                 }
                 else{$('.obs_feedback').remove();}
@@ -1032,7 +1037,7 @@ var markovChain = (function() {
                         $('.input-row').removeClass('input-row');
                         model.observe(observation,true);
                         $(".help-text").html("A random block was removed, and a random block was put in");
-                        $(this).remove();
+                        $(this).closest('.row-fluid').remove();
                         animateTransitionBlocks();
                         setTimeout(nextState,2000);
                     });
