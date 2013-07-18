@@ -412,7 +412,7 @@ var markovChain = (function() {
             +       "<div class = 'span3'>"
             +           "<div class ='nav bs-docs-sidenav affix'>"
             +               "<div class = 'row-fluid'>"
-            +                   "<div class = 'controls2'></div>"
+            +                   "<div class = 'controls'></div>"
             +               "</div>"    
             +               "<div align='center' class = 'image-container'><img src='bag.png'></div>"
             +               "<div class = 'row-fluid start-row'>"
@@ -427,7 +427,7 @@ var markovChain = (function() {
             // +   "</div>"
             +"</div>");
 
-        //$(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
+        $(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
         $(".controls2").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small next-state'>Next State</button><button class='btn btn-small previous-state'>Previous State</button>")
         
         //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
@@ -462,7 +462,7 @@ var markovChain = (function() {
         var graph;
         var state = 0;
         
-        startDisplay();
+        startDisplay([2,0]);
 
         function transition(){
             model.transition(true);
@@ -494,9 +494,9 @@ var markovChain = (function() {
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
                 
-                startDisplay();
+                state = 0;
+                startDisplay([parseInt($(".num-whites").val()),parseInt($(".num-reds").val())]);
                 
-                setupKnownBlocks([parseInt($(".num-whites").val()),parseInt($(".num-reds").val())]);
                 updateGraph();
 
             }
@@ -525,11 +525,12 @@ var markovChain = (function() {
             //$('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
         }
         
-        function startDisplay(){
+        function startDisplay(whites_reds){
+            cleardisplay();
             setupGraph(state);
             updateTopBubbles(state);
             setupSideLabels(state);
-            setupKnownBlocks([2,0]);
+            setupKnownBlocks(whites_reds);
             updateGraph();
             $('.start-row').append("<button class='btn btn-large btn-primary first-transition'>Start</button>");
             $(".first-transition").on("click", function(){
@@ -626,6 +627,14 @@ var markovChain = (function() {
             }
             
             updateTopLabels(current_state);
+        }
+        
+        function cleardisplay(){
+            $(".start-row").empty();
+            for(var i=0; i<state; i++){
+                $(".chart"+i).remove();
+            }
+            chart = [];
         }
         
         function transitionTop(){
@@ -1211,12 +1220,21 @@ var markovChain = (function() {
         }
         
         function animateTransitionBlocks(){
-            $('.block0').html("?")
-            $('.block0').attr("class","block0 block gray-block");
-            $('.block0').animate({top:-5},"fast");
-            $('.block0').animate({left:300},"slow");
-            $('.block0').animate({left:125},"slow");
-            $('.block0').animate({top:50},"fast")
+            if($('.block').hasClass("red-block") && $('.block').hasClass('white-block')){
+                setupUnknownBlocks();
+                $('.block0').animate({top:-5},"fast");
+                $('.block0').animate({left:300},"slow");
+                $('.block0').animate({left:137},"slow");
+                $('.block0').animate({top:50},"fast")
+            }
+            else{                
+                $('.block0').html("?")
+                $('.block0').attr("class","block0 block gray-block");
+                $('.block0').animate({top:-5},"fast");
+                $('.block0').animate({left:300},"slow");
+                $('.block0').animate({left:137},"slow");
+                $('.block0').animate({top:50},"fast")
+            }
 
         }
         
