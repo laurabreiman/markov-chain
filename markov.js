@@ -412,7 +412,7 @@ var markovChain = (function() {
             +       "<div class = 'span3'>"
             +           "<div class ='nav bs-docs-sidenav affix'>"
             +               "<div class = 'row-fluid'>"
-            +                   "<div class = 'controls2'></div>"
+            +                   "<div class = 'controls'></div>"
             +               "</div>"    
             +               "<div align='center' class = 'image-container'><img src='bag.png'></div>"
             +               "<div class = 'row-fluid start-row'>"
@@ -427,7 +427,7 @@ var markovChain = (function() {
             // +   "</div>"
             +"</div>");
 
-        //$(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
+        $(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
         $(".controls2").append("<div class = 'container-fluid'><div class ='row-fluid'><button class='btn btn-small next-state'>Next State</button><button class='btn btn-small previous-state'>Previous State</button>")
         
         //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
@@ -462,7 +462,7 @@ var markovChain = (function() {
         var graph;
         var state = 0;
         
-        startDisplay();
+        startDisplay([2,0]);
 
         function transition(){
             model.transition(true);
@@ -489,14 +489,13 @@ var markovChain = (function() {
             }
             
             else{
-                $('.textbox-row').closest('.row-fluid').remove()
-                $('.side-labels').empty();
+
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
                 model.set_num_blocks(states);
                 
-                startDisplay();
+                state = 0;
+                startDisplay([parseInt($(".num-whites").val()),parseInt($(".num-reds").val())]);
                 
-                setupKnownBlocks([parseInt($(".num-whites").val()),parseInt($(".num-reds").val())]);
                 updateGraph();
 
             }
@@ -525,11 +524,12 @@ var markovChain = (function() {
             //$('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
         }
         
-        function startDisplay(){
+        function startDisplay(whites_reds){
+            cleardisplay();
             setupGraph(state);
             updateTopBubbles(state);
             setupSideLabels(state);
-            setupKnownBlocks([2,0]);
+            setupKnownBlocks(whites_reds);
             updateGraph();
             $('.start-row').append("<button class='btn btn-large btn-primary first-transition'>Start</button>");
             $(".first-transition").on("click", function(){
@@ -626,6 +626,16 @@ var markovChain = (function() {
             }
             
             updateTopLabels(current_state);
+        }
+        
+        function cleardisplay(){
+            $('.textbox-row').closest('.row-fluid').remove()
+            $('.side-labels').empty();
+            $(".start-row").empty();
+            for(var i=0; i<state; i++){
+                $(".chart"+i).remove();
+            }
+            chart = [];
         }
         
         function transitionTop(){
@@ -818,8 +828,7 @@ var markovChain = (function() {
         function updateFirstInputRow(){
             $('.side-labels').append("<label class='second-prob"+state+"'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
             $('.second-prob'+state).append('<i class="icon icon-question-sign second-prob-icon" rel="tooltip"></i>');
-
-            $(".span7").append("<div class = 'row-fluid'><div class = 'first-row textbox-row"+state+" input-row'></div></div>");
+            $(".span7").append("<div class = 'row-fluid'><div class = 'first-row"+state+" textbox-row input-row'></div></div>");
             $('.second-prob'+state).offset({top: $(".input-row").offset().top});
 
             $('.second-prob-icon').attr("title","= P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=0r) \xD7 P(S<sub>"+state+"</sub>=0r)<br>+ P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=1r) \xD7 P(S<sub>"+state+"</sub>=1r)<br>+ ...");
@@ -935,7 +944,7 @@ var markovChain = (function() {
         
         function displayOgSInputRow(observation){
             $(".check-row"+state).remove();
-            $(".span7").append("<div class='row-fluid'><div class ='textbox-row"+state+" input-obs-given-row'></div></div>");
+            $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-obs-given-row"+state+"'></div></div>");
             
             $('.side-labels').append("<div class='obs-given-p"+state+"'>P(O="+observation+"|S<sub>"+(state+1)+"</sub>=s)</div>");
             $('.obs-given-p'+state).append('<i class="icon icon-question-sign obs-given-p-icon" rel="tooltip"></i>');
@@ -946,8 +955,8 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-obs-given-row.textbox-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+")'>");
-                $('.input-obs-given-row .'+i+'').offset({left: $(".input-obs-given-row").offset().left + i*(chart_width)/(num_entries-1)});
+                $('.input-obs-given-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+")'>");
+                $('.input-obs-given-row'+state+' .'+i+'').offset({left: $(".input-obs-given-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
                 // $('.obs-entry.'+i).attr("title","= # of "+observation+" blocks<br>\xF7 # of total blocks");
@@ -956,12 +965,12 @@ var markovChain = (function() {
 
             }
             
-            $('.obs-given-p'+state).offset({top: $(".input-obs-given-row.textbox-row"+state).offset().top});
+            $('.obs-given-p'+state).offset({top: $(".input-obs-given-row"+state).offset().top});
             
-            $('.input-obs-given-row.textbox-row'+state).after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-obs-given-row'+state).after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
             
             $('.input-row').removeClass('input-row');
-            $('.input-obs-given-row.textbox-row'+state).addClass('input-row');
+            $('.input-obs-given-row'+state).addClass('input-row');
             
             $('.check').on('click',function(){
                 
@@ -976,19 +985,19 @@ var markovChain = (function() {
         
         function displayOnSInputRow(observation){
             $(".check-row"+state).remove();
-            $(".span7").append("<div class='row-fluid'><div class ='textbox-row"+state+" input-ons-row'></div></div>");
+            $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-ons-row"+state+"'></div></div>");
             
             $('.side-labels').append("<div class='ons-label"+state+"'>P(O="+observation+",S<sub>"+(state+1)+"</sub>=s)</div>");
             $('.ons-label'+state).append('<i class="icon icon-question-sign ons-label-icon" rel="tooltip"></i>');
 
-            $('.ons-label-icon').attr("title","=  P(O="+observation+"|S<sub>"+(state+1)+"</sub>=s) \xD7 P(S<sub>"+(state+1)+"</sub>=s)");
+            $('.ons-label-icon').attr("title","= P(S<sub>"+(state+1)+"</sub>=s) \xD7 P(O="+observation+"|S<sub>"+(state+1)+"</sub>=s)");
             $('.ons-label-icon').tooltip({placement:'bottom', html:true});
             
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-ons-row.textbox-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+observation+","+i+")'>");
-                $('.input-ons-row.textbox-row'+state+' .'+i+'').offset({left: $(".input-ons-row").offset().left + i*(chart_width)/(num_entries-1)});
+                $('.input-ons-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+observation+","+i+")'>");
+                $('.input-ons-row'+state+' .'+i+'').offset({left: $(".input-ons-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
                 // $('.obs-entry.'+i).attr("title","=  P(O="+observation+"|S<sub>"+(state+1)+"</sub>="+i+"r) \xD7 P(S<sub>"+(state+1)+"</sub>="+i+"r)");
@@ -996,12 +1005,12 @@ var markovChain = (function() {
 
             }
             
-            $('.ons-label'+state).offset({top: $(".input-ons-row.textbox-row"+state).offset().top});
+            $('.ons-label'+state).offset({top: $(".input-ons-row"+state).offset().top});
             
-            $('.input-ons-row.textbox-row'+state).after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-ons-row'+state).after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
             
             $('.input-row').removeClass('input-row');
-            $('.input-ons-row.textbox-row'+state).addClass('input-row');
+            $('.input-ons-row'+state).addClass('input-row');
             
             $('.check').on('click',function(){
                 
@@ -1016,7 +1025,7 @@ var markovChain = (function() {
         
         function displayNormInputRow(observation){
             $(".check-row"+state).remove();
-            $(".span7").append("<div class='row-fluid'><div class ='textbox-row"+state+" input-norm-row'></div></div>");
+            $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-norm-row"+state+"'></div></div>");
             
             $('.side-labels').append("<div class='norm-label"+state+"'>P(S<sub>"+(state+1)+"</sub>=s|O="+observation+")</div>");
             $('.norm-label'+state).append('<i class="icon icon-question-sign norm-label-icon" rel="tooltip"></i>');
@@ -1026,8 +1035,8 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-norm-row.textbox-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+i+"|"+observation+")'>");
-                $('.input-norm-row.textbox-row'+state+' .'+i+'').offset({left: $(".input-norm-row").offset().left + i*(chart_width)/(num_entries-1)});
+                $('.input-norm-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+i+"|"+observation+")'>");
+                $('.input-norm-row'+state+' .'+i+'').offset({left: $(".input-norm-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
                 // $('.obs-entry.'+i).attr("title","=  P(O="+observation+",S<sub>"+(state+1)+"</sub>="+i+"r)<br>\xF7 &Sigma; P(O="+observation+",S<sub>"+(state+1)+"</sub>=state)");
@@ -1035,12 +1044,12 @@ var markovChain = (function() {
 
             }
             
-            $('.norm-label'+state).offset({top: $(".input-norm-row.textbox-row"+state).offset().top});
+            $('.norm-label'+state).offset({top: $(".input-norm-row"+state).offset().top});
             
-            $('.input-norm-row.textbox-row'+state).after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
+            $('.input-norm-row'+state).after("<div class='row-fluid check-row check-row"+state+"'><button class='btn btn-small check'>Check</button></div>");
             
             $('.input-row').removeClass('input-row');
-            $('.input-norm-row.textbox-row'+state).addClass('input-row');
+            $('.input-norm-row'+state).addClass('input-row');
             
             $('.check').on('click',function(){
                 
@@ -1228,12 +1237,21 @@ var markovChain = (function() {
         }
         
         function animateTransitionBlocks(){
-            $('.block0').html("?")
-            $('.block0').attr("class","block0 block gray-block");
-            $('.block0').animate({top:-5},"fast");
-            $('.block0').animate({left:300},"slow");
-            $('.block0').animate({left:125},"slow");
-            $('.block0').animate({top:50},"fast")
+            if($('.block').hasClass("red-block") && $('.block').hasClass('white-block')){
+                setupUnknownBlocks();
+                $('.block0').animate({top:-5},"fast");
+                $('.block0').animate({left:300},"slow");
+                $('.block0').animate({left:137},"slow");
+                $('.block0').animate({top:50},"fast")
+            }
+            else{                
+                $('.block0').html("?")
+                $('.block0').attr("class","block0 block gray-block");
+                $('.block0').animate({top:-5},"fast");
+                $('.block0').animate({left:300},"slow");
+                $('.block0').animate({left:137},"slow");
+                $('.block0').animate({top:50},"fast")
+            }
 
         }
         
