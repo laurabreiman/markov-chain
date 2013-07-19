@@ -459,10 +459,6 @@ var markovChain = (function() {
         $(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
         $(".controls2").append("<div class='container-fluid'><div class = 'btn-group'><a href='#bottom'><button class='btn btn-small next-state'>Next State</button></a><button class='btn btn-small previous-state'>Previous State</button></div></div>")
         
-        //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
-        
-        $(".next-state").on("click",transition);
-        $(".previous-state").on("click",prevState);
         $(".new-chain").on("click",newChain);
         
         $('.next-state').attr("disabled", true);
@@ -737,49 +733,6 @@ var markovChain = (function() {
                 firstupdate(state);
                 updateFirstInputRow(state);
             })
-        }
-        
-        function removeNodesPrev(){
-            $(".bottom-node").attr("class", "remove");
-            $(".bottom-bubble").attr("class","remove");
-            
-            $(".top-node").attr("class", "bottom-node");
-            $(".top_bubble").attr("class","bottom-bubble");
-            
-            $('.remove').remove();
-            
-            updateTopBubbles();
-            state--;
-            updateTopLabels();
-            $('.textbox-row').closest('.row-fluid').remove()
-            updateFirstInputRow();
-            setupSideLabels();
-        }
-        
-        function prevState(){
-            var points = model.get_current_state_array();
-            var pointdict = model.get_current_state();
-            var newpoints =[];
-            
-            for(var i in pointdict){
-                newpoints.push([i,points[i]])
-            }
-            chart.selectAll(".top-node")
-              .data(newpoints)
-              .transition().duration(1000)
-            .attr("y",(10/11)*chart_height);
-            
-            chart.selectAll(".top_bubble")
-                  .data(newpoints)
-                  .transition().duration(1000)
-                .attr("y",(10/11)*chart_height);
-            
-            chart.selectAll(".bottom-node")
-                  .data(newpoints)
-                  .transition().duration(1000)
-                .attr("transform", function(d,i,j) {return "translate(" +  (-100) + "," + (10/11)*chart_height + ")"; });
-            
-            setTimeout(removeNodesPrev,1001)
         }
         
         function updateBottomBubbles(current_state){
@@ -1484,7 +1437,7 @@ var markovChain = (function() {
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
-        return {nextState: nextState, prevState: prevState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, updateArrowTextbox: updateArrowTextbox, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks};
+        return {nextState: nextState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, updateArrowTextbox: updateArrowTextbox, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks};
 
     }
     
