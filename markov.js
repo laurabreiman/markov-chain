@@ -411,14 +411,14 @@ var markovChain = (function() {
             +       "<div class = 'span3 bs-docs-sidebar'>"
             +           "<div class ='nav bs-docs-sidenav affix'>"
             +               "<div class = 'container-fluid'>"
-            +               "<div class = 'row-fluid'>"
-            +                   "<div class = 'controls'></div>"
-            +               "</div>"    
-            +               "<div class = 'row-fluid controls2'></div>"
-            +               "<div align='center' class = 'image-container'><img src='bag.png'></div>"
-            +               "<div class = 'row-fluid start-row'>"
-            +               "</div>"           
-            +               "<div class = 'graph-container'></div>"
+            +                   "<div class = 'row-fluid'>"
+            +                       "<div class = 'controls'></div>"
+            +                   "</div>"    
+            +                   "<div class = 'row-fluid controls2'></div>"
+            +                   "<div align='center' class = 'image-container'><img src='bag.png'></div>"
+            +                   "<div class = 'row-fluid start-row'></div>"           
+            +                   "<div class = 'graph-container'></div>"
+            +                   "<div class = 'eq-container' id = 'eq-container'></div>"
             +               "</div>"
             +           "</div>"
             +       "</div>"
@@ -935,17 +935,47 @@ var markovChain = (function() {
             }
             return results;
         }
-        
+                
         function makeObservation(){
             $('.observation').remove();
             var observation = model.make_obs();
-            $(".check-row"+state).after("<div class='row-fluid obs-label obs-label"+state+"'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!</div>");
+            $(".check-row"+state).after("<div class='row-fluid obs-label obs-label"+state+"'>You observe a <span style='color:"+observation+"'>"+observation+"</span> block!<div");
+            $(".obs-label"+state).after("<div class='row-fluid ok-row'><button class='btn btn-small ok'>OK</button></div>");
+            $('.ok').on("click", function(){
+                console.log("clicked ok button");
+                $(".obs-label"+state).after("<div class='row-fluid explanation'>"
+                    +"Now your goal is to calculate P(S<sub>"+(state+1)+"</sub>=s|O="+observation+") for each state s.<br>"
+                    +"In other words, you want to calculate the probability of each state given we observe a "+observation+" block.</div>");
+                $('.ok-row').append("<button class='btn btn-small see-eq'>See Relevant Equation</button></div>");
+                $('.see-eq').on("click",function(){
+                    console.log("clicked see eq btn");
+                    displayEquation(observation);
+                });
+                $(this).remove();
+            });
             $(".help-text").html("You observe a <span style='color:"+observation+"'>"+observation+"</span> block!");
             observeBlock(observation);
-            displayOgSInputRow(observation);
+            // displayOgSInputRow(observation);
         }
-        
+
+        function displayEquation(observation){
+                $('.eq-container').append("<p class='equation'>$$P(S=s|O="+observation+")$$</p>");
+                $('.eq-container').append("<p class='equation'>$$=\\frac{P(O="+observation+",S=s)}{P(O="+observation+")}$$</p>");
+                $('.eq-container').append("<p class='equation'>$$=\\frac{P(O="+observation+"|S=s) \\cdot P(S=s)}{\\sum P(O="+observation+"|S=s) \\cdot P(S=s)}$$</p>");
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub,"eq-container"]);
+                $('.ok-row').append("<button class='btn btn-small dispOgS'>Start Calculation</button></div>")
+                $('.dispOgS').on("click", function(){
+                    console.log("clicked start calc");
+                    displayOgSInputRow(observation);
+                });
+                $('.see-eq').remove();
+        }
+
         function displayOgSInputRow(observation){
+            $('.dispOgS').remove(); //remove button
+            for (var i = 54; i <= 69; i++){
+                $("#MathJax-Span-"+i).css("color","red");
+            }
             $(".check-row"+state).remove();
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-obs-given-row"+state+"'></div></div>");
             
@@ -987,6 +1017,13 @@ var markovChain = (function() {
         }
         
         function displayOnSInputRow(observation){
+            $('.equation').css("color","blakc");
+            for (var i = 24; i<=37; i++){
+                $("#MathJax-Span-"+i).css("color","red");                
+            }
+            for (var i = 54; i<=76; i++){
+                $("#MathJax-Span-"+i).css("color","red");                                
+            }
             $(".check-row"+state).remove();
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-ons-row"+state+"'></div></div>");
             
@@ -1024,6 +1061,11 @@ var markovChain = (function() {
                     displayNormInputRow(observation);
                 }
             });
+        }
+
+        function displaySumRow(observation){
+            $(".check-row"+state).remove();
+            
         }
         
         function displayNormInputRow(observation){

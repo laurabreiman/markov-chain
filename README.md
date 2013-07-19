@@ -10,7 +10,7 @@ Uses: Bootstrap, Javascript, CSS, jQuery, d3
 
 To view the demo:
 
-http://htmlpreview.github.com/?https://github.com/laurabreiman/markov-chain/markov.html
+http://htmlpreview.github.com/?https://github.com/laurabreiman/markov-chain/blob/master/markov.html
 
 ========
 To insert the applet in your own web page, follow these steps:

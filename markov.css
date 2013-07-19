@@ -21,6 +21,17 @@ text {
     margin: 5px;
 }
 
+.equation{
+    font-size: 100%;
+    font-style: normal;
+    color: black;
+}
+
+.ok-row,
+.explanation{
+    text-align: center;
+}
+
 /*
 .new-chain{
     margin-top: 10px;
