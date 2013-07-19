@@ -319,12 +319,17 @@ var markovChain = (function() {
             var correctAns = model.transition(false);
             var result = []; var sum = 0;
             var allCorrect = 1;
-            var error = ["none",-1];//[error name, position that error was found]
+            var error = {errorName:"none",badInputs:[]};//[error name, position that error was found]
             
             for (var i = 0; i < answers.length; i++){
                 sum += answers[i];
-                if(answers[i] <0){
-                    error = ["negative_error",i];
+                if(isNaN(answers[i])){
+                    error.errorName = "nonnumber_error";
+                    error.badInputs.push(i);
+                }
+                else if(answers[i] <0){
+                    error.errorName = "negative_error";
+                    error.badInputs.push(i);
                 }
                 if (round_number(answers[i],3) == round_number(correctAns[i],3)){
                     result[i] = "right";      
@@ -332,7 +337,7 @@ var markovChain = (function() {
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            if (sum != 1){ error[0] = "sum_error"}
+            if (sum != 1 && error.errorName=="none"){ error.errorName = "sum_error"; error.badInputs =[]}
 //            else {result[answers.length+1] = "sum_correct";}
             
             result[answers.length+1] = error;
@@ -855,15 +860,24 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(0,"none");
+                var error = results[results.length-1];
                 $('.trans_feedback').remove();
                 $('.input-row .obs-entry').css("background-color","white");
                 
-                if(results[results.length-1][0] == "sum_error"){
+                if(error.errorName == "sum_error"){
                     $('.check-row'+state).append("<div class='trans_feedback'>should sum to 1.</div>");
                 }
-                else if(results[results.length-1][0] == "negative_error"){
+                else if(error.errorName == "nonnumber_error"){
+                    $('.check-row'+state).append("<div class='trans_feedback'>Not valid number.</div>");
+                    for(var i=0; i<error.badInputs.length; i++){
+                        $('.input-row .obs-entry.'+error.badInputs[i]).css("background-color","pink");
+                    }
+                }
+                else if(error.errorName == "negative_error"){
                     $('.check-row'+state).append("<div class='trans_feedback'>can't have negative numbers.</div>");
-                    $('.input-row .obs-entry.'+results[results.length-1][1]).css("background-color","pink");
+                    for(var i=0; i<error.badInputs.length; i++){
+                        $('.input-row .obs-entry.'+error.badInputs[i]).css("background-color","pink");
+                    }
                 }
                             
                 if(results[results.length-2] == 1){ //if they're all correct
