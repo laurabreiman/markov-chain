@@ -511,7 +511,9 @@ var markovChain = (function() {
             }
             setupSideLabels();
         }
-
+        
+        /*function that creates a new markov chain display based on the user inputted number of initial whites and initial reds
+        */
         function newChain(){
 
             if(isNaN($(".num-whites").val()) || $(".num-whites").val() < 0 || isNaN($(".num-reds").val()) || $(".num-reds").val() < 0){
@@ -822,6 +824,7 @@ var markovChain = (function() {
                 allows user to move to the next row of calculation
         */
         function updateFirstInputRow(){
+            
             $('.side-labels').append("<label class='second-prob"+state+"'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
             $('.second-prob'+state).append('<i class="icon icon-question-sign second-prob-icon" rel="tooltip"></i>');
             $(".span7").append("<div class = 'row-fluid'><div class = 'first-row"+state+" textbox-row input-row'></div></div>");
@@ -896,6 +899,28 @@ var markovChain = (function() {
                 var keycode = (event.keyCode ? event.keyCode : event.which);
                 if(keycode == '13'){
                     $('.check').click();   
+                }
+            
+            });
+            
+            $('.check').attr("disabled", true);
+            
+            $(document).keyup(function(event){
+                var all_boxes_entered = 1;
+                for(var i=0; i<$('.input-row .obs-entry').length; i++){
+                    if( $('.input-row .obs-entry.'+i).val() == ""){
+                        all_boxes_entered = 0;
+                        break;
+                    }
+                }
+                
+                console.log(all_boxes_entered);
+                
+                if(all_boxes_entered == 1){
+                    $('.check').attr("disabled",false);
+                }
+                else{
+                    $('.check').attr("disabled",true);
                 }
             
             });
