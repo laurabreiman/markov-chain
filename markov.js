@@ -549,6 +549,9 @@ var markovChain = (function() {
             //$('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
         }
         
+        /*
+            function that starts the display
+        */
         function startDisplay(whites_reds){
             cleardisplay();
             state = 0;
@@ -596,14 +599,17 @@ var markovChain = (function() {
             })
         }
         
+        /*
+            function that updates the top blocks of the current svg
+        */
         function updateTopBubbles(current_state){
-//            //color_scale = d3.scale.linear()
-//                            .domain([0, model.get_current_state_array().length-1])
-//                            .range(['white','red']);
             var this_chart = chart[current_state]
+            
+            //clear the past blocks from the svg
             this_chart.selectAll(".top-node"+current_state).remove();
             this_chart.selectAll(".top_bubble"+current_state).remove();
             
+            //append a light gray rectangle that groups the possible states together
             this_chart.append("rect")
                 .attr("class","grouping-rect")
                 .attr("x",-1*margin.left)
@@ -611,10 +617,9 @@ var markovChain = (function() {
                 .attr("width",chart_width+margin.left+margin.right)
                 .attr("height",margin.top+chart_height/12+10)
                 .attr("fill","#e4e4e4")
-                //.attr("stroke","black")
-                //.attr("stroke-width",2)
                 .attr("rx",40);
 
+            //setup the data needed to draw the blocks
             var points = model.get_current_state_array();
             var pointdict = model.get_current_state();
             var newpoints =[];
@@ -624,6 +629,7 @@ var markovChain = (function() {
                 newpoints.push([i,points[i]])
             }
             
+            //create nodes for each possible state of the bag
             var node = this_chart.selectAll(".top-node"+current_state)
                   .data(newpoints)
                 .enter().append("g")
@@ -644,7 +650,8 @@ var markovChain = (function() {
                         $("[id=faded-line]").attr("id","")
                         $(".arrow"+current_state).attr("marker-end","url(#arrowhead)")
                     });
-                //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
+            
+            //appends blocks to the nodes
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
                     .attr("class", "top_bubble"+current_state)
@@ -660,6 +667,7 @@ var markovChain = (function() {
             updateTopLabels(current_state);
         }
         
+        //clears the past markov chain and visualizations from the display
         function cleardisplay(){
             $('.textbox-row').closest('.row-fluid').remove();
             $(".firstDiv").remove();
@@ -669,30 +677,10 @@ var markovChain = (function() {
             $(".continue-row").remove();
             chart = [];
         }
-        
-        function transitionTop(){
             
-            var points = model.get_current_state_array();
-            var numpoints = points.length;
-            var newstate = [];
-            
-            for(var i=0; i<numpoints; i++){
-                for(var j=0; j<numpoints-1; j++){
-                    newstate.push(points[i])
-                }
-            }
-            
-            chart.selectAll(".top_bubble").data(newstate).transition().duration(500)
-                .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
-                .attr("height", function(d){return d*(chart_height/12)+10})
-                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/12)+10)/(numpoints-1))})
-                //.attr("r", function(d){return d*(chart_height/16)+8})
-                //.style("fill-opacity",function(d){return d;});
-            
-            
-            updateTopLabels();
-        }
-        
+        /*
+            function that resizes the bottom blocks based on the inputted probabilities from the user
+        */
         function transitionBottom(current_state, blocks_state){
             var points = blocks_state;
             var numpoints = points.length;
@@ -704,16 +692,16 @@ var markovChain = (function() {
                 }
             }
             
-            
             chart[current_state].selectAll(".bottom-bubble"+state).data(newstate).transition().duration(500)
                 .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
                 .attr("height", function(d){return d*(chart_height/12)+10})
                 .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/12)+10)/(numpoints-1))})
-                //.attr("r", function(d){return d*(chart_height/16)+8})
-                //.style("fill-opacity",function(d){return d;});
-
         }
         
+        /*
+            function that moves the display to the next state of calculation
+                draws another svg with the next possible lego states
+        */
         function nextState(){
             var points = model.get_current_state_array();
             var pointdict = model.get_current_state();
@@ -740,13 +728,18 @@ var markovChain = (function() {
             })
         }
         
+        /*
+            function that updates the bottom bubbles of the current svg
+        */
         function updateBottomBubbles(current_state){
             var this_chart = chart[current_state]
             
+            //removes the current bubbles from the svg
             this_chart.selectAll(".bottom-node"+current_state).remove();
             this_chart.selectAll(".bottom-bubble"+current_state).remove();
-            var pointlength = model.get_current_state_array().length;
             
+            //sets up the necessary data
+            var pointlength = model.get_current_state_array().length;
             var points = model.get_current_state_array();
             var pointdict = model.get_current_state();
             var newpoints =[];
@@ -756,6 +749,7 @@ var markovChain = (function() {
                 newpoints.push([i,1/pointlength])
             }
             
+            //appends a light gray rectangle that groups the states together
             this_chart.append("rect")
                 .attr("class","grouping-rect")
                 .attr("x",-1*margin.left)
@@ -763,16 +757,16 @@ var markovChain = (function() {
                 .attr("width",chart_width+margin.left+margin.right)
                 .attr("height",margin.top+chart_height/12+10)
                 .attr("fill","#e4e4e4")
-                // .attr("stroke","black")
-                // .attr("stroke-width",2)
                 .attr("rx",40);
             
+            //creates n nodes, where n is the number of possible states
             var node = this_chart.selectAll(".bottom-node"+current_state)
                   .data(newpoints)
                 .enter().append("g")
                   .attr("class", "bottom-node"+current_state)
                 .attr("y", (10/11)*chart_height);
-                //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
+
+            //appends rectangles to the nodes that represents the blocks in each state
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
                     .attr("class", "bottom-bubble"+current_state)
@@ -802,6 +796,9 @@ var markovChain = (function() {
             }
         }
         
+        /*
+            function that updates the probability labels on the top states of the current svg
+        */
         function updateTopLabels(current_state){
             
             var points = model.get_current_state_array();
@@ -817,6 +814,13 @@ var markovChain = (function() {
                 .text(function(d) { return round_number(d,4); });
         }
         
+        /*
+            function that displays the first row of calculation:
+                label for P(S=state)
+                textboxes to input answers
+                check button to trigger the controller's checkAnswers function
+                allows user to move to the next row of calculation
+        */
         function updateFirstInputRow(){
             $('.side-labels').append("<label class='second-prob"+state+"'>P(S<sub>"+(state+1)+"</sub>=s)</label>");
             $('.second-prob'+state).append('<i class="icon icon-question-sign second-prob-icon" rel="tooltip"></i>');
@@ -897,7 +901,12 @@ var markovChain = (function() {
             });
         }
         
-        //displays to the user if they are correct or incorrect, with the parameter indexOfCheck referring to the type of answer it is (which row is being checked - 0: p(s=s), 1: p(o=obs|s=s), 2: p(o=obs,s=s)...)
+        /*
+        displays to the user if they are correct or incorrect, with the parameter indexOfCheck referring to the type of answer it is (which row is being checked - 0: p(s=s), 1: p(o=obs|s=s), 2: p(o=obs,s=s)...)
+            adds checkmarks and xs to the correct and incorrect answers
+            and returns results, an array like ["right","wrong","right",...,0,{}]
+                where the second to last entry is a flag that signals if all answers were right (1) or not (0), and last entry is an associative array of errors (like entering a probability greater than 1) in the input fields
+        */
         function checkView(indexOfCheck,observation){
             var answers = [];
             var num_entries = model.get_current_state_array().length;
@@ -939,6 +948,11 @@ var markovChain = (function() {
             return results;
         }
         
+        /*
+            function that makes an observation and displays the observation to the user through text
+            and a visual display of the observed block
+            then triggers next row of calculations
+        */
         function makeObservation(){
             $('.observation').remove();
             var observation = model.make_obs();
@@ -948,6 +962,13 @@ var markovChain = (function() {
             displayOgSInputRow(observation);
         }
         
+        /*
+            function that takes in an observation and displays the second row of calculation:
+                label for P(O=observation|S=state)
+                textboxes to input answers
+                check button to trigger the controller's checkOgS function
+                allows user to move to the next row of calculation
+        */
         function displayOgSInputRow(observation){
             $(".check-row"+state).remove();
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-obs-given-row"+state+"'></div></div>");
@@ -1000,6 +1021,13 @@ var markovChain = (function() {
             });
         }
         
+        /*
+            function that takes in an observation and displays the third row of calculation:
+                label for P(O=observation,S=state)
+                textboxes to input answers
+                check button to trigger the controller's checkOnS function
+                allows user to move to the next row of calculation
+        */
         function displayOnSInputRow(observation){
             $(".check-row"+state).remove();
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-ons-row"+state+"'></div></div>");
@@ -1050,6 +1078,13 @@ var markovChain = (function() {
             });
         }
         
+        /*
+            function that takes in an observation and displays the last row of calculation:
+                label for P(O=observation|S=state)
+                textboxes to input answers
+                check button to trigger the controller's checkObs function
+                allows user to move to the next state of the chain
+        */
         function displayNormInputRow(observation){
             $(".check-row"+state).remove();
             $(".span7").append("<div class='row-fluid'><div class ='textbox-row input-norm-row"+state+"'></div></div>");
@@ -1106,6 +1141,9 @@ var markovChain = (function() {
             });
         }
         
+        /* 
+            function that clears all of the transition arrows from the current svg.
+        */
         function clearArrows(current_state){
             var this_chart = chart[current_state]
             
@@ -1236,6 +1274,8 @@ var markovChain = (function() {
             // }
         }
         
+        /*sets up a bag visualization with the model's current amount of blocks
+        all blocks are unknown color, so they are set up as gray with ?s */
         function setupUnknownBlocks(){
             $(".block").remove();
             var numblocks = model.get_current_state_array().length -1;
@@ -1249,6 +1289,8 @@ var markovChain = (function() {
             
         }
         
+        /*sets up a bag visualization with a known distribution of blocks
+        parameter whites_reds is an array of [white blocks, red blocks] to be displayed*/
         function setupKnownBlocks(whites_reds){
             $(".block").remove();
             var numblocks = model.get_current_state_array().length -1;
@@ -1265,6 +1307,8 @@ var markovChain = (function() {
             }
         }
         
+        /* animates a block being removed from the bag and observed,
+        parameter 'observation' is the color of the block that is observed */
         function observeBlock(observation){
             setupUnknownBlocks();
             $('.block0').animate({top:-5},"slow");
@@ -1274,7 +1318,10 @@ var markovChain = (function() {
             $('.block0').html("");
         }
         
+        //animates one block being removed from the bag and one block being put in the bag
         function animateTransitionBlocks(){
+            
+            //if there are both red and white blocks in the bag
             if($('.block').hasClass("red-block") && $('.block').hasClass('white-block')){
                 setupUnknownBlocks();
                 $('.block0').animate({top:-5},"fast");
@@ -1282,6 +1329,8 @@ var markovChain = (function() {
                 $('.block0').animate({left:137},"slow");
                 $('.block0').animate({top:parseInt($("img").css("height"))/2},"fast")
             }
+            
+            //if both blocks are the same color
             else{                
                 $('.block0').html("?")
                 $('.block0').attr("class","block0 block gray-block");
@@ -1293,7 +1342,7 @@ var markovChain = (function() {
 
         }
         
-        //set up svg with axes and labels
+        //sets up svg with axes and labels to display the states and their transition arrows
         function setupGraph(current_state){
             
             $(".chart-container.chart"+current_state).empty();            
@@ -1319,10 +1368,7 @@ var markovChain = (function() {
                         .attr("d", "M 0,0 V 4 L6,2 Z");
         }
         
-
-        // var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
-        // var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
-        
+        //sets up the line graph of the transitions on the sidebar
         function setupProbVsTime(){
             $(".graph-container").empty();
             graph = d3.select(".graph-container").append("svg")
@@ -1367,7 +1413,8 @@ var markovChain = (function() {
                 //.attr("dx","-0.1em")
                 .text("Time");
         }
-
+        
+        //updates the line graph on the side that shows the transitions between states
         function updateGraph(){
             $(".graph").empty();
             setupProbVsTime();
