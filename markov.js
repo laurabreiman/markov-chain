@@ -567,7 +567,7 @@ var markovChain = (function() {
                                 var firstDivBtn = $("<button hidden class='btn btn-small firstDivBtn'>OK</button>");
                                 firstDiv.append(firstDivBtn);
                                 $('.firstDivBtn').on("click", function(){
-                                    firstDiv.html("Using the transition model,<br>you can figure out the prob distribution of each state in the next time step.<br>");
+                                    firstDiv.html("Using the transition model,<br>you can figure out the probability distribution of each state in the next time step.<br>");
                                     firstDiv.append(firstDivBtn);
                                     $('.firstDivBtn').on("click", function(){
                                         firstDiv.remove();
@@ -702,10 +702,9 @@ var markovChain = (function() {
         }
         
         function nextState(){
-            for (var i = 3; i<=101; i++){
+            for (var i = 3; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","black");                
-            }            
-
+            }
             var points = model.get_current_state_array();
             var pointdict = model.get_current_state();
             var numpoints = points.length;
@@ -849,10 +848,10 @@ var markovChain = (function() {
         }
         
         function updateFirstInputRow(status){
-            for (var i = 3; i<=101; i++){
+            for (var i = 3; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","black");                
             }
-            for (var i = 71; i<=76; i++){
+            for (var i = 63; i<=68; i++){
                 $("#MathJax-Span-"+i).css("color","red");                
             }
 
@@ -861,7 +860,7 @@ var markovChain = (function() {
             $(".span7").append("<div class = 'row-fluid'><div class = 'first-row"+state+" textbox-row input-row'></div></div>");
             $('.second-prob'+state).offset({top: $(".first-row"+state).offset().top});
 
-            $('.second-prob-icon').attr("title","= P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=0r) \xD7 P(S<sub>"+state+"</sub>=0r)<br>+ P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=1r) \xD7 P(S<sub>"+state+"</sub>=1r)<br>+ ...");
+            $('.second-prob-icon').attr("title","= P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=0red) \xD7 P(S<sub>"+state+"</sub>=0red)<br>+ P(S<sub>"+(state+1)+"</sub>=s|S<sub>"+state+"</sub>=1red) \xD7 P(S<sub>"+state+"</sub>=1red)<br>+ ...");
             $('.second-prob-icon').tooltip({placement:'bottom', html:true});
 
 
@@ -1021,9 +1020,9 @@ var markovChain = (function() {
         }
 
         function displayEquation(observation){
-                $('.eq-container').append("<p class='equation'>$$P(S=s|O="+observation+")$$</p>");
-                $('.eq-container').append("<p class='equation'>$$=\\frac{P(O="+observation+",S=s)}{P(O="+observation+")}$$</p>");
-                $('.eq-container').append("<p class='equation'>$$=\\frac{P(O="+observation+"|S=s) \\cdot P(S=s)}{\\sum P(O="+observation+"|S=s) \\cdot P(S=s)}$$</p>");
+                $('.eq-container').append("<p class='equation'>$$P(S=s|O=obs)$$</p>");
+                $('.eq-container').append("<p class='equation'>$$=\\frac{P(O=obs,S=s)}{P(O=obs)}$$</p>");
+                $('.eq-container').append("<p class='equation'>$$=\\frac{P(O=obs|S=s) \\cdot P(S=s)}{\\sum P(O=obs|S=s) \\cdot P(S=s)}$$</p>");
                 MathJax.Hub.Queue(["Typeset",MathJax.Hub,"eq-container"]);
                 $('.ok-row').append("<button class='btn btn-small dispOgS'>Start Calculation</button></div>")
                 $('.dispOgS').on("click", function(){
@@ -1035,7 +1034,10 @@ var markovChain = (function() {
 
         function displayOgSInputRow(observation){
             $('.dispOgS').remove(); //remove button
-            for (var i = 54; i <= 69; i++){
+            for (var i = 3; i <= 91; i++){
+                $("#MathJax-Span-"+i).css("color","black");
+            }
+            for (var i = 48; i <= 61; i++){
                 $("#MathJax-Span-"+i).css("color","red");
             }
             $(".check-row"+state).remove();
@@ -1079,13 +1081,13 @@ var markovChain = (function() {
         }
         
         function displayOnSInputRow(observation){
-            for (var i = 3; i<=101; i++){
+            for (var i = 3; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","black");                
             }
-            for (var i = 24; i<=37; i++){
+            for (var i = 22; i<=33; i++){
                 $("#MathJax-Span-"+i).css("color","red");                
             }
-            for (var i = 54; i<=76; i++){
+            for (var i = 48; i<=68; i++){
                 $("#MathJax-Span-"+i).css("color","red");                                
             }
             $(".check-row"+state).remove();
@@ -1128,13 +1130,13 @@ var markovChain = (function() {
         }
 
         function displaySumRow(observation){
-            for (var i = 3; i<=101; i++){
+            for (var i = 3; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","black");                
             }
-            for (var i = 39; i<=48; i++){
+            for (var i = 35; i<=42; i++){
                 $("#MathJax-Span-"+i).css("color","red");                
             }
-            for (var i = 78; i<=101; i++){
+            for (var i = 70; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","red");                                
             }
             $(".check-row"+state).remove();
@@ -1167,10 +1169,10 @@ var markovChain = (function() {
         }
         
         function displayNormInputRow(observation){
-            for (var i = 3; i<=101; i++){
+            for (var i = 3; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","black");                
             }
-            for (var i = 3; i<=18; i++){
+            for (var i = 3; i<=42; i++){
                 $("#MathJax-Span-"+i).css("color","red");                
             }
             $(".check-row"+state).remove();
