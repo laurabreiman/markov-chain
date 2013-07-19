@@ -461,7 +461,7 @@ var markovChain = (function() {
             // +   "</div>"
             +"</div>");
 
-        $(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
+        $(".controls").append("# of Whites: <input type='text' class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
         $(".controls2").append("<div class='container-fluid'><div class = 'btn-group'><a href='#bottom'><button class='btn btn-small next-state'>Next State</button></a><button class='btn btn-small previous-state'>Previous State</button></div></div>")
         
         $(".new-chain").on("click",newChain);
@@ -724,7 +724,7 @@ var markovChain = (function() {
                 $(this).closest('.row-fluid').remove();
                 $('.num-label'+state).remove(); $('.first-prob'+state).remove(); //to remove the duplicate
                 firstupdate(state);
-                updateFirstInputRow(state);
+                updateFirstInputRow();
             })
         }
         
@@ -834,7 +834,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+")' id='"+i+"'>");
+                $('.input-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+"R)' id='"+i+"'>");
                 $('.input-row .'+i).offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
             }
@@ -1317,6 +1317,34 @@ var markovChain = (function() {
             $('.block0').animate({top:parseInt($("img").css("height"))/2},"slow");
             $('.block0').html("");
         }
+//        function swapblocks(){
+//                var goto = [];
+//                for(var i=0; i<$(".block").length; i++){
+//                    var index = i;
+//                    if(i == $(".block").length -1){
+//                        index = -1;
+//                    }
+//                    goto.push( $('.block'+(index+1)).css("top") );
+//                }
+//                console.log(goto);
+//                for(var i=0; i<$(".block").length; i++){
+//                    var index = i;
+//                    if(i == $(".block").length -1){
+//                        index = -1;
+//                    }            
+//                    $('.block'+i).animate({top:goto[i]},"slow");
+//                                        
+//                }
+//                for(var i=0; i<$(".block").length; i++){
+//                    var index = i;
+//                    if(i == $(".block").length -1){
+//                        index = -1;
+//                    }
+//                    $('.block'+i).not(".swapped").addClass("block"+(index+1)+" swapped");
+//                    $('.block'+i+".block"+(index+1)).removeClass("block"+i);
+//                }
+//                $('.swapped').removeClass("swapped");
+//            }
         
         //animates one block being removed from the bag and one block being put in the bag
         function animateTransitionBlocks(){
@@ -1358,12 +1386,13 @@ var markovChain = (function() {
             //draws an arrowhead 
             chart[current_state].append("defs").append("marker")
                     .attr("id", "arrowhead")
-                    .attr("refX", 6) 
+                    .attr("refX", 5) 
                     .attr("refY", 2)
-                    .attr("markerWidth", 10)
-                    .attr("markerHeight", 6)
+                    .attr("markerWidth", 25)
+                    .attr("markerHeight", 5)
                     .attr("orient", "auto")
                     .attr("stroke","inherit")
+                    .attr("fill","inherit")
                     .append("path")
                         .attr("d", "M 0,0 V 4 L6,2 Z");
         }
@@ -1505,7 +1534,7 @@ var markovChain = (function() {
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
-        return {nextState: nextState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, updateArrowTextbox: updateArrowTextbox, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks};
+        return {nextState: nextState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, updateArrowTextbox: updateArrowTextbox, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks, observeBlock:observeBlock};
 
     }
     
@@ -1516,6 +1545,7 @@ var markovChain = (function() {
         var model = Model();
         var controller = Controller(model);
         var view = View(div, model, controller);
+
     }; 
     
     exports.setup = setup;
