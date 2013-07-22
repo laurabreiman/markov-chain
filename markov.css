@@ -21,6 +21,18 @@ text {
     margin: 5px;
 }
 
+.equation{
+    font-size: 100%;
+    font-style: normal;
+    color: black;
+    border: none;
+}
+
+.ok-row,
+.explanation{
+    text-align: center;
+}
+
 /*
 .new-chain{
     margin-top: 10px;
@@ -78,6 +90,11 @@ text {
 span{
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
+
+.equation span{
+    text-shadow: none;
+}
+
 .selected-line{
     stroke-width: 8px;
 }
