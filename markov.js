@@ -1477,40 +1477,44 @@ var markovChain = (function() {
         parameter 'observation' is the color of the block that is observed */
         function observeBlock(observation){
             setupUnknownBlocks();
-            $('.block0').animate({top:-5},"slow");
-            $('.block0').removeClass("gray-block");
-            $('.block0').addClass(observation+"-block");
-            $('.block0').animate({top:parseInt($("img").css("height"))/2},"slow");
-            $('.block0').html("");
+            swapblocks();
+            window.setTimeout(function(){
+                $('.block0').animate({top:-5},"slow");
+                $('.block0').removeClass("gray-block");
+                $('.block0').addClass(observation+"-block");
+                $('.block0').animate({top:parseInt($("img").css("height"))/2},"slow");
+                $('.block0').html("");
+            },1000);
+
         }
-//        function swapblocks(){
-//                var goto = [];
-//                for(var i=0; i<$(".block").length; i++){
-//                    var index = i;
-//                    if(i == $(".block").length -1){
-//                        index = -1;
-//                    }
-//                    goto.push( $('.block'+(index+1)).css("top") );
-//                }
-//                console.log(goto);
-//                for(var i=0; i<$(".block").length; i++){
-//                    var index = i;
-//                    if(i == $(".block").length -1){
-//                        index = -1;
-//                    }            
-//                    $('.block'+i).animate({top:goto[i]},"slow");
-//                                        
-//                }
-//                for(var i=0; i<$(".block").length; i++){
-//                    var index = i;
-//                    if(i == $(".block").length -1){
-//                        index = -1;
-//                    }
-//                    $('.block'+i).not(".swapped").addClass("block"+(index+1)+" swapped");
-//                    $('.block'+i+".block"+(index+1)).removeClass("block"+i);
-//                }
-//                $('.swapped').removeClass("swapped");
-//            }
+        
+        function swapblocks(){
+                var goto = [];
+                for(var i=0; i<$(".block").length; i++){
+                    var index = i;
+                    if(i == $(".block").length -1){
+                        index = -1;
+                    }
+                    goto.push( parseFloat($('.block'+(index+1)).css("top")) );
+                }
+                for(var i=0; i<$(".block").length; i++){
+                    var index = i;
+                    if(i == $(".block").length -1){
+                        index = -1;
+                    }            
+                    $('.block'+i).animate({top:goto[i]},"fast");
+                                        
+                }
+                for(var i=0; i<$(".block").length; i++){
+                    var index = i;
+                    if(i == $(".block").length -1){
+                        index = -1;
+                    }
+                    $('.block'+i).not(".swapped").addClass("block"+(index+1)+" swapped");
+                    $('.block'+i+".block"+(index+1)).removeClass("block"+i);
+                }
+                $('.swapped').removeClass("swapped");
+            }
         
         //animates one block being removed from the bag and one block being put in the bag
         function animateTransitionBlocks(){
@@ -1700,23 +1704,24 @@ var markovChain = (function() {
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
-        return {nextState: nextState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, updateArrowTextbox: updateArrowTextbox, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks, observeBlock:observeBlock};
+        return {nextState: nextState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, updateArrowTextbox: updateArrowTextbox, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks, swapblocks:swapblocks, observeBlock:observeBlock};
 
     }
-    
+
     
     //setup main structure of app
     function setup(div) {
 
         var model = Model();
         var controller = Controller(model);
-        var view = View(div, model, controller);
+        view = View(div, model, controller);
+        exports.view = view;
 
     }; 
     
     exports.setup = setup;
     exports.model = Model;
-    exports.view = View;
+
     exports.controller = Controller;
 
     return exports;
