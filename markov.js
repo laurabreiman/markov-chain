@@ -319,16 +319,28 @@ var markovChain = (function() {
             var correctAns = model.transition(false);
             var result = []; var sum = 0;
             var allCorrect = 1;
+            var error = {errorName:"none",badInputs:[]};//[error name, position that error was found]
+            
             for (var i = 0; i < answers.length; i++){
                 sum += answers[i];
+                if(isNaN(answers[i])){
+                    error.errorName = "nonnumber_error";
+                    error.badInputs.push(i);
+                }
+                else if(answers[i] <0){
+                    error.errorName = "negative_error";
+                    error.badInputs.push(i);
+                }
                 if (round_number(answers[i],3) == round_number(correctAns[i],3)){
-                    result[i] = "right";                 
+                    result[i] = "right";      
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            if (sum != 1){result[answers.length+1] = "sum_error";}
-            else {result[answers.length+1] = "sum_correct";}
+            if (sum != 1 && error.errorName=="none"){ error.errorName = "sum_error"; error.badInputs =[]}
+//            else {result[answers.length+1] = "sum_correct";}
+            
+            result[answers.length+1] = error;
             return result;
         }
         /*
@@ -340,14 +352,22 @@ var markovChain = (function() {
             var result = [];
             var correctAns = model.prob_OgS()[obs];
             var allCorrect = 1;
+            var error = ["none",-1];
+
             for (var i = 0; i < answers.length; i++){
+                if(answers[i] <0){
+                    error = ["negative_error",i];
+                }
+                if(answers[i] >1){
+                    error = ["greater_error",i];
+                }
                 if (round_number(answers[i],3) == round_number(correctAns[i],3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            result[answers.length+1] = NaN;
+            result[answers.length+1] = error;
             return result;
         }
 
@@ -360,14 +380,22 @@ var markovChain = (function() {
             var result = [];
             var correctAns = model.prob_OnS()[obs];
             var allCorrect = 1;
+            var error = ["",-1];
+            
             for (var i = 0; i < answers.length; i++){
+                if(answers[i]<0){
+                    error = ["negative_error",i];
+                }
+                else if(answers[i]>1){
+                    error = ["greater_error",i];
+                }
                 if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            result[answers.length+1] = NaN;
+            result[answers.length+1] = error;
            return result;
         }
 
@@ -396,16 +424,21 @@ var markovChain = (function() {
             var result = []; var sum = 0;
             var correctAns = model.observe(obs,false);
             var allCorrect = 1;
+            var error = ["",-1];
+            
             for (var i = 0; i < answers.length; i++){
                 sum += answers[i];
+                if(answers[i] < 0){
+                    error = ["negative_error",i];
+                }
                 if (answers[i].toFixed(3) == correctAns[i].toFixed(3)){
                     result[i] = "right";                 
                 }
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            if (sum != 1){result[answers.length+1] = "sum_error";}
-            else {result[answers.length+1] = "sum_correct";}
+            if (sum != 1){error[0] = "sum_error";}
+            result[answers.length+1] = error;
             return result;
         }
         
@@ -444,16 +477,12 @@ var markovChain = (function() {
             // +   "</div>"
             +"</div>");
 
-        $(".controls").append("# of Whites: <input class='num-states num-whites' value='2'># of Reds: <input class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
-        $(".controls2").append("<div class='container-fluid'><div class = 'btn-group'><button class='btn btn-small next-state'><a href='#bottom'>Next State</a></button><button class='btn btn-small previous-state'>Previous State</button></div></div>")
+        $(".controls").append("# of Whites: <input type='text' class='num-states num-whites' value='2'># of Reds: <input type='text' class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
+        $(".controls2").append("<div class='container-fluid'><div class = 'btn-group'><a href='#bottom'><button class='btn btn-small next-state'>Next State</button></a><button class='btn btn-small previous-state'>Previous State</button></div></div>")
         
-        //$(".span8").append("<div class = 'row-fluid'><div class = 'textbox-row input-row'></div></div>");
-        
-        $(".next-state").on("click",transition);
-        $(".previous-state").on("click",prevState);
         $(".new-chain").on("click",newChain);
         
-        //$('.next-state').attr("disabled", true);
+        $('.next-state').attr("disabled", true);
         $('.previous-state').attr("disabled", true);
         
         var chart = [];
@@ -536,6 +565,9 @@ var markovChain = (function() {
             //$('.input-row #'+i+'').offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
         }
         
+        /*
+            function that starts the display
+        */
         function startDisplay(whites_reds){
             cleardisplay();
             state = 0;
@@ -583,14 +615,17 @@ var markovChain = (function() {
             })
         }
         
+        /*
+            function that updates the top blocks of the current svg
+        */
         function updateTopBubbles(current_state){
-//            //color_scale = d3.scale.linear()
-//                            .domain([0, model.get_current_state_array().length-1])
-//                            .range(['white','red']);
             var this_chart = chart[current_state]
+            
+            //clear the past blocks from the svg
             this_chart.selectAll(".top-node"+current_state).remove();
             this_chart.selectAll(".top_bubble"+current_state).remove();
             
+            //append a light gray rectangle that groups the possible states together
             this_chart.append("rect")
                 .attr("class","grouping-rect")
                 .attr("x",-1*margin.left)
@@ -598,10 +633,9 @@ var markovChain = (function() {
                 .attr("width",chart_width+margin.left+margin.right)
                 .attr("height",margin.top+chart_height/12+10)
                 .attr("fill","#e4e4e4")
-                //.attr("stroke","black")
-                //.attr("stroke-width",2)
                 .attr("rx",40);
 
+            //setup the data needed to draw the blocks
             var points = model.get_current_state_array();
             var pointdict = model.get_current_state();
             var newpoints =[];
@@ -611,6 +645,7 @@ var markovChain = (function() {
                 newpoints.push([i,points[i]])
             }
             
+            //create nodes for each possible state of the bag
             var node = this_chart.selectAll(".top-node"+current_state)
                   .data(newpoints)
                 .enter().append("g")
@@ -631,7 +666,8 @@ var markovChain = (function() {
                         $("[id=faded-line]").attr("id","")
                         $(".arrow"+current_state).attr("marker-end","url(#arrowhead)")
                     });
-                //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
+            
+            //appends blocks to the nodes
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
                     .attr("class", "top_bubble"+current_state)
@@ -647,6 +683,7 @@ var markovChain = (function() {
             updateTopLabels(current_state);
         }
         
+        //clears the past markov chain and visualizations from the display
         function cleardisplay(){
             $('.textbox-row').closest('.row-fluid').remove();
             $(".firstDiv").remove();
@@ -656,30 +693,10 @@ var markovChain = (function() {
             $(".continue-row").remove();
             chart = [];
         }
-        
-        function transitionTop(){
             
-            var points = model.get_current_state_array();
-            var numpoints = points.length;
-            var newstate = [];
-            
-            for(var i=0; i<numpoints; i++){
-                for(var j=0; j<numpoints-1; j++){
-                    newstate.push(points[i])
-                }
-            }
-            
-            chart.selectAll(".top_bubble").data(newstate).transition().duration(500)
-                .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
-                .attr("height", function(d){return d*(chart_height/12)+10})
-                .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/12)+10)/(numpoints-1))})
-                //.attr("r", function(d){return d*(chart_height/16)+8})
-                //.style("fill-opacity",function(d){return d;});
-            
-            
-            updateTopLabels();
-        }
-        
+        /*
+            function that resizes the bottom blocks based on the inputted probabilities from the user
+        */
         function transitionBottom(current_state, blocks_state){
             var points = blocks_state;
             var numpoints = points.length;
@@ -691,16 +708,16 @@ var markovChain = (function() {
                 }
             }
             
-            
             chart[current_state].selectAll(".bottom-bubble"+state).data(newstate).transition().duration(500)
                 .attr("width", function(d){return (d*(chart_height/12)+10)/(numpoints-1)})
                 .attr("height", function(d){return d*(chart_height/12)+10})
                 .attr("x", function(d,i){ return -8+(chart_width)*(parseInt(i/(numpoints-1))/(points.length-1))+(i%(numpoints-1))*((d*(chart_height/12)+10)/(numpoints-1))})
-                //.attr("r", function(d){return d*(chart_height/16)+8})
-                //.style("fill-opacity",function(d){return d;});
-
         }
         
+        /*
+            function that moves the display to the next state of calculation
+                draws another svg with the next possible lego states
+        */
         function nextState(){
             for (var i = 3; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","black");                
@@ -712,6 +729,9 @@ var markovChain = (function() {
             
             state++;
             updateGraph();
+            
+            $(".next-state").attr("disabled",false);
+            $(".previous-state").attr("disabled",false);
                                     
             $(".span7").append("<a name='bottom'><div class='chart-container chart"+state+"'></div></a>");
             setupGraph(state);
@@ -727,56 +747,18 @@ var markovChain = (function() {
             })
         }
         
-        function removeNodesPrev(){
-            $(".bottom-node").attr("class", "remove");
-            $(".bottom-bubble").attr("class","remove");
-            
-            $(".top-node").attr("class", "bottom-node");
-            $(".top_bubble").attr("class","bottom-bubble");
-            
-            $('.remove').remove();
-            
-            updateTopBubbles();
-            state--;
-            updateTopLabels();
-            $('.textbox-row').closest('.row-fluid').remove()
-            updateFirstInputRow();
-            setupSideLabels();
-        }
-        
-        function prevState(){
-            var points = model.get_current_state_array();
-            var pointdict = model.get_current_state();
-            var newpoints =[];
-            
-            for(var i in pointdict){
-                newpoints.push([i,points[i]])
-            }
-            chart.selectAll(".top-node")
-              .data(newpoints)
-              .transition().duration(1000)
-            .attr("y",(10/11)*chart_height);
-            
-            chart.selectAll(".top_bubble")
-                  .data(newpoints)
-                  .transition().duration(1000)
-                .attr("y",(10/11)*chart_height);
-            
-            chart.selectAll(".bottom-node")
-                  .data(newpoints)
-                  .transition().duration(1000)
-                .attr("transform", function(d,i,j) {return "translate(" +  (-100) + "," + (10/11)*chart_height + ")"; });
-            
-            setTimeout(removeNodesPrev,1001)
-        }
-        
+        /*
+            function that updates the bottom bubbles of the current svg
+        */
         function updateBottomBubbles(current_state){
             var this_chart = chart[current_state]
             
+            //removes the current bubbles from the svg
             this_chart.selectAll(".bottom-node"+current_state).remove();
             this_chart.selectAll(".bottom-bubble"+current_state).remove();
-            var pointlength = model.get_current_state_array().length;
             
+            //sets up the necessary data
+            var pointlength = model.get_current_state_array().length;
             var points = model.get_current_state_array();
             var pointdict = model.get_current_state();
             var newpoints =[];
@@ -786,6 +768,7 @@ var markovChain = (function() {
                 newpoints.push([i,1/pointlength])
             }
             
+            //appends a light gray rectangle that groups the states together
             this_chart.append("rect")
                 .attr("class","grouping-rect")
                 .attr("x",-1*margin.left)
@@ -793,16 +776,16 @@ var markovChain = (function() {
                 .attr("width",chart_width+margin.left+margin.right)
                 .attr("height",margin.top+chart_height/12+10)
                 .attr("fill","#e4e4e4")
-                // .attr("stroke","black")
-                // .attr("stroke-width",2)
                 .attr("rx",40);
             
+            //creates n nodes, where n is the number of possible states
             var node = this_chart.selectAll(".bottom-node"+current_state)
                   .data(newpoints)
                 .enter().append("g")
                   .attr("class", "bottom-node"+current_state)
                 .attr("y", (10/11)*chart_height);
-                //.attr("transform", function(d,i,j) {return "translate(" +  (chart_width)*(i/(points.length-1)) + "," + chart_height/20 + ")"; });
+
+            //appends rectangles to the nodes that represents the blocks in each state
             for(var a =0; a < numpoints-1; a++){
                 node.append("rect")
                     .attr("class", "bottom-bubble"+current_state)
@@ -832,6 +815,9 @@ var markovChain = (function() {
             }
         }
         
+        /*
+            function that updates the probability labels on the top states of the current svg
+        */
         function updateTopLabels(current_state){
             
             var points = model.get_current_state_array();
@@ -847,6 +833,13 @@ var markovChain = (function() {
                 .text(function(d) { return round_number(d,4); });
         }
         
+        /*
+            function that displays the first row of calculation:
+                label for P(S=state)
+                textboxes to input answers
+                check button to trigger the controller's checkAnswers function
+                allows user to move to the next row of calculation
+        */
         function updateFirstInputRow(status){
             for (var i = 3; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","black");                
@@ -867,7 +860,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-row').append("<input class='obs-entry "+i+"' placeholder='P("+i+")' id='"+i+"'>");
+                $('.input-row').append("<input type='text' class='obs-entry "+i+"' placeholder='P("+i+"R)' id='"+i+"'>");
                 $('.input-row .'+i).offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
             }
@@ -879,15 +872,15 @@ var markovChain = (function() {
 
                 $('.obs-entry.'+i).focusin(function(){
                     var index = parseInt($(this).attr("id"));
-                    $('.arrow').attr("id","faded-arrow");
-                    $('.straight.arrow'+index).attr("id","");
-                    $('.diagRight.arrow'+(index-1)).attr("id","");
-                    $('.diagLeft.arrow'+(index+1)).attr("id","");
+                    $('.arrow'+state).attr("id","faded-arrow");
+                    $('.straight.this-arrow'+index).attr("id","");
+                    $('.diagRight.this-arrow'+(index-1)).attr("id","");
+                    $('.diagLeft.this-arrow'+(index+1)).attr("id","");
                     $("[id=faded-arrow]").attr("marker-end","");
                 })
                 $('.obs-entry.'+i).focusout(function(){
-                    $('.arrow').attr("id","");
-                    $('.arrow').attr("marker-end","url(#arrowhead)")
+                    $('.arrow'+state).attr("id","");
+                    $('.arrow'+state).attr("marker-end","url(#arrowhead)")
                 })
             }
             
@@ -897,13 +890,27 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(0,"none");
-                if(results[results.length-1] == "sum_error"){
-                    $('.trans_feedback').remove();
+                var error = results[results.length-1];
+                $('.trans_feedback').remove();
+                $('.input-row .obs-entry').css("background-color","white");
+                
+                if(error.errorName == "sum_error"){
                     $('.check-row'+state).append("<div class='trans_feedback'>should sum to 1.</div>");
-                    $('.trans_feedback').css("color","red");
                 }
-                else{$('.trans_feedback').remove();}
-                if(results[results.length-2] == 1){
+                else if(error.errorName == "nonnumber_error"){
+                    $('.check-row'+state).append("<div class='trans_feedback'>Not valid number.</div>");
+                    for(var i=0; i<error.badInputs.length; i++){
+                        $('.input-row .obs-entry.'+error.badInputs[i]).css("background-color","pink");
+                    }
+                }
+                else if(error.errorName == "negative_error"){
+                    $('.check-row'+state).append("<div class='trans_feedback'>can't have negative numbers.</div>");
+                    for(var i=0; i<error.badInputs.length; i++){
+                        $('.input-row .obs-entry.'+error.badInputs[i]).css("background-color","pink");
+                    }
+                }
+                            
+                if(results[results.length-2] == 1){ //if they're all correct
                     $(this).remove(); $('.trans_feedback').remove();
                     $('.check-row'+state).append("<button class='btn btn-small observation'>Make Observation</button>");
                     if (status == "first"){$('.observation').on("click",makeObservationFirstOnly);}
@@ -920,11 +927,16 @@ var markovChain = (function() {
             });
         }
         
-        //displays to the user if they are correct or incorrect, with the parameter indexOfCheck referring to the type of answer it is (which row is being checked - 0: p(s=s), 1: p(o=obs|s=s), 2: p(o=obs,s=s)...)
+        /*
+        displays to the user if they are correct or incorrect, with the parameter indexOfCheck referring to the type of answer it is (which row is being checked - 0: p(s=s), 1: p(o=obs|s=s), 2: p(o=obs,s=s)...)
+            adds checkmarks and xs to the correct and incorrect answers
+            and returns results, an array like ["right","wrong","right",...,0,{}]
+                where the second to last entry is a flag that signals if all answers were right (1) or not (0), and last entry is an associative array of errors (like entering a probability greater than 1) in the input fields
+        */
         function checkView(indexOfCheck,observation){
             var answers = [];
             var num_entries = model.get_current_state_array().length;
-            
+
             if (indexOfCheck == 3){
                 var input = $('.input-row .'+0).val();
                 answers.push(calculator.evaluate(calculator.parse(input)));
@@ -1032,6 +1044,14 @@ var markovChain = (function() {
                 $('.see-eq').remove();
         }
 
+        
+        /*
+            function that takes in an observation and displays the second row of calculation:
+                label for P(O=observation|S=state)
+                textboxes to input answers
+                check button to trigger the controller's checkOgS function
+                allows user to move to the next row of calculation
+        */
         function displayOgSInputRow(observation){
             $('.dispOgS').remove(); //remove button
             for (var i = 3; i <= 91; i++){
@@ -1052,7 +1072,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-obs-given-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+")'>");
+                $('.input-obs-given-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+")'>");
                 $('.input-obs-given-row'+state+' .'+i+'').offset({left: $(".input-obs-given-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
@@ -1072,14 +1092,32 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(1,observation);
-    
-                if(results[results.length-2] == 1){
+                $('.trans_feedback').remove();
+                $('.input-row .obs-entry').css("background-color","white");
+                
+                if(results[results.length-1][0] == "greater_error"){
+                    $('.check-row'+state).append("<div class='trans_feedback'>can't have probability greater than 1</div>");
+                    $('.input-row .obs-entry.'+results[results.length-1][1]).css("background-color","pink");
+                }
+                else if(results[results.length-1][0] == "negative_error"){
+                    $('.check-row'+state).append("<div class='trans_feedback'>can't have negative numbers.</div>");
+                    $('.input-row .obs-entry.'+results[results.length-1][1]).css("background-color","pink");
+                }
+                
+                if(results[results.length-2] == 1){ // if they're all correct, move on
                     $(this).remove();
                     displayOnSInputRow(observation);
                 }
             });
         }
         
+        /*
+            function that takes in an observation and displays the third row of calculation:
+                label for P(O=observation,S=state)
+                textboxes to input answers
+                check button to trigger the controller's checkOnS function
+                allows user to move to the next row of calculation
+        */
         function displayOnSInputRow(observation){
             for (var i = 3; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","black");                
@@ -1102,7 +1140,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-ons-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+observation+","+i+")'>");
+                $('.input-ons-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+observation+","+i+")'>");
                 $('.input-ons-row'+state+' .'+i+'').offset({left: $(".input-ons-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
@@ -1121,7 +1159,17 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(2,observation);
-    
+                $('.obs_feedback').remove();
+                $('.input-row .obs-entry').css("background-color","white");
+                
+                if(results[results.length-1][0] == "greater_error"){
+                    $('.check-row'+state).append('<div class="obs_feedback">can\'t have probability greater than 1</div>');
+                    $('.input-row .obs-entry.'+results[results.length-1][1]).css("background-color","pink");
+                }
+                else if(results[results.length-1][0] == "negative_error"){
+                    $('.check-row'+state).append('<div class="obs_feedback">can\'t have negative numbers.</div>');
+                    $('.input-row .obs-entry.'+results[results.length-1][1]).css("background-color","pink");
+                }
                 if(results[results.length-2] == 1){
                     $(this).remove();
                     displaySumRow(observation);
@@ -1168,6 +1216,13 @@ var markovChain = (function() {
             }); 
         }
         
+        /*
+            function that takes in an observation and displays the last row of calculation:
+                label for P(O=observation|S=state)
+                textboxes to input answers
+                check button to trigger the controller's checkObs function
+                allows user to move to the next state of the chain
+        */
         function displayNormInputRow(observation){
             for (var i = 3; i<=91; i++){
                 $("#MathJax-Span-"+i).css("color","black");                
@@ -1186,7 +1241,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-norm-row'+state).append("<input class='obs-entry "+i+"' placeholder='P("+i+"|"+observation+")'>");
+                $('.input-norm-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+i+"|"+observation+")'>");
                 $('.input-norm-row'+state+' .'+i+'').offset({left: $(".input-norm-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
@@ -1205,12 +1260,16 @@ var markovChain = (function() {
             $('.check').on('click',function(){
                 
                 var results = checkView(4,observation);
-                if(results[results.length-1] == "sum_error"){
-                    $('.obs_feedback').remove();
+                $('.obs_feedback').remove();
+                $('.input-row .obs-entry').css("background-color","white");
+                
+                if(results[results.length-1][0] == "sum_error"){
                     $('.check-row'+state).append('<div class="obs_feedback">should sum to 1.</div>');
-                    $('.obs_feedback').css("color","red");
                 }
-                else{$('.obs_feedback').remove();}
+                else if(results[results.length-1][0] == "negative_error"){
+                    $('.check-row'+state).append('<div class="obs_feedback">can\'t have negative numbers.</div>');
+                    $('.input-row .obs-entry.'+results[results.length-1][1]).css("background-color","pink");
+                }
                 if(results[results.length-2] == 1){
                     $(this).html("Next State");
                     $('.obs_feedback').remove();
@@ -1226,6 +1285,9 @@ var markovChain = (function() {
             });
         }
         
+        /* 
+            function that clears all of the transition arrows from the current svg.
+        */
         function clearArrows(current_state){
             var this_chart = chart[current_state]
             
@@ -1356,6 +1418,8 @@ var markovChain = (function() {
             // }
         }
         
+        /*sets up a bag visualization with the model's current amount of blocks
+        all blocks are unknown color, so they are set up as gray with ?s */
         function setupUnknownBlocks(){
             $(".block").remove();
             var numblocks = model.get_current_state_array().length -1;
@@ -1369,6 +1433,8 @@ var markovChain = (function() {
             
         }
         
+        /*sets up a bag visualization with a known distribution of blocks
+        parameter whites_reds is an array of [white blocks, red blocks] to be displayed*/
         function setupKnownBlocks(whites_reds){
             $(".block").remove();
             var numblocks = model.get_current_state_array().length -1;
@@ -1385,6 +1451,8 @@ var markovChain = (function() {
             }
         }
         
+        /* animates a block being removed from the bag and observed,
+        parameter 'observation' is the color of the block that is observed */
         function observeBlock(observation){
             setupUnknownBlocks();
             $('.block0').animate({top:-5},"slow");
@@ -1393,8 +1461,39 @@ var markovChain = (function() {
             $('.block0').animate({top:parseInt($("img").css("height"))/2},"slow");
             $('.block0').html("");
         }
+//        function swapblocks(){
+//                var goto = [];
+//                for(var i=0; i<$(".block").length; i++){
+//                    var index = i;
+//                    if(i == $(".block").length -1){
+//                        index = -1;
+//                    }
+//                    goto.push( $('.block'+(index+1)).css("top") );
+//                }
+//                console.log(goto);
+//                for(var i=0; i<$(".block").length; i++){
+//                    var index = i;
+//                    if(i == $(".block").length -1){
+//                        index = -1;
+//                    }            
+//                    $('.block'+i).animate({top:goto[i]},"slow");
+//                                        
+//                }
+//                for(var i=0; i<$(".block").length; i++){
+//                    var index = i;
+//                    if(i == $(".block").length -1){
+//                        index = -1;
+//                    }
+//                    $('.block'+i).not(".swapped").addClass("block"+(index+1)+" swapped");
+//                    $('.block'+i+".block"+(index+1)).removeClass("block"+i);
+//                }
+//                $('.swapped').removeClass("swapped");
+//            }
         
+        //animates one block being removed from the bag and one block being put in the bag
         function animateTransitionBlocks(){
+            
+            //if there are both red and white blocks in the bag
             if($('.block').hasClass("red-block") && $('.block').hasClass('white-block')){
                 setupUnknownBlocks();
                 $('.block0').animate({top:-5},"fast");
@@ -1402,6 +1501,8 @@ var markovChain = (function() {
                 $('.block0').animate({left:137},"slow");
                 $('.block0').animate({top:parseInt($("img").css("height"))/2},"fast")
             }
+            
+            //if both blocks are the same color
             else{                
                 $('.block0').html("?")
                 $('.block0').attr("class","block0 block gray-block");
@@ -1413,7 +1514,7 @@ var markovChain = (function() {
 
         }
         
-        //set up svg with axes and labels
+        //sets up svg with axes and labels to display the states and their transition arrows
         function setupGraph(current_state){
             
             $(".chart-container.chart"+current_state).empty();            
@@ -1429,20 +1530,18 @@ var markovChain = (function() {
             //draws an arrowhead 
             chart[current_state].append("defs").append("marker")
                     .attr("id", "arrowhead")
-                    .attr("refX", 6) 
+                    .attr("refX", 5) 
                     .attr("refY", 2)
-                    .attr("markerWidth", 10)
-                    .attr("markerHeight", 6)
+                    .attr("markerWidth", 25)
+                    .attr("markerHeight", 5)
                     .attr("orient", "auto")
                     .attr("stroke","inherit")
+                    .attr("fill","inherit")
                     .append("path")
                         .attr("d", "M 0,0 V 4 L6,2 Z");
         }
         
-
-        // var x_scale = d3.scale.linear().domain([0,10]).range([0,chart_width]);
-        // var y_scale = d3.scale.linear().domain([0,1]).range([chart_height,0]);
-        
+        //sets up the line graph of the transitions on the sidebar
         function setupProbVsTime(){
             $(".graph-container").empty();
             graph = d3.select(".graph-container").append("svg")
@@ -1487,7 +1586,8 @@ var markovChain = (function() {
                 //.attr("dx","-0.1em")
                 .text("Time");
         }
-
+        
+        //updates the line graph on the side that shows the transitions between states
         function updateGraph(){
             $(".graph").empty();
             setupProbVsTime();
@@ -1578,7 +1678,7 @@ var markovChain = (function() {
             // first_line.attr("stroke","blue").attr("stroke-width",3).attr("fill","none");
 //            graph.selectAll(".x-scale-label").data(x_scale.ticks(10)).enter().append("text").attr("class", "x-scale-label").attr("x",x_scale).attr('y',y_scale(0)).attr("text-anchor","end").attr("dy","0.3em").attr("dx","0.5em").text(String);
         }
-        return {nextState: nextState, prevState: prevState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, updateArrowTextbox: updateArrowTextbox, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks};
+        return {nextState: nextState, updateTopBubbles: updateTopBubbles, updateArrows: updateArrows, updateArrowTextbox: updateArrowTextbox, setupGraph: setupGraph, updateGraph: updateGraph, animateTransitionBlocks:animateTransitionBlocks, observeBlock:observeBlock};
 
     }
     
@@ -1589,6 +1689,7 @@ var markovChain = (function() {
         var model = Model();
         var controller = Controller(model);
         var view = View(div, model, controller);
+
     }; 
     
     exports.setup = setup;

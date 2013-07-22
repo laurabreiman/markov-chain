@@ -190,3 +190,16 @@ img{
 body{
     background-color:#F5F5F5;
 }
+
+a{
+    color: black
+}
+
+a:hover{
+    color: black;
+    text-decoration:none;
+}
+
+.trans_feedback,.obs_feedback{
+    color: red;
+}
