@@ -1095,7 +1095,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-obs-given-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+")'>");
+                $('.input-obs-given-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+"R)'>");
                 $('.input-obs-given-row'+state+' .'+i+'').offset({left: $(".input-obs-given-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
@@ -1163,7 +1163,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-ons-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+observation+","+i+")'>");
+                $('.input-ons-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+observation+","+i+"R)'>");
                 $('.input-ons-row'+state+' .'+i+'').offset({left: $(".input-ons-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
@@ -1219,8 +1219,7 @@ var markovChain = (function() {
             $('.sum-label-icon').tooltip({placement:'bottom', html:true});
 
             var num_entries = model.get_current_state_array().length;
-            
-            $('.sum-row'+state).append("<input class='obs-entry "+0+"' placeholder='P(O="+observation+"'>");
+            $('.sum-row'+state).append("<input type='text' class='obs-entry "+0+"' placeholder='P(O="+observation+")'>");
             $('.sum-row'+state+' .'+0+'').offset({left: $(".sum-row"+state).offset().left + chart_width/2});
             $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 
@@ -1264,7 +1263,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             
             for(var i = 0; i < num_entries; i++){
-                $('.input-norm-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+i+"|"+observation+")'>");
+                $('.input-norm-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+i+"R|"+observation+")'>");
                 $('.input-norm-row'+state+' .'+i+'').offset({left: $(".input-norm-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
                 $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
 

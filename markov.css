@@ -12,6 +12,10 @@ text {
     text-align: left;
 }
 
+input[type="text"]::-webkit-input-placeholder {
+    font-size: 6pt;
+}
+
 .chart-container line {
 /*    stroke-dasharray: 2,2;*/
 }
