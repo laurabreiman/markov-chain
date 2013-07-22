@@ -13,7 +13,7 @@ text {
 }
 
 input[type="text"]::-webkit-input-placeholder {
-    font-size: 6pt;
+    font-size: 8pt;
 }
 
 .chart-container line {
@@ -192,7 +192,17 @@ img{
 }
 
 body{
+    padding-top: 40px;
     background-color:#F5F5F5;
+}
+
+.navbar .brand{
+    margin-left: 0px;
+}
+
+#title:hover{
+    color: #999999;
+
 }
 
 a{

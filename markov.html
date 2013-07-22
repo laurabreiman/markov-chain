@@ -18,29 +18,29 @@
     </head>
     
 <body>
-    <div class = "navbar navbar-inverse">
-            <div class = "navbar-inner">
-                <div class = "container">
-                <a class = "brand pull-right" href="#">Markov Chain: Lego Game</a>
-                <a class = "brand" href="#rulesModal" data-toggle = "modal">Rules</a>
-                </div>
+    <div class = "navbar navbar-inverse navbar-fixed-top">
+        <div class = "navbar-inner">
+            <a class = "brand" id = "title">Markov Chain: Lego Game</a>
+            <div class = "nav-collapse collapse">
+                <a class = "brand rules" href="#rulesModal" data-toggle = "modal">Rules</a>
             </div>
         </div>
+    </div>
     
-        <div id="rulesModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel">How to Play the Lego Game</h3>
-            </div>
-            <div class="modal-body">
-                <p>Two <span style='color:white'>white</span> lego bricks are put into a bag. A transition and an observation happens every round.<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be <span style='color:red'>red</span> or <span style='color:white'>white</span> is added to the bag.<br>2. Then you pull one brick from the bag, observe color, and replace.</p>
-                <p class='text-info'><small><br>Fill in the blank with appropriate probabilities.
-                You may change number of blocks on the right column and start over.</small></p>
-            </div>
-            <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-            </div>
+    <div id="rulesModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">How to Play the Lego Game</h3>
         </div>
+        <div class="modal-body">
+            <p>Two <span style='color:white'>white</span> lego bricks are put into a bag. A transition and an observation happens every round.<br>1. A random brick is removed from the bag, and a replacement brick that is equally likely to be <span style='color:red'>red</span> or <span style='color:white'>white</span> is added to the bag.<br>2. Then you pull one brick from the bag, observe color, and replace.</p>
+            <p class='text-info'><small><br>Fill in the blank with appropriate probabilities.
+            You may change number of blocks on the right column and start over.</small></p>
+        </div>
+        <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        </div>
+    </div>
     
     <div class='markov'></div>
     <script src="markov.js"></script>
