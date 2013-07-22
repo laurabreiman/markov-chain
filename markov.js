@@ -1006,7 +1006,7 @@ var markovChain = (function() {
                 for(var i = 0; i<results.length-2 ; i++){
                     if(results[i] == "right"){
                         $('.input-row .'+i).after('<i class="icon icon-large icon-ok" id="icon'+i+'"></i>');
-                        $(".input-row #icon"+i).offset({left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
+                    $(".input-row #icon"+i).offset({top:$('.input-row .'+i).offset().top, left: $('.input-row .'+i).offset().left + parseInt($('.input-row .'+i).css("width"))+5});
                         $('.input-row .'+i).val(answers[i]);
                         $('.input-row .'+i).attr("disabled",true);
                     }
