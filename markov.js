@@ -537,6 +537,10 @@ var markovChain = (function() {
             if(isNaN($(".num-whites").val()) || $(".num-whites").val() < 0 || isNaN($(".num-reds").val()) || $(".num-reds").val() < 0){
                 alert("Please enter a valid number");
             }
+
+            else if ($(".num-whites").val()+$(".num-reds").val() > 5) {
+                alert("Total number of blocks must be less than 6.");
+            }
             
             else{
                 var states = [parseInt($(".num-reds").val()),parseInt($(".num-whites").val())];
@@ -683,7 +687,7 @@ var markovChain = (function() {
                     //.attr("y", function(d,i,j) {return chart_height/100; })
                     //.style("fill-opacity",function(d){return d[1];});
             }
-            
+
             updateTopLabels(current_state);
         }
         

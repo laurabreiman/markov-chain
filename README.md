@@ -4,7 +4,7 @@ Developed by So yeun (Ashley) Cho (<socho@mit.edu>) and Laura Breiman (<lauracle
 Mentor: Robert Miller (<rcm@mit.edu>)
 
 =======
-General Description: this applet, using a particular lego game example, helps students visualize how a Markov chain transitions the probability distribution of each state in discrete time. It also helps students to understand the application of Bayes' Theorem in updating the probability distribution. For use in the MIT class 6.01(Introducation to Electrical Engineering and Computer Science) to understand Markov chain and Bayes' Theorem.
+General Description: This applet, using a particular lego game example, helps students visualize how a Markov chain transitions the probability distribution of each state in discrete time. It also helps students to understand the application of Bayes' Theorem in updating the probability distribution. For use in the MIT class 6.01(Introducation to Electrical Engineering and Computer Science) to understand Markov chain and Bayes' Theorem.
 
 Uses: Bootstrap, Javascript, CSS, jQuery, d3
 
