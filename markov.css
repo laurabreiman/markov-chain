@@ -12,10 +12,10 @@ text {
     text-align: left;
 }
 
-input[type="text"]::-webkit-input-placeholder {
+/*input[type="text"]::-webkit-input-placeholder {
     font-size: 8pt;
 }
-
+*/
 .chart-container line {
 /*    stroke-dasharray: 2,2;*/
 }
@@ -187,7 +187,7 @@ img{
     left: 15px;
 }
 .textbox-row{
-    width: 80%;
+    width: 100%;
 }
 
 .btn-group{

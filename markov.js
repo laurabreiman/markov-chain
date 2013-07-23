@@ -864,8 +864,9 @@ var markovChain = (function() {
             
             for(var i = 0; i < num_entries; i++){
                 $('.input-row').append("<input type='text' class='obs-entry "+i+"' placeholder='P("+i+"R)' id='"+i+"'>");
-                $('.input-row .'+i).offset({left: $(".input-row").offset().left + i*(chart_width)/(num_entries-1)});
-                $('.obs-entry').css("width",""+(10-num_entries/3)+"%")
+                $('.input-row .'+i).offset({left: $(".input-row").offset().left + i*(outer_width)/(num_entries-1) - i*0.6/(num_entries)*outer_width/(num_entries-1)});
+                $('.obs-entry').css("width",""+(100/num_entries*.6)+"%")
+                // $('.obs-entry').css("width","100%")
             }
 
             for(var i=0; i <num_entries; i++){
@@ -1098,9 +1099,9 @@ var markovChain = (function() {
             
             for(var i = 0; i < num_entries; i++){
                 $('.input-obs-given-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+observation+"|"+i+"R)'>");
-                $('.input-obs-given-row'+state+' .'+i+'').offset({left: $(".input-obs-given-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
-                $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
-
+                $('.input-obs-given-row'+state+' .'+i+'').offset({left: $(".input-obs-given-row"+state).offset().left + i*(outer_width)/(num_entries-1) - i*0.6/(num_entries)*outer_width/(num_entries-1)});
+                $('.obs-entry').css("width",""+(100/num_entries*.6)+"%")
+ 
                 // $('.obs-entry.'+i).attr("title","= # of "+observation+" blocks<br>\xF7 # of total blocks");
                 // $('.obs-entry.'+i).tooltip({placement:'right', html:true});
  
@@ -1166,9 +1167,8 @@ var markovChain = (function() {
             
             for(var i = 0; i < num_entries; i++){
                 $('.input-ons-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+observation+","+i+"R)'>");
-                $('.input-ons-row'+state+' .'+i+'').offset({left: $(".input-ons-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
-                $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
-
+                $('.input-ons-row'+state+' .'+i+'').offset({left: $(".input-ons-row"+state).offset().left + i*(outer_width)/(num_entries-1) - i*0.6/(num_entries)*outer_width/(num_entries-1)});
+                $('.obs-entry').css("width",""+(100/num_entries*.6)+"%")
                 // $('.obs-entry.'+i).attr("title","=  P(O="+observation+"|S<sub>"+(state+1)+"</sub>="+i+"r) \xD7 P(S<sub>"+(state+1)+"</sub>="+i+"r)");
                 // $('.obs-entry.'+i).tooltip({placement:'right', html:true});
 
@@ -1223,7 +1223,7 @@ var markovChain = (function() {
             var num_entries = model.get_current_state_array().length;
             $('.sum-row'+state).append("<input type='text' class='obs-entry "+0+"' placeholder='P(O="+observation+")'>");
             $('.sum-row'+state+' .'+0+'').offset({left: $(".sum-row"+state).offset().left + chart_width/2});
-            $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
+            $('.obs-entry').css("width",""+(100/num_entries*.6)+"%")
 
             $('.sum-label'+state).offset({top: $(".sum-row"+state).offset().top});
             
@@ -1266,8 +1266,8 @@ var markovChain = (function() {
             
             for(var i = 0; i < num_entries; i++){
                 $('.input-norm-row'+state).append("<input type='text' class='obs-entry "+i+"' placeholder='P("+i+"R|"+observation+")'>");
-                $('.input-norm-row'+state+' .'+i+'').offset({left: $(".input-norm-row"+state).offset().left + i*(chart_width)/(num_entries-1)});
-                $('.obs-entry').css("width",""+(10-num_entries/3)+"%");
+                $('.input-norm-row'+state+' .'+i+'').offset({left: $(".input-norm-row"+state).offset().left + i*(outer_width)/(num_entries-1) - i*0.6/(num_entries)*outer_width/(num_entries-1)});
+                $('.obs-entry').css("width",""+(100/num_entries*.6)+"%")
 
                 // $('.obs-entry.'+i).attr("title","=  P(O="+observation+",S<sub>"+(state+1)+"</sub>="+i+"r)<br>\xF7 &Sigma; P(O="+observation+",S<sub>"+(state+1)+"</sub>=state)");
                 // $('.obs-entry.'+i).tooltip({placement:'right', html:true});
