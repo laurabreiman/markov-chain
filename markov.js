@@ -337,7 +337,7 @@ var markovChain = (function() {
                 else {result[i] = "wrong"; allCorrect = 0;}
             }
             result[answers.length] = allCorrect;
-            if (sum != 1 && error.errorName=="none"){ error.errorName = "sum_error"; error.badInputs =[]}
+            if (round_number(sum,3) != round_number(1,3) && error.errorName=="none"){ error.errorName = "sum_error"; error.badInputs =[]}
 //            else {result[answers.length+1] = "sum_correct";}
             
             result[answers.length+1] = error;
@@ -497,7 +497,7 @@ var markovChain = (function() {
         var graph_container_width = parseInt($(".span3").css("width"))        
         var graph_container_height = 160;
 
-        var graph_margin = { top: 30, right: 20, bottom: 35, left: 20 }
+        var graph_margin = { top: 30, right: 20, bottom: 35, left: 40 }
         var graph_width = graph_container_width - graph_margin.left - graph_margin.right;
         var graph_height = graph_container_height - graph_margin.top - graph_margin.bottom;
 
@@ -531,6 +531,8 @@ var markovChain = (function() {
         /*function that creates a new markov chain display based on the user inputted number of initial whites and initial reds
         */
         function newChain(){
+
+            $('.equation').remove();
 
             if(isNaN($(".num-whites").val()) || $(".num-whites").val() < 0 || isNaN($(".num-reds").val()) || $(".num-reds").val() < 0){
                 alert("Please enter a valid number");
@@ -1573,7 +1575,7 @@ var markovChain = (function() {
             graph = d3.select(".graph-container").append("svg")
                 .attr("class","graph").attr("height", graph_container_height)
                 .attr("width",parseInt(graph_container_width)).append("g")
-                .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+                .attr("transform","translate(" + graph_margin.left + "," + graph_margin.top + ")");
 
             graph.selectAll(".y-line").data(y_scale.ticks(1)).enter().append("line")
                 .attr("class", "y-line")
@@ -1611,6 +1613,14 @@ var markovChain = (function() {
                 .attr("dy","2em")
                 //.attr("dx","-0.1em")
                 .text("Time");
+
+            graph.append("text")
+                .attr("class", "prob-label")
+                .attr("x",x_scale(0))
+                .attr("y",graph_height/2)
+                .attr("text-anchor","middle")
+                .attr("transform",'rotate(-90 -12,65)')
+                .text("Probability");
         }
         
         //updates the line graph on the side that shows the transitions between states
