@@ -12,10 +12,10 @@ text {
     text-align: left;
 }
 
-input[type="text"]::-webkit-input-placeholder {
-    font-size: 6pt;
+/*input[type="text"]::-webkit-input-placeholder {
+    font-size: 8pt;
 }
-
+*/
 .chart-container line {
 /*    stroke-dasharray: 2,2;*/
 }
@@ -91,6 +91,9 @@ input[type="text"]::-webkit-input-placeholder {
     color: red;
 }
 
+.help-text{
+    margin-right: 15px;
+}
 span{
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
@@ -184,7 +187,7 @@ img{
     left: 15px;
 }
 .textbox-row{
-    width: 80%;
+    width: 100%;
 }
 
 .btn-group{
@@ -192,7 +195,17 @@ img{
 }
 
 body{
+    padding-top: 40px;
     background-color:#F5F5F5;
+}
+
+.navbar .brand{
+    margin-left: 0px;
+}
+
+#title:hover{
+    color: #999999;
+
 }
 
 a{
