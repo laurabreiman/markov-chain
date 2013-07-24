@@ -477,8 +477,8 @@ var markovChain = (function() {
             // +   "</div>"
             +"</div>");
 
-        $(".controls").append("# of Whites: <input type='text' class='num-states num-whites' value='2'># of Reds: <input type='text' class='num-states num-reds' value='0'><button class='btn btn-small new-chain'>New</button></div></div>");
-        $(".controls2").append("<div class='container-fluid'><div class = 'btn-group'><a href='#bottom'><button class='btn btn-small next-state'>Next State</button></a><button class='btn btn-small previous-state'>Previous State</button></div></div>")
+        $(".controls").append("# of Whites: <input type='text' class='num-states num-whites' value='2'># of Reds: <input type='text' class='num-states num-reds' value='0'><br><button class='btn btn-small new-chain'>Start a New Round</button></div></div>");
+        // $(".controls2").append("<div class='container-fluid'><div class = 'btn-group'><a href='#bottom'><button class='btn btn-small next-state'>Next State</button></a><button class='btn btn-small previous-state'>Previous State</button></div></div>")
         
         $(".new-chain").on("click",newChain);
         
@@ -538,7 +538,7 @@ var markovChain = (function() {
                 alert("Please enter a valid number");
             }
 
-            else if ($(".num-whites").val()+$(".num-reds").val() > 5) {
+            else if (parseInt($(".num-whites").val())+parseInt($(".num-reds").val()) > 5) {
                 alert("Total number of blocks must be less than 6.");
             }
             
@@ -1225,8 +1225,9 @@ var markovChain = (function() {
             $('.sum-label-icon').tooltip({placement:'bottom', html:true});
 
             var num_entries = model.get_current_state_array().length;
-            $('.sum-row'+state).append("<input type='text' class='obs-entry "+0+"' placeholder='P(O="+observation+")'>");
-            $('.sum-row'+state+' .'+0+'').offset({left: $(".sum-row"+state).offset().left + chart_width/2});
+            $('.sum-row'+state).append("<input type='text' class='obs-entry "+0+"' placeholder='P(O="+observation+")'>");            
+            $('.sum-row'+state+' .'+0+'').offset({left: $(".sum-row"+state).offset().left + outer_width/2 - .5*outer_width/num_entries*.6});
+
             $('.obs-entry').css("width",""+(100/num_entries*.6)+"%")
 
             $('.sum-label'+state).offset({top: $(".sum-row"+state).offset().top});

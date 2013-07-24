@@ -20,6 +20,10 @@ text {
 /*    stroke-dasharray: 2,2;*/
 }
 
+.controls {
+    text-align: center;
+}
+
 .num-states{
     width: 10%;
     margin: 5px;
